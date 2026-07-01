@@ -167,6 +167,7 @@ class SyncUseCase @Inject constructor(
         val isAdmin = tokenStorage.canPushMasterData()
         Timber.d("SyncUseCase: role=${tokenStorage.getRole()}, isAdmin=$isAdmin")
         val pendingCheckups = checkUpDao.getPendingSync()
+        val deletedCheckups = checkUpDao.getDeletedPendingSync()
         val pendingCheckupIds = pendingCheckups.map { it.id }
         return SyncPayloadDto(
             deviceId = deviceId,
@@ -187,7 +188,7 @@ class SyncUseCase @Inject constructor(
             checkupStatuses = if (isAdmin) checkUpStatusDao.getPendingSync().map { syncMapper.checkUpStatusToDto(it) } else emptyList(),
             checkItemTemplates = if (isAdmin) checkItemTemplateDao.getPendingSync().map { syncMapper.checkItemTemplateToDto(it) } else emptyList(),
             moduleTypeIslandTypeLinks = if (isAdmin) moduleTypeDao.getAllModuleIslandLinksOnce().map { syncMapper.moduleIslandLinkToDto(it) } else emptyList(),
-            checkups = pendingCheckups.map { syncMapper.checkUpToDto(it) },
+            checkups = (pendingCheckups + deletedCheckups).map { syncMapper.checkUpToDto(it) },
             checkupIslandAssociations = checkUpAssociationDao.getPendingSync().map { syncMapper.checkUpIslandAssociationToDto(it) },
             checkupItems = if (pendingCheckupIds.isNotEmpty())
                 checkItemDao.getCheckItemsByCheckUpIds(pendingCheckupIds).map { syncMapper.checkItemToDto(it) }
@@ -253,9 +254,26 @@ class SyncUseCase @Inject constructor(
         if (payload.checkups.isNotEmpty()) checkUpDao.upsertAll(payload.checkups.map {
             syncMapper.checkUpToEntity(it)
         })
-        if (payload.checkupIslandAssociations.isNotEmpty()) checkUpAssociationDao.upsertAll(payload.checkupIslandAssociations.map {
-            syncMapper.checkUpIslandAssociationToEntity(it)
-        })
+        if (payload.checkupIslandAssociations.isNotEmpty()) {
+            // Guard against FK violations: the server may send associations that reference
+            // checkups soft-deleted on the server (not included in payload.checkups) or
+            // islands absent from the payload. Build the full set of known IDs from both
+            // the current payload and whatever is already in the local DB.
+            val knownCheckupIds = payload.checkups.map { it.id }.toHashSet()
+                .also { it.addAll(checkUpDao.getAllIds()) }
+            val knownIslandIds = payload.facilityIslands.map { it.id }.toHashSet()
+                .also { it.addAll(syncDao.getAllFacilityIslandIds()) }
+
+            val validAssociations = payload.checkupIslandAssociations
+                .filter { it.checkupId in knownCheckupIds && it.islandId in knownIslandIds }
+                .map { syncMapper.checkUpIslandAssociationToEntity(it) }
+
+            val skipped = payload.checkupIslandAssociations.size - validAssociations.size
+            if (skipped > 0) {
+                Timber.w("SyncUseCase: skipped $skipped associations with unresolvable FK — will retry on next sync")
+            }
+            if (validAssociations.isNotEmpty()) checkUpAssociationDao.upsertAll(validAssociations)
+        }
         if (payload.checkupItems.isNotEmpty()) {
             payload.checkupItems.groupBy { it.checkupId }.forEach { (checkupId, items) ->
                 checkItemDao.deleteCheckItemsByCheckUpId(checkupId)

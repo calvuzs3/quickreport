@@ -141,7 +141,7 @@ fun CheckUpDetailScreen(
     fun launchQStorePicker() {
         val preselectedUuids = uiState.spareParts.map { it.articleUuid }
         val intent = Intent(ArticleContract.ACTION_PICK).apply {
-            setPackage("net.calvuz.qstore")
+            setPackage("net.calvuz.quickstore")
             putStringArrayListExtra(
                 ArticleContract.PickerExtras.PRESELECTED_UUIDS,
                 ArrayList(preselectedUuids)

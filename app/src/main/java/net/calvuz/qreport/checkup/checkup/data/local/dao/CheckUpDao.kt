@@ -9,10 +9,10 @@ import net.calvuz.qreport.checkup.checkup.data.local.entity.CheckUpWithDetails
 @Dao
 interface CheckUpDao {
 
-    @Query("SELECT * FROM checkups ORDER BY updated_at DESC")
+    @Query("SELECT * FROM checkups WHERE is_deleted = 0 ORDER BY updated_at DESC")
     fun getAllCheckUpsFlow(): Flow<List<CheckUpEntity>>
 
-    @Query("SELECT * FROM checkups WHERE status = :status ORDER BY updated_at DESC")
+    @Query("SELECT * FROM checkups WHERE status = :status AND is_deleted = 0 ORDER BY updated_at DESC")
     fun getCheckUpsByStatusFlow(status: String): Flow<List<CheckUpEntity>>
 
     @Query("SELECT * FROM checkups WHERE id = :id")
@@ -26,7 +26,7 @@ interface CheckUpDao {
     suspend fun getCheckUpWithDetails(id: String): CheckUpWithDetails?
 
     @Transaction
-    @Query("SELECT * FROM checkups ORDER BY updated_at DESC")
+    @Query("SELECT * FROM checkups WHERE is_deleted = 0 ORDER BY updated_at DESC")
     fun getAllCheckUpsWithDetailsFlow(): Flow<List<CheckUpWithDetails>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -48,21 +48,27 @@ interface CheckUpDao {
     suspend fun completeCheckUp(id: String, completedAt: Instant, status: String, updatedAt: Instant)
 
     // Statistiche e ricerche
-    @Query("SELECT COUNT(*) FROM checkups WHERE status = :status")
+    @Query("SELECT COUNT(*) FROM checkups WHERE status = :status AND is_deleted = 0")
     suspend fun countCheckUpsByStatus(status: String): Int
 
-    @Query("SELECT * FROM checkups WHERE client_company_name LIKE '%' || :query || '%' OR island_serial_number LIKE '%' || :query || '%' ORDER BY updated_at DESC")
+    @Query("SELECT * FROM checkups WHERE (client_company_name LIKE '%' || :query || '%' OR island_serial_number LIKE '%' || :query || '%') AND is_deleted = 0 ORDER BY updated_at DESC")
     fun searchCheckUps(query: String): Flow<List<CheckUpEntity>>
 
     // ============================================================
     // SYNC METHODS
     // ============================================================
 
+    @Query("SELECT id FROM checkups")
+    suspend fun getAllIds(): List<String>
+
     @Query("SELECT * FROM checkups WHERE updated_at > COALESCE(synced_at, 0) AND is_deleted = 0 ORDER BY updated_at ASC")
     suspend fun getPendingSync(): List<CheckUpEntity>
 
-    @Query("SELECT * FROM checkups WHERE is_deleted = 1 AND synced_at IS NOT NULL ORDER BY updated_at ASC")
+    @Query("SELECT * FROM checkups WHERE is_deleted = 1 AND updated_at > COALESCE(synced_at, 0) ORDER BY updated_at ASC")
     suspend fun getDeletedPendingSync(): List<CheckUpEntity>
+
+    @Query("UPDATE checkups SET is_deleted = 1, updated_at = :now WHERE id = :id")
+    suspend fun softDeleteById(id: String, now: kotlinx.datetime.Instant)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(checkUps: List<CheckUpEntity>)

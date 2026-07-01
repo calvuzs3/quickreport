@@ -18,6 +18,13 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" android:host="maps.google.com" />
         </intent>
+
+        <!-- QuickStore: picker ricambi e ContentProvider articoli -->
+        <package android:name="net.calvuz.quickstore" />
+        <intent>
+            <action android:name="net.calvuz.qstore.action.PICK_ARTICLES" />
+        </intent>
+        <provider android:authorities="net.calvuz.qstore.provider" />
     </queries>
 
     <!-- Camera permissions -->

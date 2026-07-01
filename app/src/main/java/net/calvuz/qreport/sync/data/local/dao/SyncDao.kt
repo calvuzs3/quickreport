@@ -135,6 +135,11 @@ interface SyncDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertMaintenanceLogs(logs: List<MaintenanceLogEntity>)
 
+    // ===== ID LOOKUPS — used by SyncUseCase to validate FK references before upsert =====
+
+    @Query("SELECT id FROM facility_islands")
+    suspend fun getAllFacilityIslandIds(): List<String>
+
     // ===== DIAGNOSTICS =====
 
     /** Total number of records pending push across all client-management tables. */

@@ -93,7 +93,12 @@ class CheckUpRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteCheckUp(id: String) {
-        checkUpDao.deleteCheckUpById(id)
+        val entity = checkUpDao.getCheckUpById(id) ?: return
+        if (entity.syncedAt != null) {
+            checkUpDao.softDeleteById(id, Clock.System.now())
+        } else {
+            checkUpDao.deleteCheckUpById(id)
+        }
     }
 
     override suspend fun updateCheckUpStatus(id: String, status: String) {
