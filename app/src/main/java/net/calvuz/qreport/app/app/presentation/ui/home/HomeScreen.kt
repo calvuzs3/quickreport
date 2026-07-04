@@ -17,11 +17,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrListStatItem
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import net.calvuz.qreport.app.app.presentation.ui.theme.onSuccessContainer
 import net.calvuz.qreport.app.app.presentation.ui.theme.onWarningContainer
@@ -63,7 +65,7 @@ fun HomeScreen(
             isLoading = uiState.isLoading,
             modifier = Modifier
                 .statusBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = Spacing.lg, vertical = 12.dp)
         )
 
         HorizontalDivider()
@@ -73,7 +75,7 @@ fun HomeScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(Spacing.lg),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
@@ -87,9 +89,9 @@ fun HomeScreen(
                         chips = {
                             val stats = uiState.checkupStats
                             if (stats != null) {
-                                StatChip(stats.totalCheckUps.toString(), stringResource(R.string.home_checkup_stat_total), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
-                                StatChip(stats.activeCheckUps.toString(), stringResource(R.string.home_checkup_stat_active), MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary)
-                                StatChip(stats.completedThisWeek.toString(), stringResource(R.string.home_checkup_stat_week), MaterialTheme.colorScheme.successContainer, MaterialTheme.colorScheme.onSuccessContainer)
+                                QrListStatItem(value = stats.totalCheckUps.toString(), label = stringResource(R.string.home_checkup_stat_total), containerColor = MaterialTheme.colorScheme.primary, color = MaterialTheme.colorScheme.onPrimary)
+                                QrListStatItem(value = stats.activeCheckUps.toString(), label = stringResource(R.string.home_checkup_stat_active), containerColor = MaterialTheme.colorScheme.secondary, color = MaterialTheme.colorScheme.onSecondary)
+                                QrListStatItem(value = stats.completedThisWeek.toString(), label = stringResource(R.string.home_checkup_stat_week), containerColor = MaterialTheme.colorScheme.successContainer, color = MaterialTheme.colorScheme.onSuccessContainer)
                             }
                         }
                     ) {
@@ -117,8 +119,8 @@ fun HomeScreen(
                         chips = {
                             val stats = uiState.clientStats
                             if (stats != null) {
-                                StatChip(stats.totalClient.toString(), stringResource(R.string.home_clients_stat_total), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
-                                StatChip(stats.activeClient.toString(), stringResource(R.string.home_clients_stat_active), MaterialTheme.colorScheme.successContainer, MaterialTheme.colorScheme.onSuccessContainer)
+                                QrListStatItem(value = stats.totalClient.toString(), label = stringResource(R.string.home_clients_stat_total), containerColor = MaterialTheme.colorScheme.primary, color = MaterialTheme.colorScheme.onPrimary)
+                                QrListStatItem(value = stats.activeClient.toString(), label = stringResource(R.string.home_clients_stat_active), containerColor = MaterialTheme.colorScheme.successContainer, color = MaterialTheme.colorScheme.onSuccessContainer)
                             }
                         }
                     ) {
@@ -139,10 +141,10 @@ fun HomeScreen(
                         onTileClick = onNavigateToIslands,
                         chips = {
                             with(uiState.islandStats) {
-                                StatChip(total.toString(), stringResource(R.string.home_islands_stat_total), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
-                                StatChip(operational.toString(), stringResource(R.string.home_islands_stat_operational), MaterialTheme.colorScheme.successContainer, MaterialTheme.colorScheme.onSuccessContainer)
+                                QrListStatItem(value = total.toString(), label = stringResource(R.string.home_islands_stat_total), containerColor = MaterialTheme.colorScheme.primary, color = MaterialTheme.colorScheme.onPrimary)
+                                QrListStatItem(value = operational.toString(), label = stringResource(R.string.home_islands_stat_operational), containerColor = MaterialTheme.colorScheme.successContainer, color = MaterialTheme.colorScheme.onSuccessContainer)
                                 if (maintenanceSoon > 0) {
-                                    StatChip(maintenanceSoon.toString(), stringResource(R.string.home_islands_stat_maintenance), MaterialTheme.colorScheme.warningContainer, MaterialTheme.colorScheme.onWarningContainer)
+                                    QrListStatItem(value = maintenanceSoon.toString(), label = stringResource(R.string.home_islands_stat_maintenance), containerColor = MaterialTheme.colorScheme.warningContainer, color = MaterialTheme.colorScheme.onWarningContainer)
                                 }
                             }
                         }
@@ -170,7 +172,7 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
                     )
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                         NavTile(modifier = Modifier.weight(1f), title = stringResource(ClientPkg.titleResId), icon = ClientPkg.icon, onClick = onNavigateToClients, isHighlighted = true)
                         //NavTile(modifier = Modifier.weight(1f), title = stringResource(CheckupPkg.titleResId), icon = CheckupPkg.icon, onClick = onNavigateToCheckUps)
                         NavTile(modifier = Modifier.weight(1f), title = (CheckupPkg.title), icon = CheckupPkg.icon, onClick = onNavigateToCheckUps)
@@ -240,7 +242,7 @@ private fun DashboardSectionCard(
                 shape = MaterialTheme.shapes.medium
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                    modifier = Modifier.padding(horizontal = Spacing.lg, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -256,28 +258,10 @@ private fun DashboardSectionCard(
             }
 
             // ── Chips + preview ──────────────────────────────────────────────
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(modifier = Modifier.padding(horizontal = Spacing.lg, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { chips() }
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { content() }
             }
-        }
-    }
-}
-
-// =============================================================================
-// STAT CHIP
-// =============================================================================
-
-@Composable
-private fun StatChip(value: String, label: String, containerColor: Color, contentColor: Color) {
-    Surface(shape = MaterialTheme.shapes.small, color = containerColor) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(text = value, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = contentColor)
-            Text(text = label, style = MaterialTheme.typography.labelSmall, color = contentColor.copy(alpha = 0.85f))
         }
     }
 }
@@ -314,7 +298,7 @@ private fun IslandPreviewRow(island: Island, islandTypes: List<IslandTypeMaster>
     val typeDisplay = resolveIslandTypeDisplay(island.islandTypeId, islandTypes)
     Surface(modifier = Modifier.fillMaxWidth(), onClick = onClick, shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)) {
         Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                 Icon(imageVector = typeDisplay.icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
                 Column {
                     Text(text = island.customName ?: island.serialNumber , style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -340,7 +324,7 @@ private fun NavTile(title: String, icon: ImageVector, onClick: () -> Unit, modif
     val containerColor = if (isHighlighted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
     val contentColor = if (isHighlighted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
     Card(modifier = modifier.height(72.dp), colors = CardDefaults.cardColors(containerColor = containerColor), onClick = onClick) {
-        Column(modifier = Modifier.fillMaxSize().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        Column(modifier = Modifier.fillMaxSize().padding(Spacing.sm), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Icon(imageVector = icon, contentDescription = title, modifier = Modifier.size(22.dp), tint = contentColor)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = title, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, color = contentColor, maxLines = 1, overflow = TextOverflow.Ellipsis)

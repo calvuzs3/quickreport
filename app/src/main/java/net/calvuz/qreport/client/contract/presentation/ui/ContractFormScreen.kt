@@ -28,7 +28,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -49,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import net.calvuz.qreport.app.app.presentation.components.QrDatePickerField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -204,34 +204,31 @@ private fun ContractFormContent(
 
         // ValidationError
         ContractFormSection(title = stringResource(R.string.contracts_screen_form_section_contract)) {
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.name,
                 onValueChange = { onFormEvent(ContractFormEvent.NameChanged(it)) },
-                label = { Text(stringResource(R.string.contracts_screen_form_field_name)) },
-                placeholder = { Text(stringResource(R.string.contracts_screen_form_field_name_placeholder)) },
-                isError = uiState.nameError != null,
-                supportingText = uiState.nameError?.let { { Text(it.asString()) } },
+                label = stringResource(R.string.contracts_screen_form_field_name),
+                placeholder = stringResource(R.string.contracts_screen_form_field_name_placeholder),
+                errorText = uiState.nameError?.asString(),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Next
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.description,
                 onValueChange = { onFormEvent(ContractFormEvent.DescriptionChanged(it)) },
-                label = { Text(stringResource(R.string.contracts_screen_form_field_description)) },
-                placeholder = { Text(stringResource(R.string.contracts_screen_form_field_description_placeholder)) },
-                isError = uiState.descriptionError != null,
-                supportingText = uiState.descriptionError?.let { { Text(it.asString()) } },
+                label = stringResource(R.string.contracts_screen_form_field_description),
+                placeholder = stringResource(R.string.contracts_screen_form_field_description_placeholder),
+                errorText = uiState.descriptionError?.asString(),
+                singleLine = false,
                 minLines = 2,
                 maxLines = 6,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Done
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
             QrDatePickerField(

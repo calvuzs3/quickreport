@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PrecisionManufacturing
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -33,10 +30,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
 import net.calvuz.qreport.R
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpSingleStatistics
 import net.calvuz.qreport.checkup.status.domain.model.CheckUpStatusMaster
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QReportConfirmDeleteDialog
 import net.calvuz.qreport.app.app.presentation.components.QrListStatItem
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDateTime
@@ -60,11 +59,9 @@ fun CheckupCard(
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    Card(
+    QReportCard(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = modifier
     ) {
         when (variant) {
             ListViewMode.FULL -> FullCheckupCard(
@@ -112,7 +109,7 @@ private fun FullCheckupCard(
     onEdit: (() -> Unit)?
 ) {
     Column(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier.padding(Spacing.lg),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         // Header: date + company / edit button
@@ -213,7 +210,7 @@ private fun FullCheckupCard(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.lg)
                 ) {
                     QrListStatItem(
                         icon = Icons.Default.CheckCircle,
@@ -264,7 +261,7 @@ private fun CompactCheckupCard(
     statusMaster: CheckUpStatusMaster?
 ) {
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier = Modifier.padding(horizontal = Spacing.lg, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -327,7 +324,7 @@ private fun MinimalCheckupCard(
     statusMaster: CheckUpStatusMaster?
 ) {
     Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.padding(horizontal = Spacing.lg, vertical = Spacing.sm),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

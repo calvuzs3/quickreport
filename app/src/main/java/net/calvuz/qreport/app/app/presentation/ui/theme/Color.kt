@@ -6,15 +6,51 @@ import androidx.compose.ui.graphics.Color
 // QReport Color System - Industrial Theme
 // =============================================
 
-// Primary Colors - Professional Blue
-val QReportBlue = Color(0xFF1976D2)       // Primary blue - brand color
-val QReportBlueLight = Color(0xFF63A4FF)  // Light blue variant
-val QReportBlueDark = Color(0xFF004BA0)   // Dark blue variant
+// =============================================
+// Brand Chrome — Arancio e Technical Design
+// (accento unico di brand; sostituisce il vecchio blu/arancio come primary/
+// secondary/tertiary di MaterialTheme in Theme.kt. Status/Criticality/Module
+// più sotto NON fanno parte di questo sistema, restano segnali semantici
+// indipendenti — vedi design/design-system.md, sezione "regola d'inchiostro".)
+// =============================================
 
-// Secondary Colors - Warning Orange
-val QReportOrange = Color(0xFFFF8F00)     // Secondary orange - warnings/attention
-val QReportOrangeLight = Color(0xFFFFC947) // Light orange
-val QReportOrangeDark = Color(0xFFC56000)  // Dark orange
+// Orange — riempimento (pulsanti/chip/badge/strisce/mire). Come inchiostro
+// (testo/icona) ammesso solo su sfondo grafite.
+val TechnicalOrangeLight = Color(0xFFE88706)
+val TechnicalOrangeDark = Color(0xFFF0993A)
+
+// Sfumatura più scura dell'arancio (stesso hue, non un terzo colore) — usata
+// per il ruolo Material3 "tertiary".
+val TechnicalOrangeDarkerLight = Color(0xFFB96A05)
+val TechnicalOrangeDarkerDark = Color(0xFFD68A3E)
+
+// Graphite — inchiostro primario: su bianco, o sopra un riempimento arancione
+// (in entrambi i temi: mai bianco su arancio, contrasto insufficiente).
+val TechnicalGraphite = Color(0xFF333333)
+
+// Vecchi colori brand — non più usati da Theme.kt, ma restano qui perché
+// Status/Progress/Focus più sotto li usano come base: quei colori sono
+// segnali semantici indipendenti dal brand chrome, non toccati dall'adozione
+// arancio/grafite (vedi design/design-system.md).
+val QReportBlue = Color(0xFF1976D2)
+val QReportBlueLight = Color(0xFF63A4FF)
+val QReportBlueDark = Color(0xFF004BA0)
+val QReportOrange = Color(0xFFFF8F00)
+val QReportOrangeLight = Color(0xFFFFC947)
+val QReportOrangeDark = Color(0xFFC56000)
+
+// Neutri tema chiaro
+val TechnicalPaper = Color(0xFFF4F4F4)        // sfondo pagina
+val TechnicalSurfaceLight = Color(0xFFFFFFFF) // card/superficie
+val TechnicalBorder = Color(0xFFE3E3E3)       // bordi/hairline
+val TechnicalSlate = Color(0xFF707070)        // testo secondario
+
+// Neutri tema scuro (famiglia "grafite": qui l'arancio è ammesso come inchiostro)
+val TechnicalBackgroundDark = Color(0xFF1B1B1B)
+val TechnicalSurfaceDark = Color(0xFF262626)
+val TechnicalBorderDark = Color(0xFF3A3A3A)
+val TechnicalTextDark = Color(0xFFF2F2F2)
+val TechnicalTextSecondaryDark = Color(0xFFABABAB)
 
 // Status Colors
 val QReportGreen = Color(0xFF388E3C)      // Success/OK status
@@ -115,39 +151,10 @@ val HighContrastSuccess = Color(0xFF1B5E20)
 val FocusIndicator = QReportBlue
 val FocusIndicatorHigh = Color(0xFF0D47A1)
 
-// =============================================
-// Helper Functions
-// =============================================
-
-/**
- * Restituisce il colore appropriato per uno stato di check item
- */
-fun getCheckItemStatusColor(status: String): Color = when (status.uppercase()) {
-    "OK" -> StatusOK
-    "NOK" -> StatusNOK
-    "PENDING" -> StatusPending
-    "NA" -> StatusNA
-    else -> QReportGrey500
-}
-
-/**
- * Restituisce il colore appropriato per un livello di criticità
- */
-fun getCriticalityColor(criticality: String): Color = when (criticality.uppercase()) {
-    "CRITICAL" -> CriticalityHigh
-    "IMPORTANT" -> CriticalityMedium
-    "ROUTINE" -> CriticalityLow
-    "NA" -> CriticalityNA
-    else -> QReportGrey500
-}
-
-/**
- * Restituisce il colore appropriato per un modulo
- */
-fun getModuleColor(moduleType: String): Color = when (moduleType.lowercase()) {
-    "safety" -> ModuleSafety
-    "mechanical" -> ModuleMechanical
-    "electrical" -> ModuleElectrical
-    "software" -> ModuleSoftware
-    else -> ModuleSpecific
-}
+// Nota: le funzioni getCheckItemStatusColor/getCriticalityColor/getModuleColor
+// (String -> Color) sono state rimosse: erano dead code (zero call site), in
+// conflitto con la fonte di colore reale per lo stato check-item
+// (CheckItemStatusExt.getColor(), su enum CheckItemStatus) e strutturalmente
+// superate per criticità/modulo, ora a metà migrazione verso master data Room
+// (CriticalityMaster/ModuleTypeMaster) — il colore da lì va letto tramite
+// ColorUtils.toComposeColor() su un campo colorHex, non da un when su String.

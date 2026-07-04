@@ -18,6 +18,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.app.presentation.components.QReportFormAddressSection
+import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.facility.domain.model.FacilityType
 import timber.log.Timber
 
@@ -128,86 +130,51 @@ private fun FacilityFormContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Name
-        OutlinedTextField(
+        QrFormField(
             value = uiState.name,
             onValueChange = { onFormEvent(FacilityFormEvent.NameChanged(it)) },
-            label = { Text(stringResource(R.string.facility_form_field_name)) },
-            placeholder = { Text(stringResource(R.string.facility_form_field_name_placeholder)) },
-            isError = uiState.nameError != null,
-            supportingText = uiState.nameError?.let { error ->
-                { Text(error.asString()) }
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            label = stringResource(R.string.facility_form_field_name),
+            placeholder = stringResource(R.string.facility_form_field_name_placeholder),
+            errorText = uiState.nameError?.asString()
         )
 
         // Code
-        OutlinedTextField(
+        QrFormField(
             value = uiState.code,
             onValueChange = { onFormEvent(FacilityFormEvent.CodeChanged(it)) },
-            label = { Text(stringResource(R.string.facility_form_field_code)) },
-            placeholder = { Text(stringResource(R.string.facility_form_field_code_placeholder)) },
-            isError = uiState.codeError != null,
-            supportingText = uiState.codeError?.let { error ->
-                { Text(error.asString()) }
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            label = stringResource(R.string.facility_form_field_code),
+            placeholder = stringResource(R.string.facility_form_field_code_placeholder),
+            errorText = uiState.codeError?.asString()
         )
 
         // Notes
-        OutlinedTextField(
+        QrFormField(
             value = uiState.notes,
             onValueChange = { onFormEvent(FacilityFormEvent.NotesChanged(it)) },
-            label = { Text(stringResource(R.string.facility_form_field_notes)) },
-            placeholder = { Text(stringResource(R.string.facility_form_field_notes_placeholder)) },
-            maxLines = 3,
-            modifier = Modifier.fillMaxWidth()
+            label = stringResource(R.string.facility_form_field_notes),
+            placeholder = stringResource(R.string.facility_form_field_notes_placeholder),
+            singleLine = false,
+            maxLines = 3
         )
 
         // Facility Type dropdown
-        var expanded by remember { mutableStateOf(false) }
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            OutlinedTextField(
-                value = stringResource(uiState.facilityType.labelResId),
-                onValueChange = { },
-                readOnly = true,
-                label = { Text(stringResource(R.string.facility_form_field_type)) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                modifier = Modifier
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .fillMaxWidth()
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                FacilityType.entries.forEach { type ->
-                    DropdownMenuItem(
-                        text = {
-                            Column {
-                                Text(stringResource(type.labelResId))
-                                Text(
-                                    text = stringResource(type.descriptionResId),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        },
-                        onClick = {
-                            onFormEvent(FacilityFormEvent.TypeChanged(type))
-                            expanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+        QrDropdownField(
+            selected = uiState.facilityType,
+            options = FacilityType.entries,
+            label = stringResource(R.string.facility_form_field_type),
+            optionLabel = { stringResource(it.labelResId) },
+            onSelect = { onFormEvent(FacilityFormEvent.TypeChanged(it)) },
+            optionContent = { type ->
+                Column {
+                    Text(stringResource(type.labelResId))
+                    Text(
+                        text = stringResource(type.descriptionResId),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-        }
+        )
 
         // Address
         QReportFormAddressSection(

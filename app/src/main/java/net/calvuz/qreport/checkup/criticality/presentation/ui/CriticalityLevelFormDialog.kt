@@ -2,11 +2,9 @@ package net.calvuz.qreport.checkup.criticality.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -14,11 +12,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.checkup.criticality.domain.model.CriticalityMaster
 
 /**
@@ -60,49 +58,37 @@ fun CriticalityLevelFormDialog(
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
+                QrFormField(
                     value = code,
                     onValueChange = { code = it },
-                    label = { Text(stringResource(R.string.criticality_level_field_code)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.criticality_level_field_code)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = label,
                     onValueChange = { label = it },
-                    label = { Text(stringResource(R.string.criticality_level_field_label)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.criticality_level_field_label)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = priority,
                     onValueChange = { priority = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.criticality_level_field_priority)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.criticality_level_field_priority),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = colorHex,
                     onValueChange = { colorHex = it },
-                    label = { Text(stringResource(R.string.criticality_level_field_color_hex)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.criticality_level_field_color_hex)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = iconEmoji,
                     onValueChange = { iconEmoji = it },
-                    label = { Text(stringResource(R.string.criticality_level_field_icon_emoji)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.criticality_level_field_icon_emoji)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = sortOrder,
                     onValueChange = { sortOrder = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.criticality_level_field_sort_order)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.criticality_level_field_sort_order),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 if (errorMessage != null) {
                     Text(

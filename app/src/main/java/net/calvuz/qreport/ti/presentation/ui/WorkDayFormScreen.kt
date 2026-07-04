@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 
 /**
  * Form screen for editing work day details:
@@ -189,12 +190,11 @@ private fun BasicInfoSection(
             }
 
             // Date picker
-            OutlinedTextField(
+            QrFormField(
                 value = date,
                 onValueChange = onDateChange,
-                label = { Text(stringResource(R.string.intervention_workday_date_label)) },
-                placeholder = { Text(stringResource(R.string.intervention_details_ddt_date_placeholder)) },
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.intervention_workday_date_label),
+                placeholder = stringResource(R.string.intervention_details_ddt_date_placeholder)
             )
 
             // Remote assistance toggle
@@ -251,21 +251,21 @@ private fun BasicInfoSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                OutlinedTextField(
+                QrFormField(
                     value = technicianCount,
                     onValueChange = onTechnicianCountChange,
-                    label = { Text(stringResource(R.string.intervention_workday_technician_count_label)) },
+                    label = stringResource(R.string.intervention_workday_technician_count_label),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
                     ),
                     modifier = Modifier.weight(0.4f)
                 )
 
-                OutlinedTextField(
+                QrFormField(
                     value = technicianInitials,
                     onValueChange = onTechnicianInitialsChange,
-                    label = { Text(stringResource(R.string.intervention_workday_technician_initials_label)) },
-                    placeholder = { Text(stringResource(R.string.intervention_workday_technician_initials_placeholder)) },
+                    label = stringResource(R.string.intervention_workday_technician_initials_label),
+                    placeholder = stringResource(R.string.intervention_workday_technician_initials_placeholder),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         capitalization = KeyboardCapitalization.Characters
@@ -622,7 +622,7 @@ private fun TimeTextField(
     label: String,
     modifier: Modifier = Modifier
 ) {
-    OutlinedTextField(
+    QrFormField(
         value = value,
         onValueChange = { newValue ->
             // Filter input to HH:mm format
@@ -631,8 +631,8 @@ private fun TimeTextField(
                 onValueChange(filtered)
             }
         },
-        label = { Text(label) },
-        placeholder = { Text(stringResource(R.string.intervention_workday_time_placeholder)) },
+        label = label,
+        placeholder = stringResource(R.string.intervention_workday_time_placeholder),
         modifier = modifier
     )
 }

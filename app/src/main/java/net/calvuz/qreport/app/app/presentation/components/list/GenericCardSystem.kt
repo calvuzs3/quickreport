@@ -1,11 +1,12 @@
 package net.calvuz.qreport.app.app.presentation.components.list
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.settings.domain.model.ListViewMode
 
 /**
@@ -14,15 +15,6 @@ import net.calvuz.qreport.settings.domain.model.ListViewMode
  * Allows any domain entity to implement FULL, COMPACT, MINIMAL variants
  * using composable content lambdas instead of inheritance
  */
-
-/**
- * Card variant types
- */
-enum class CardVariant {
-    FULL,     // Complete information with all details
-    COMPACT,  // Essential information only
-    MINIMAL   // Just core identifier + basic info
-}
 
 /**
  * Content provider interface for different card variants
@@ -71,51 +63,37 @@ fun <T> GenericCard(
     contentProvider: CardContentProvider<T>,
     isSelected: Boolean = false,
     isLoading: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    // Mira d'angolo opzionale (design/design-system.md) — null preserva il
+    // comportamento attuale invariato per i chiamanti esistenti (Contract/TI).
+    tickColor: Color? = null
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isSelected) 8.dp else 2.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        )
+    QReportCard(
+        modifier = modifier,
+        isSelected = isSelected,
+        isLoading = isLoading,
+        tickColor = tickColor
     ) {
-        Column {
-            // Content based on variant
-            when (variant) {
-                ListViewMode.FULL -> {
-                    contentProvider.FullContent(
-                        item = item,
-                        isSelected = isSelected,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-                ListViewMode.COMPACT -> {
-                    contentProvider.CompactContent(
-                        item = item,
-                        isSelected = isSelected,
-                        modifier = Modifier.padding(12.dp)
-                    )
-                }
-                ListViewMode.MINIMAL -> {
-                    contentProvider.MinimalContent(
-                        item = item,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
+        // Content based on variant
+        when (variant) {
+            ListViewMode.FULL -> {
+                contentProvider.FullContent(
+                    item = item,
+                    isSelected = isSelected,
+                    modifier = Modifier.padding(16.dp)
+                )
             }
-
-            // Loading indicator
-            if (isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
+            ListViewMode.COMPACT -> {
+                contentProvider.CompactContent(
+                    item = item,
+                    isSelected = isSelected,
+                    modifier = Modifier.padding(12.dp)
+                )
+            }
+            ListViewMode.MINIMAL -> {
+                contentProvider.MinimalContent(
+                    item = item,
+                    modifier = Modifier.padding(8.dp)
                 )
             }
         }

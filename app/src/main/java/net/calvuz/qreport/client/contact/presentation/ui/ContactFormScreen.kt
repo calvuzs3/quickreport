@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import net.calvuz.qreport.client.contact.domain.model.ContactMethod
 import timber.log.Timber
@@ -242,74 +244,67 @@ private fun ContactFormContent(
         // ===== DATI ANAGRAFICI =====
         ContactFormSection(title = stringResource(R.string.contact_form_section_data)) {
             // Nome (obbligatorio)
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.firstName,
                 onValueChange = onFirstNameChange,
-                label = { Text(stringResource(R.string.contact_form_field_name)) },
-                placeholder = { Text(stringResource(R.string.contact_form_field_name_placeholder))},
-                isError = uiState.firstNameError != null,
-                supportingText = uiState.firstNameError?.let { { Text(it.asString()) } },
+                label = stringResource(R.string.contact_form_field_name),
+                placeholder = stringResource(R.string.contact_form_field_name_placeholder),
+                errorText = uiState.firstNameError?.asString(),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
             // Cognome
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.lastName,
                 onValueChange = onLastNameChange,
-                label = { Text(stringResource(R.string.contact_form_field_surname) )},
-                isError = uiState.lastNameError != null,
-                supportingText = uiState.lastNameError?.let { { Text(it.asString()) } },
+                label = stringResource(R.string.contact_form_field_surname),
+                errorText = uiState.lastNameError?.asString(),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
             // Titolo
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.title,
                 onValueChange = onTitleChange,
-                label = { Text(stringResource(R.string.contact_form_field_title)) },
-                placeholder = { Text(stringResource(R.string.contact_form_field_title_placeholder)) },
+                label = stringResource(R.string.contact_form_field_title),
+                placeholder = stringResource(R.string.contact_form_field_title_placeholder),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
         }
 
         // ===== RUOLO AZIENDALE =====
         ContactFormSection(title = stringResource(R.string.contact_form_section_role)) {
             // Ruolo
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.role,
                 onValueChange = onRoleChange,
-                label = { Text(stringResource(R.string.contact_form_field_role)) },
-                placeholder = { Text(stringResource(R.string.contact_form_field_role_placeholder) )},
+                label = stringResource(R.string.contact_form_field_role),
+                placeholder = stringResource(R.string.contact_form_field_role_placeholder),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
             // Dipartimento
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.department,
                 onValueChange = onDepartmentChange,
-                label = { Text(stringResource(R.string.contact_form_field_department)) },
-                placeholder = { Text(stringResource(R.string.contact_form_field_department_placholder) )},
+                label = stringResource(R.string.contact_form_field_department),
+                placeholder = stringResource(R.string.contact_form_field_department_placholder),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
         }
 
@@ -334,18 +329,16 @@ private fun ContactFormContent(
             )
 
             // Email alternativa
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.alternativeEmail,
                 onValueChange = onAlternativeEmailChange,
-                label = { Text(stringResource(R.string.contact_form_field_alternative_email)) },
-                placeholder = { Text(stringResource(R.string.contact_form_field_email_placeholder) )},
-                isError = uiState.alternativeEmailError != null,
-                supportingText = uiState.alternativeEmailError?.let { { Text(it.asString()) } },
+                label = stringResource(R.string.contact_form_field_alternative_email),
+                placeholder = stringResource(R.string.contact_form_field_email_placeholder),
+                errorText = uiState.alternativeEmailError?.asString(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
 
             // Telefono fisso
@@ -444,18 +437,18 @@ private fun ContactFormContent(
 
         // ===== NOTE =====
         ContactFormSection(title = stringResource(R.string.contact_form_section_note)) {
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.notes,
                 onValueChange = onNotesChange,
-                label = { Text(stringResource(R.string.contact_form_field_notes)) },
-                placeholder = { Text(stringResource(R.string.contact_form_field_notes_placeholder)) },
+                label = stringResource(R.string.contact_form_field_notes),
+                placeholder = stringResource(R.string.contact_form_field_notes_placeholder),
+                singleLine = false,
                 minLines = 3,
                 maxLines = 6,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Done
-                ),
-                modifier = Modifier.fillMaxWidth()
+                )
             )
         }
 
@@ -522,49 +515,15 @@ private fun ContactMethodDropdown(
     onMethodSelected: (ContactMethod?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
+    QrDropdownField(
+        selected = selectedMethod,
+        options = listOf<ContactMethod?>(null) + ContactMethod.entries,
+        label = stringResource(R.string.contact_form_field_preferred_contact_method),
+        optionLabel = { method ->
+            method?.getDisplayName()?.asString()
+                ?: stringResource(R.string.contact_form_field_preferred_contact_method_empty)
+        },
+        onSelect = onMethodSelected,
         modifier = modifier
-    ) {
-        OutlinedTextField(
-            value = selectedMethod?.getDisplayName()?.asString() ?: "",
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(stringResource(R.string.contact_form_field_preferred_contact_method)) },
-            placeholder = { Text(stringResource(R.string.contact_form_field_preferred_contact_method_placholder)) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            // Opzione "Nessuna preferenza"
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.contact_form_field_preferred_contact_method_empty)) },
-                onClick = {
-                    onMethodSelected(null)
-                    expanded = false
-                }
-            )
-
-            ContactMethod.entries.forEach { method ->
-                DropdownMenuItem(
-                    text = { Text(method.getDisplayName().asString()) },
-                    onClick = {
-                        onMethodSelected(method)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
+    )
 }

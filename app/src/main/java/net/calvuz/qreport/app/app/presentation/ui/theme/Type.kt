@@ -2,12 +2,23 @@ package net.calvuz.qreport.app.app.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import net.calvuz.qreport.R
 
-// QReport Typography - Professional e industriale
-// Utilizziamo Roboto (default Android) per massima leggibilità
+// QReport Typography — Arancio e Technical Design
+// Display/headline restano sul font di sistema (Roboto, solo pesi più alti):
+// Big Shoulders Display è stato provato e scartato per questa opzione in
+// QuickStore (troppo condensato per restare leggibile su titoli reali), quindi
+// non viene introdotto qui. IBM Plex Sans copre title/body/label, IBM Plex
+// Mono i dati tecnici (codici voce, timestamp) via QReportTextStyles.TechnicalText.
+val PlexSans = FontFamily(Font(R.font.ibm_plex_sans))
+val PlexMono = FontFamily(
+    Font(R.font.ibm_plex_mono_regular, FontWeight.Normal),
+    Font(R.font.ibm_plex_mono_medium, FontWeight.Medium)
+)
 
 val QReportTypography = Typography(
     // Display styles - per titoli grandi
@@ -58,21 +69,21 @@ val QReportTypography = Typography(
 
     // Title styles - per titoli componenti
     titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp,
     ),
     titleMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp,
     ),
     titleSmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
@@ -81,21 +92,21 @@ val QReportTypography = Typography(
 
     // Body styles - per testi principali
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp,
     ),
     bodySmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
@@ -104,21 +115,21 @@ val QReportTypography = Typography(
 
     // Label styles - per etichette e pulsanti
     labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
     ),
     labelMedium = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
     ),
     labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
@@ -135,7 +146,7 @@ object QReportTextStyles {
 
     // Check item description - deve essere molto leggibile
     val CheckItemDescription = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Normal,
         fontSize = 15.sp,
         lineHeight = 22.sp,
@@ -144,7 +155,7 @@ object QReportTextStyles {
 
     // Status labels - devono essere chiari e boldati
     val StatusLabel = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Bold,
         fontSize = 12.sp,
         lineHeight = 16.sp,
@@ -153,7 +164,7 @@ object QReportTextStyles {
 
     // Module headers - per raggruppare check items
     val ModuleHeader = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
         lineHeight = 24.sp,
@@ -162,7 +173,7 @@ object QReportTextStyles {
 
     // Card titles - per titoli nelle card
     val CardTitle = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 20.sp,
@@ -171,7 +182,7 @@ object QReportTextStyles {
 
     // Metadata text - per info secondarie
     val MetadataText = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Normal,
         fontSize = 13.sp,
         lineHeight = 18.sp,
@@ -180,7 +191,7 @@ object QReportTextStyles {
 
     // Button text - per pulsanti specifici QReport
     val ButtonText = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
@@ -189,7 +200,7 @@ object QReportTextStyles {
 
     // Photo caption - per didascalie foto
     val PhotoCaption = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
@@ -198,7 +209,7 @@ object QReportTextStyles {
 
     // ValidationError label - per etichette nei form
     val FormLabel = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 13.sp,
         lineHeight = 18.sp,
@@ -207,7 +218,7 @@ object QReportTextStyles {
 
     // Technical text - per testi tecnici (codici, ID, ecc.)
     val TechnicalText = TextStyle(
-        fontFamily = FontFamily.Monospace,
+        fontFamily = PlexMono,
         fontWeight = FontWeight.Normal,
         fontSize = 13.sp,
         lineHeight = 18.sp,
@@ -216,7 +227,7 @@ object QReportTextStyles {
 
     // Error text - per messaggi di errore
     val ErrorText = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
@@ -225,7 +236,7 @@ object QReportTextStyles {
 
     // Progress text - per indicatori di progresso
     val ProgressText = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = PlexSans,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 14.sp,

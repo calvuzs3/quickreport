@@ -23,6 +23,8 @@ import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpHeader
 import net.calvuz.qreport.checkup.checkup.domain.model.ClientInfo
 import net.calvuz.qreport.client.island.domain.model.IslandInfo
 import net.calvuz.qreport.settings.domain.model.TechnicianInfo
+import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.app.app.presentation.components.SectionCard
 import net.calvuz.qreport.settings.presentation.ui.TechnicianSettingsViewModel
 
@@ -183,36 +185,30 @@ fun EditHeaderDialog(
                         Column(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            OutlinedTextField(
+                            QrFormField(
                                 value = companyName,
                                 onValueChange = { companyName = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_client_company_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                isError = companyName.isBlank()
+                                label = stringResource(R.string.checkup_dialog_edit_header_client_company_label),
+                                errorText = if (companyName.isBlank()) "" else null
                             )
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = contactPerson,
                                 onValueChange = { contactPerson = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_client_contact_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true
+                                label = stringResource(R.string.checkup_dialog_edit_header_client_contact_label)
                             )
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = site,
                                 onValueChange = { site = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_client_site_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true
+                                label = stringResource(R.string.checkup_dialog_edit_header_client_site_label)
                             )
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = address,
                                 onValueChange = { address = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_client_address_label)) },
-                                modifier = Modifier.fillMaxWidth(),
+                                label = stringResource(R.string.checkup_dialog_edit_header_client_address_label),
+                                singleLine = false,
                                 maxLines = 2
                             )
 
@@ -220,20 +216,18 @@ fun EditHeaderDialog(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                OutlinedTextField(
+                                QrFormField(
                                     value = phone,
                                     onValueChange = { phone = it },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_client_phone_label)) },
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    label = stringResource(R.string.checkup_dialog_edit_header_client_phone_label),
+                                    modifier = Modifier.weight(1f)
                                 )
 
-                                OutlinedTextField(
+                                QrFormField(
                                     value = email,
                                     onValueChange = { email = it },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_client_email_label)) },
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    label = stringResource(R.string.checkup_dialog_edit_header_client_email_label),
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
                         }
@@ -247,43 +241,37 @@ fun EditHeaderDialog(
                         Column(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            OutlinedTextField(
+                            QrFormField(
                                 value = serialNumber,
                                 onValueChange = { serialNumber = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_island_serial_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                isError = serialNumber.isBlank()
+                                label = stringResource(R.string.checkup_dialog_edit_header_island_serial_label),
+                                errorText = if (serialNumber.isBlank()) "" else null
                             )
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = model,
                                 onValueChange = { model = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_island_model_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true
+                                label = stringResource(R.string.checkup_dialog_edit_header_island_model_label)
                             )
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                OutlinedTextField(
+                                QrFormField(
                                     value = installationDate,
                                     onValueChange = { installationDate = it },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_island_installation_label)) },
+                                    label = stringResource(R.string.checkup_dialog_edit_header_island_installation_label),
                                     modifier = Modifier.weight(1f),
-                                    singleLine = true,
-                                    placeholder = { Text(stringResource(R.string.checkup_dialog_edit_header_island_installation_placeholder)) }
+                                    placeholder = stringResource(R.string.checkup_dialog_edit_header_island_installation_placeholder)
                                 )
 
-                                OutlinedTextField(
+                                QrFormField(
                                     value = lastMaintenanceDate,
                                     onValueChange = { lastMaintenanceDate = it },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_island_maintenance_label)) },
+                                    label = stringResource(R.string.checkup_dialog_edit_header_island_maintenance_label),
                                     modifier = Modifier.weight(1f),
-                                    singleLine = true,
-                                    placeholder = { Text(stringResource(R.string.checkup_dialog_edit_header_island_maintenance_placeholder)) }
+                                    placeholder = stringResource(R.string.checkup_dialog_edit_header_island_maintenance_placeholder)
                                 )
                             }
 
@@ -291,28 +279,26 @@ fun EditHeaderDialog(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                OutlinedTextField(
+                                QrFormField(
                                     value = operatingHours,
                                     onValueChange = { value ->
                                         if (value.all { it.isDigit() } || value.isEmpty()) {
                                             operatingHours = value
                                         }
                                     },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_island_hours_label)) },
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    label = stringResource(R.string.checkup_dialog_edit_header_island_hours_label),
+                                    modifier = Modifier.weight(1f)
                                 )
 
-                                OutlinedTextField(
+                                QrFormField(
                                     value = cycleCount,
                                     onValueChange = { value ->
                                         if (value.all { it.isDigit() } || value.isEmpty()) {
                                             cycleCount = value
                                         }
                                     },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_island_cycles_label)) },
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    label = stringResource(R.string.checkup_dialog_edit_header_island_cycles_label),
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
                         }
@@ -352,48 +338,40 @@ fun EditHeaderDialog(
                                 Spacer(modifier = Modifier.height(4.dp))
                             }
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = technicianName,
                                 onValueChange = { technicianName = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_technician_name_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true
+                                label = stringResource(R.string.checkup_dialog_edit_header_technician_name_label)
                             )
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = technicianCompany,
                                 onValueChange = { technicianCompany = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_technician_company_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true
+                                label = stringResource(R.string.checkup_dialog_edit_header_technician_company_label)
                             )
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = certification,
                                 onValueChange = { certification = it },
-                                label = { Text(stringResource(R.string.checkup_dialog_edit_header_technician_certification_label)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true
+                                label = stringResource(R.string.checkup_dialog_edit_header_technician_certification_label)
                             )
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                OutlinedTextField(
+                                QrFormField(
                                     value = technicianPhone,
                                     onValueChange = { technicianPhone = it },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_technician_phone_label)) },
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    label = stringResource(R.string.checkup_dialog_edit_header_technician_phone_label),
+                                    modifier = Modifier.weight(1f)
                                 )
 
-                                OutlinedTextField(
+                                QrFormField(
                                     value = technicianEmail,
                                     onValueChange = { technicianEmail = it },
-                                    label = { Text(stringResource(R.string.checkup_dialog_edit_header_technician_email_label)) },
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    label = stringResource(R.string.checkup_dialog_edit_header_technician_email_label),
+                                    modifier = Modifier.weight(1f)
                                 )
                             }
                         }
@@ -404,13 +382,13 @@ fun EditHeaderDialog(
                         title = stringResource(R.string.checkup_dialog_edit_header_section_notes),
                         icon = Icons.AutoMirrored.Default.Notes
                     ) {
-                        OutlinedTextField(
+                        QrFormField(
                             value = notes,
                             onValueChange = { notes = it },
-                            label = { Text(stringResource(R.string.checkup_dialog_edit_header_notes_label)) },
-                            modifier = Modifier.fillMaxWidth(),
+                            label = stringResource(R.string.checkup_dialog_edit_header_notes_label),
+                            singleLine = false,
                             maxLines = 3,
-                            placeholder = { Text(stringResource(R.string.checkup_dialog_edit_header_notes_placeholder)) }
+                            placeholder = stringResource(R.string.checkup_dialog_edit_header_notes_placeholder)
                         )
                     }
                 }
@@ -418,63 +396,43 @@ fun EditHeaderDialog(
                 // Actions
                 HorizontalDivider()
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        enabled = !isLoading
-                    ) {
-                        Text(stringResource(R.string.checkup_dialog_edit_header_action_cancel))
-                    }
-
-                    Button(
-                        onClick = {
-                            val updatedHeader = header.copy(
-                                clientInfo = ClientInfo(
-                                    companyName = companyName,
-                                    contactPerson = contactPerson,
-                                    site = site,
-                                    address = address,
-                                    phone = phone,
-                                    email = email
-                                ),
-                                islandInfo = IslandInfo(
-                                    serialNumber = serialNumber,
-                                    model = model,
-                                    installationDate = installationDate,
-                                    lastMaintenanceDate = lastMaintenanceDate,
-                                    operatingHours = operatingHours.toIntOrNull() ?: 0,
-                                    cycleCount = cycleCount.toLongOrNull() ?: 0L
-                                ),
-                                technicianInfo = TechnicianInfo(
-                                    name = technicianName,
-                                    company = technicianCompany,
-                                    certification = certification,
-                                    phone = technicianPhone,
-                                    email = technicianEmail
-                                ),
-                                notes = notes
-                            )
-                            onConfirm(updatedHeader)
-                        },
-                        enabled = isValidForm && !isLoading,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(stringResource(R.string.checkup_dialog_edit_header_action_save))
-                        }
-                    }
-                }
+                QrFormActionsRow(
+                    onCancel = onDismiss,
+                    onSave = {
+                        val updatedHeader = header.copy(
+                            clientInfo = ClientInfo(
+                                companyName = companyName,
+                                contactPerson = contactPerson,
+                                site = site,
+                                address = address,
+                                phone = phone,
+                                email = email
+                            ),
+                            islandInfo = IslandInfo(
+                                serialNumber = serialNumber,
+                                model = model,
+                                installationDate = installationDate,
+                                lastMaintenanceDate = lastMaintenanceDate,
+                                operatingHours = operatingHours.toIntOrNull() ?: 0,
+                                cycleCount = cycleCount.toLongOrNull() ?: 0L
+                            ),
+                            technicianInfo = TechnicianInfo(
+                                name = technicianName,
+                                company = technicianCompany,
+                                certification = certification,
+                                phone = technicianPhone,
+                                email = technicianEmail
+                            ),
+                            notes = notes
+                        )
+                        onConfirm(updatedHeader)
+                    },
+                    modifier = Modifier.padding(24.dp),
+                    saveEnabled = isValidForm,
+                    isSaving = isLoading,
+                    cancelText = stringResource(R.string.checkup_dialog_edit_header_action_cancel),
+                    saveText = stringResource(R.string.checkup_dialog_edit_header_action_save)
+                )
             }
         }
     }

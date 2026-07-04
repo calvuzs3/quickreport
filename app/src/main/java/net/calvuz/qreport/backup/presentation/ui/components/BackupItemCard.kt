@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.backup.domain.model.BackupInfo
 import net.calvuz.qreport.app.util.DateTimeUtils.getFormattedDate
 import net.calvuz.qreport.app.util.SizeUtils.getFormattedSize
@@ -56,13 +55,8 @@ fun BackupItemCard(
     isExporting: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+    QReportCard(
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

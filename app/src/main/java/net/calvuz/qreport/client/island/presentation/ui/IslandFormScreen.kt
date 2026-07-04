@@ -17,6 +17,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.app.presentation.components.QrDatePickerField
+import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -123,15 +125,12 @@ private fun IslandBasicInfoSection(
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.island_form_section_basic), style = MaterialTheme.typography.titleMedium)
 
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.serialNumber,
                 onValueChange = { onFormEvent(FacilityIslandFormEvent.SerialNumberChanged(it)) },
-                label = { Text(stringResource(R.string.island_form_field_serial)) },
-                placeholder = { Text(stringResource(R.string.island_form_field_serial_placeholder)) },
-                isError = uiState.serialNumberError != null,
-                supportingText = uiState.serialNumberError?.let { e -> { Text(e.asString()) } },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.island_form_field_serial),
+                placeholder = stringResource(R.string.island_form_field_serial_placeholder),
+                errorText = uiState.serialNumberError?.asString()
             )
 
             IslandTypeSelector(
@@ -141,32 +140,25 @@ private fun IslandBasicInfoSection(
                 onTypeSelected = { onFormEvent(FacilityIslandFormEvent.IslandTypeChanged(it)) }
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.modelNumber,
                 onValueChange = { onFormEvent(FacilityIslandFormEvent.ModelChanged(it)) },
-                label = { Text(stringResource(R.string.island_form_field_model)) },
-                placeholder = { Text(stringResource(R.string.island_form_field_model_placeholder)) },
-                isError = uiState.modelNumberError != null,
-                supportingText = uiState.modelNumberError?.let { e -> { Text(e.asString()) } },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.island_form_field_model),
+                placeholder = stringResource(R.string.island_form_field_model_placeholder),
+                errorText = uiState.modelNumberError?.asString()
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.customName,
                 onValueChange = { onFormEvent(FacilityIslandFormEvent.CustomNameChanged(it)) },
-                label = { Text(stringResource(R.string.island_form_field_custom_name)) },
-                placeholder = { Text(stringResource(R.string.island_form_field_custom_name_placeholder)) },
-                isError = uiState.customNameError != null,
-                supportingText = uiState.customNameError?.let { e -> { Text(e.asString()) } },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.island_form_field_custom_name),
+                placeholder = stringResource(R.string.island_form_field_custom_name_placeholder),
+                errorText = uiState.customNameError?.asString()
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun IslandTypeSelector(
     availableTypes: List<IslandTypeMaster>,
@@ -174,47 +166,27 @@ private fun IslandTypeSelector(
     fallbackType: String,
     onTypeSelected: (IslandTypeMaster) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
     val selected = availableTypes.find { it.id == selectedTypeId }
-    val selectedLabel = selected?.label ?: fallbackType
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedLabel,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(stringResource(R.string.island_form_field_type)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            availableTypes.forEach { type ->
-                DropdownMenuItem(
-                    text = {
-                        Column {
-                            Text(type.label, style = MaterialTheme.typography.bodyMedium)
-                            type.description?.let {
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    },
-                    onClick = { onTypeSelected(type); expanded = false },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                )
+    QrDropdownField(
+        selected = selected,
+        options = availableTypes,
+        label = stringResource(R.string.island_form_field_type),
+        optionLabel = { it?.label ?: fallbackType },
+        onSelect = { type -> type?.let(onTypeSelected) },
+        optionContent = { type ->
+            Column {
+                Text(type?.label ?: fallbackType, style = MaterialTheme.typography.bodyMedium)
+                type?.description?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
-    }
+    )
 }
 
 @Composable
@@ -241,22 +213,18 @@ private fun TechnicalInfoSection(
             )
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
+                QrFormField(
                     value = uiState.operatingHours,
                     onValueChange = { onFormEvent(FacilityIslandFormEvent.OperatingHoursChanged(it)) },
-                    label = { Text(stringResource(R.string.island_form_field_operating_hours)) },
-                    isError = uiState.operatingHoursError != null,
-                    supportingText = uiState.operatingHoursError?.let { e -> { Text(e.asString()) } },
-                    singleLine = true,
+                    label = stringResource(R.string.island_form_field_operating_hours),
+                    errorText = uiState.operatingHoursError?.asString(),
                     modifier = Modifier.weight(1f)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = uiState.cycleCount,
                     onValueChange = { onFormEvent(FacilityIslandFormEvent.CycleCountChanged(it)) },
-                    label = { Text(stringResource(R.string.island_form_field_cycle_count)) },
-                    isError = uiState.cycleCountError != null,
-                    supportingText = uiState.cycleCountError?.let { e -> { Text(e.asString()) } },
-                    singleLine = true,
+                    label = stringResource(R.string.island_form_field_cycle_count),
+                    errorText = uiState.cycleCountError?.asString(),
                     modifier = Modifier.weight(1f)
                 )
             }

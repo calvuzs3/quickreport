@@ -1,7 +1,6 @@
 package net.calvuz.qreport.client.unit.presentation.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QReportConfirmDeleteDialog
 import net.calvuz.qreport.app.app.presentation.components.QReportConfirmRestoreDialog
 import net.calvuz.qreport.app.app.presentation.components.QrCardFooter
@@ -37,11 +37,9 @@ fun MechanicalUnitCard(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showRestoreDialog by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    QReportCard(
+        modifier = modifier,
+        onClick = onClick
     ) {
         when (variant) {
             ListViewMode.FULL -> FullMechanicalUnitCard(

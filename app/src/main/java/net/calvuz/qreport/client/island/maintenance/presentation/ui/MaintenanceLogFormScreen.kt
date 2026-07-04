@@ -21,6 +21,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.app.presentation.components.QrDateTimePickerField
+import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceOperationType
 import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceOutcome
 import net.calvuz.qreport.client.unit.domain.model.MechanicalUnit
@@ -187,53 +189,29 @@ private fun OperationSection(
 
             // Custom label — visible only when OTHER is selected
             if (uiState.isCustomLabelRequired) {
-                OutlinedTextField(
+                QrFormField(
                     value = uiState.customOperationLabel,
                     onValueChange = { onFormEvent(MaintenanceLogFormEvent.CustomOperationLabelChanged(it)) },
-                    label = { Text(stringResource(R.string.maint_label_custom_operation)) },
-                    isError = uiState.customOperationLabelError != null,
-                    supportingText = uiState.customOperationLabelError?.let { e -> { Text(e.asString()) } },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.maint_label_custom_operation),
+                    errorText = uiState.customOperationLabelError?.asString()
                 )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun OperationTypeDropdown(
     selected: MaintenanceOperationType,
     onSelected: (MaintenanceOperationType) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = stringResource(selected.labelResId),
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(stringResource(R.string.maint_label_operation_type)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-            modifier = Modifier
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .fillMaxWidth()
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            MaintenanceOperationType.entries.forEach { type ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(type.labelResId)) },
-                    onClick = { onSelected(type); expanded = false },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                )
-            }
-        }
-    }
+    QrDropdownField(
+        selected = selected,
+        options = MaintenanceOperationType.entries,
+        label = stringResource(R.string.maint_label_operation_type),
+        optionLabel = { stringResource(it.labelResId) },
+        onSelect = onSelected
+    )
 }
 
 @Composable
@@ -263,19 +241,13 @@ private fun ComponentSection(
 
             // Free text — active when no unit is selected from FK list
             if (uiState.isFreeTextComponentActive) {
-                OutlinedTextField(
+                QrFormField(
                     value = uiState.componentLabel,
                     onValueChange = { onFormEvent(MaintenanceLogFormEvent.ComponentLabelChanged(it)) },
-                    label = {
-                        Text(
-                            if (uiState.availableUnits.isNotEmpty())
-                                stringResource(R.string.maint_label_component_not_listed)
-                            else
-                                stringResource(R.string.maint_label_component_free)
-                        )
-                    },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = if (uiState.availableUnits.isNotEmpty())
+                        stringResource(R.string.maint_label_component_not_listed)
+                    else
+                        stringResource(R.string.maint_label_component_free)
                 )
             }
         }
@@ -351,14 +323,13 @@ private fun DescriptionSection(
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.description,
                 onValueChange = { onFormEvent(MaintenanceLogFormEvent.DescriptionChanged(it)) },
-                label = { Text(stringResource(R.string.maint_label_description)) },
-                isError = uiState.descriptionError != null,
-                supportingText = uiState.descriptionError?.let { e -> { Text(e.asString()) } },
-                maxLines = 5,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.maint_label_description),
+                errorText = uiState.descriptionError?.asString(),
+                singleLine = false,
+                maxLines = 5
             )
         }
     }
@@ -400,15 +371,12 @@ private fun OutcomeSection(
             }
 
             // Duration field
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.durationMinutes,
                 onValueChange = { onFormEvent(MaintenanceLogFormEvent.DurationChanged(it)) },
-                label = { Text(stringResource(R.string.maint_label_duration)) },
-                isError = uiState.durationError != null,
-                supportingText = uiState.durationError?.let { e -> { Text(e.asString()) } },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.maint_label_duration),
+                errorText = uiState.durationError?.asString(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
     }
@@ -432,24 +400,20 @@ private fun MachineStateSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedTextField(
+                QrFormField(
                     value = uiState.operatingHoursAtEvent,
                     onValueChange = { onFormEvent(MaintenanceLogFormEvent.OperatingHoursChanged(it)) },
-                    label = { Text(stringResource(R.string.maint_label_operating_hours)) },
-                    isError = uiState.operatingHoursError != null,
-                    supportingText = uiState.operatingHoursError?.let { e -> { Text(e.asString()) } },
+                    label = stringResource(R.string.maint_label_operating_hours),
+                    errorText = uiState.operatingHoursError?.asString(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = uiState.cycleCountAtEvent,
                     onValueChange = { onFormEvent(MaintenanceLogFormEvent.CycleCountChanged(it)) },
-                    label = { Text(stringResource(R.string.maint_label_cycle_count)) },
-                    isError = uiState.cycleCountError != null,
-                    supportingText = uiState.cycleCountError?.let { e -> { Text(e.asString()) } },
+                    label = stringResource(R.string.maint_label_cycle_count),
+                    errorText = uiState.cycleCountError?.asString(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -471,21 +435,16 @@ private fun TechnicianSection(
                 text = stringResource(R.string.maint_label_technician),
                 style = MaterialTheme.typography.titleMedium
             )
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.technicianName,
                 onValueChange = { onFormEvent(MaintenanceLogFormEvent.TechnicianNameChanged(it)) },
-                label = { Text(stringResource(R.string.maint_label_technician)) },
-                isError = uiState.technicianNameError != null,
-                supportingText = uiState.technicianNameError?.let { e -> { Text(e.asString()) } },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.maint_label_technician),
+                errorText = uiState.technicianNameError?.asString()
             )
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.technicianCompany,
                 onValueChange = { onFormEvent(MaintenanceLogFormEvent.TechnicianCompanyChanged(it)) },
-                label = { Text(stringResource(R.string.maint_label_technician_company)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.maint_label_technician_company)
             )
         }
     }
@@ -503,12 +462,12 @@ private fun NotesSection(
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(12.dp))
-            OutlinedTextField(
+            QrFormField(
                 value = uiState.notes,
                 onValueChange = { onFormEvent(MaintenanceLogFormEvent.NotesChanged(it)) },
-                label = { Text(stringResource(R.string.maint_label_notes)) },
-                maxLines = 4,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.maint_label_notes),
+                singleLine = false,
+                maxLines = 4
             )
         }
     }

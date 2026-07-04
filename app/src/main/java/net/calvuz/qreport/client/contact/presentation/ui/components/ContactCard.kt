@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Call
@@ -20,8 +19,6 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +42,7 @@ import net.calvuz.qreport.client.contact.domain.model.Contact
 import net.calvuz.qreport.client.contact.domain.model.ContactMethod
 import net.calvuz.qreport.app.app.presentation.components.DeleteDialog
 import net.calvuz.qreport.app.app.presentation.components.PrimaryBadge
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QReportConfirmRestoreDialog
 import net.calvuz.qreport.app.app.presentation.components.QrCardFooter
 import net.calvuz.qreport.app.app.presentation.components.QrCardFooterData
@@ -69,17 +67,9 @@ fun ContactCard(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showOnRestoreDialog by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
-        )
+    QReportCard(
+        modifier = modifier,
+        isSelected = isSelected
     ) {
         when (variant) {
             ListViewMode.FULL -> FullContactCard(

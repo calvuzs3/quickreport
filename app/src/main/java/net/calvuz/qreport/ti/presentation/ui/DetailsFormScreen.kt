@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 
 /**
  * Form screen for editing intervention details:
@@ -158,14 +159,14 @@ private fun InterventionDescriptionSection(
                 )
             }
 
-            OutlinedTextField(
+            QrFormField(
                 value = description,
                 onValueChange = onDescriptionChange,
-                label = { Text(stringResource(R.string.intervention_details_description_label)) },
-                placeholder = { Text(stringResource(R.string.intervention_details_description_placeholder)) },
+                label = stringResource(R.string.intervention_details_description_label),
+                placeholder = stringResource(R.string.intervention_details_description_placeholder),
+                singleLine = false,
                 minLines = 5,
-                maxLines = 10,
-                modifier = Modifier.fillMaxWidth()
+                maxLines = 10
             )
         }
     }
@@ -212,19 +213,19 @@ private fun MaterialsUsedSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                OutlinedTextField(
+                QrFormField(
                     value = ddtNumber,
                     onValueChange = onDdtNumberChange,
-                    label = { Text(stringResource(R.string.intervention_details_ddt_number_label)) },
-                    placeholder = { Text(stringResource(R.string.intervention_details_ddt_number_placeholder)) },
+                    label = stringResource(R.string.intervention_details_ddt_number_label),
+                    placeholder = stringResource(R.string.intervention_details_ddt_number_placeholder),
                     modifier = Modifier.weight(1f)
                 )
 
-                OutlinedTextField(
+                QrFormField(
                     value = ddtDate,
                     onValueChange = onDdtDateChange,
-                    label = { Text(stringResource(R.string.intervention_details_ddt_date_label)) },
-                    placeholder = { Text(stringResource(R.string.intervention_details_ddt_date_placeholder)) },
+                    label = stringResource(R.string.intervention_details_ddt_date_label),
+                    placeholder = stringResource(R.string.intervention_details_ddt_date_placeholder),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f)
                 )
@@ -261,25 +262,25 @@ private fun MaterialsUsedSection(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            OutlinedTextField(
+                            QrFormField(
                                 value = if (index < materialItems.size) materialItems[index].quantity else "",
                                 onValueChange = { newQuantity ->
                                     val currentDescription = if (index < materialItems.size) materialItems[index].description else ""
                                     onMaterialItemChange(index, newQuantity, currentDescription)
                                 },
-                                label = { Text(stringResource(R.string.intervention_details_material_quantity_label)) },
+                                label = stringResource(R.string.intervention_details_material_quantity_label),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 modifier = Modifier.width(80.dp)
                             )
 
-                            OutlinedTextField(
+                            QrFormField(
                                 value = if (index < materialItems.size) materialItems[index].description else "",
                                 onValueChange = { newDescription ->
                                     val currentQuantity = if (index < materialItems.size) materialItems[index].quantity else ""
                                     onMaterialItemChange(index, currentQuantity, newDescription)
                                 },
-                                label = { Text(stringResource(R.string.field_description)) },
-                                placeholder = { Text(stringResource(R.string.intervention_details_material_description_placeholder)) },
+                                label = stringResource(R.string.field_description),
+                                placeholder = stringResource(R.string.intervention_details_material_description_placeholder),
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -322,12 +323,11 @@ private fun ExternalReportSection(
                 )
             }
 
-            OutlinedTextField(
+            QrFormField(
                 value = reportNumber,
                 onValueChange = onReportNumberChange,
-                label = { Text(stringResource(R.string.intervention_details_report_number_label)) },
-                placeholder = { Text(stringResource(R.string.intervention_details_report_number_placeholder)) },
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.intervention_details_report_number_label),
+                placeholder = stringResource(R.string.intervention_details_report_number_placeholder)
             )
         }
     }

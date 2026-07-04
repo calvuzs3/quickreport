@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -19,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
 
 /**
@@ -62,48 +62,38 @@ fun IslandTypeFormDialog(
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
+                QrFormField(
                     value = code,
                     onValueChange = { code = it },
-                    label = { Text(stringResource(R.string.island_type_field_code)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.island_type_field_code)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = label,
                     onValueChange = { label = it },
-                    label = { Text(stringResource(R.string.island_type_field_label)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.island_type_field_label)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.island_type_field_description)) },
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.island_type_field_description),
+                    singleLine = false
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = iconName,
                     onValueChange = { iconName = it },
-                    label = { Text(stringResource(R.string.island_type_field_icon_name)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.island_type_field_icon_name)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = maintenanceIntervalDays,
                     onValueChange = { maintenanceIntervalDays = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.island_type_field_maintenance_interval)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.island_type_field_maintenance_interval),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = sortOrder,
                     onValueChange = { sortOrder = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.island_type_field_sort_order)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.island_type_field_sort_order),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 if (errorMessage != null) {
                     Text(

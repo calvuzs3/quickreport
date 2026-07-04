@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
@@ -16,8 +15,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PrecisionManufacturing
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrListStatItem
 import net.calvuz.qreport.app.app.presentation.components.QReportConfirmDeleteDialog
 import net.calvuz.qreport.app.app.presentation.components.QrCardFooter
@@ -64,11 +62,9 @@ fun ClientCard(
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    Card(
+    QReportCard(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = modifier
     ) {
         when (variant) {
             ListViewMode.FULL -> FullClientCard(

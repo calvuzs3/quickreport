@@ -1,7 +1,6 @@
 package net.calvuz.qreport.client.island.presentation.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
@@ -15,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrCardFooter
 import net.calvuz.qreport.app.app.presentation.components.QrCardFooterData
 import net.calvuz.qreport.app.app.presentation.components.QrStatusIndicator
@@ -57,11 +57,9 @@ fun IslandCard(
     @Suppress("unused") var showDeleteDialog by remember { mutableStateOf(false) }
     @Suppress("unused") var showRestoreDialog by remember { mutableStateOf(false) }
 
-    Card(
+    QReportCard(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = modifier
     ) {
         when (variant) {
             ListViewMode.FULL -> FullIslandCard(

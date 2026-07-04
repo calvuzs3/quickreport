@@ -4,19 +4,13 @@ package net.calvuz.qreport.checkup.items.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,6 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.checkup.criticality.domain.model.CriticalityMaster
 import net.calvuz.qreport.checkup.items.domain.model.CheckItemTemplateMaster
 import net.calvuz.qreport.checkup.modules.domain.model.ModuleTypeMaster
@@ -65,9 +61,6 @@ fun CheckItemTemplateFormDialog(
         mutableStateOf(editingTemplate?.criticalityId ?: criticalityLevels.firstOrNull()?.id)
     }
 
-    var moduleMenuExpanded by remember { mutableStateOf(false) }
-    var criticalityMenuExpanded by remember { mutableStateOf(false) }
-
     val isValid = category.isNotBlank() && description.isNotBlank() &&
         selectedModuleTypeId != null && selectedCriticalityId != null
 
@@ -86,87 +79,43 @@ fun CheckItemTemplateFormDialog(
                 modifier = Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                OutlinedTextField(
+                QrFormField(
                     value = category,
                     onValueChange = { category = it },
-                    label = { Text(stringResource(R.string.check_item_template_field_category)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.check_item_template_field_category)
                 )
-                OutlinedTextField(
+                QrFormField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.check_item_template_field_description)) },
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.check_item_template_field_description),
+                    singleLine = false
                 )
 
-                ExposedDropdownMenuBox(
-                    expanded = moduleMenuExpanded,
-                    onExpandedChange = { moduleMenuExpanded = it },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OutlinedTextField(
-                        value = moduleTypes.find { it.id == selectedModuleTypeId }?.label ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.check_item_template_field_module_type)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = moduleMenuExpanded) },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                if (moduleTypes.isNotEmpty()) {
+                    QrDropdownField(
+                        selected = moduleTypes.find { it.id == selectedModuleTypeId } ?: moduleTypes.first(),
+                        options = moduleTypes,
+                        label = stringResource(R.string.check_item_template_field_module_type),
+                        optionLabel = { it.label },
+                        onSelect = { selectedModuleTypeId = it.id }
                     )
-                    ExposedDropdownMenu(
-                        expanded = moduleMenuExpanded,
-                        onDismissRequest = { moduleMenuExpanded = false }
-                    ) {
-                        moduleTypes.forEach { module ->
-                            DropdownMenuItem(
-                                text = { Text(module.label) },
-                                onClick = {
-                                    selectedModuleTypeId = module.id
-                                    moduleMenuExpanded = false
-                                }
-                            )
-                        }
-                    }
                 }
 
-                ExposedDropdownMenuBox(
-                    expanded = criticalityMenuExpanded,
-                    onExpandedChange = { criticalityMenuExpanded = it },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    OutlinedTextField(
-                        value = criticalityLevels.find { it.id == selectedCriticalityId }?.label ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.check_item_template_field_criticality)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = criticalityMenuExpanded) },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                if (criticalityLevels.isNotEmpty()) {
+                    QrDropdownField(
+                        selected = criticalityLevels.find { it.id == selectedCriticalityId } ?: criticalityLevels.first(),
+                        options = criticalityLevels,
+                        label = stringResource(R.string.check_item_template_field_criticality),
+                        optionLabel = { it.label },
+                        onSelect = { selectedCriticalityId = it.id }
                     )
-                    ExposedDropdownMenu(
-                        expanded = criticalityMenuExpanded,
-                        onDismissRequest = { criticalityMenuExpanded = false }
-                    ) {
-                        criticalityLevels.forEach { level ->
-                            DropdownMenuItem(
-                                text = { Text(level.label) },
-                                onClick = {
-                                    selectedCriticalityId = level.id
-                                    criticalityMenuExpanded = false
-                                }
-                            )
-                        }
-                    }
                 }
 
-                OutlinedTextField(
+                QrFormField(
                     value = orderIndex,
                     onValueChange = { orderIndex = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.check_item_template_field_order_index)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.check_item_template_field_order_index),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
                 if (errorMessage != null) {

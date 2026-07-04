@@ -17,6 +17,10 @@ import androidx.compose.material3.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.window.DialogProperties
+import net.calvuz.qreport.app.app.presentation.ui.theme.onSuccessContainer
+import net.calvuz.qreport.app.app.presentation.ui.theme.onWarningContainer
+import net.calvuz.qreport.app.app.presentation.ui.theme.success
+import net.calvuz.qreport.app.app.presentation.ui.theme.warning
 
 // ============================================================
 // 1. ERROR/INFO DIALOG - Solo informativo
@@ -96,9 +100,9 @@ private fun getMessageConfig(type: MessageType): DialogConfig {
         )
         MessageType.WARNING -> DialogConfig(
             icon = Icons.Default.Warning,
-            iconTint = Color(0xFFFF9800),
-            titleColor = Color(0xFFE65100),
-            buttonColor = Color(0xFFFF9800)
+            iconTint = MaterialTheme.colorScheme.warning,
+            titleColor = MaterialTheme.colorScheme.onWarningContainer,
+            buttonColor = MaterialTheme.colorScheme.warning
         )
         MessageType.INFO -> DialogConfig(
             icon = Icons.Default.Info,
@@ -108,9 +112,9 @@ private fun getMessageConfig(type: MessageType): DialogConfig {
         )
         MessageType.SUCCESS -> DialogConfig(
             icon = Icons.Default.CheckCircle,
-            iconTint = Color(0xFF4CAF50),
-            titleColor = Color(0xFF2E7D32),
-            buttonColor = Color(0xFF4CAF50)
+            iconTint = MaterialTheme.colorScheme.success,
+            titleColor = MaterialTheme.colorScheme.onSuccessContainer,
+            buttonColor = MaterialTheme.colorScheme.success
         )
     }
 }

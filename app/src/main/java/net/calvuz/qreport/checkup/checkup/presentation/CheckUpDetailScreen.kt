@@ -55,6 +55,9 @@ import net.calvuz.qreport.checkup.items.presentation.components.CheckupItemStatu
 import net.calvuz.qreport.checkup.items.presentation.model.CheckItemStatusExt.getColor
 import net.calvuz.qreport.checkup.items.presentation.model.CheckItemStatusExt.getNextStatus
 import net.calvuz.qreport.app.app.presentation.components.ErrorDialog
+import net.calvuz.qreport.app.app.presentation.components.QrListStatItem
+import net.calvuz.qreport.app.app.presentation.components.StatItemOrientation
+import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
 import net.calvuz.qreport.photo.presentation.ui.components.PhotoCountBadge
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import timber.log.Timber
@@ -268,10 +271,10 @@ fun CheckUpDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(
-                        start = 16.dp,
-                        top = 16.dp,
-                        end = 16.dp,
-                        bottom = 16.dp + WindowInsets.navigationBars.asPaddingValues()
+                        start = Spacing.lg,
+                        top = Spacing.lg,
+                        end = Spacing.lg,
+                        bottom = Spacing.lg + WindowInsets.navigationBars.asPaddingValues()
                             .calculateBottomPadding()
                     )
                 ) {
@@ -377,7 +380,7 @@ private fun ProgressOverviewCard(
         modifier = modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.lg),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
@@ -390,72 +393,42 @@ private fun ProgressOverviewCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                StatItem(
+                QrListStatItem(
                     icon = Icons.AutoMirrored.Default.Assignment,
                     value = statistics.totalItems.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_total_label),
+                    orientation = StatItemOrientation.Vertical,
                     modifier = Modifier.weight(1f)
                 )
 
-                StatItem(
+                QrListStatItem(
                     icon = Icons.Default.CheckCircle,
                     value = statistics.completedItems.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_completed_label),
                     color = Color(0xFF4CAF50),
+                    orientation = StatItemOrientation.Vertical,
                     modifier = Modifier.weight(1f)
                 )
 
-                StatItem(
+                QrListStatItem(
                     icon = Icons.Default.Error,
                     value = statistics.nokItems.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_nok_label),
                     color = Color(0xFFF44336),
+                    orientation = StatItemOrientation.Vertical,
                     modifier = Modifier.weight(1f)
                 )
 
-                StatItem(
+                QrListStatItem(
                     icon = Icons.Default.Warning,
                     value = statistics.criticalIssues.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_critical_label),
                     color = if (statistics.criticalIssues > 0) Color(0xFFFF5722) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    orientation = StatItemOrientation.Vertical,
                     modifier = Modifier.weight(1f)
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun StatItem(
-    icon: ImageVector,
-    value: String,
-    label: String,
-    color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(28.dp)
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 
@@ -481,7 +454,7 @@ private fun ModuleSectionWithPhotos(
         modifier = modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Spacing.lg),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Module Header
@@ -513,7 +486,7 @@ private fun ModuleSectionWithPhotos(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
                 ) {
                     // Photo count badge
                     val totalPhotos = items.sumOf { photoCountsByItem[it.id] ?: 0 }
@@ -535,7 +508,7 @@ private fun ModuleSectionWithPhotos(
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     items.forEach { item ->
                         CheckItemCardWithPhotos(
                             checkItem = item,
@@ -591,7 +564,7 @@ private fun CheckItemCardWithPhotos(
                 modifier = Modifier
                     .weight(1f)
                     .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm)
             ) {
                 // Check Item Header
                 Row(
@@ -645,7 +618,7 @@ private fun CheckItemCardWithPhotos(
                 // Notes button
                 TextButton(
                     onClick = { showNotesDialog = true },
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                    contentPadding = PaddingValues(horizontal = Spacing.sm, vertical = 4.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.Notes,
@@ -730,7 +703,7 @@ private fun PhotoSection(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Photo preview (first 3 photos)

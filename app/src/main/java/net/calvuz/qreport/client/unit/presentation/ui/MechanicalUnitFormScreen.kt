@@ -15,6 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.unit.domain.model.UnitType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,46 +88,35 @@ fun MechanicalUnitFormScreen(
                 )
             })
 
-            OutlinedTextField(
+            QrFormField(
                 value = state.name,
                 onValueChange = { formEvent(MechanicalUnitFormEvent.NameChanged(it)) },
-                label = { Text(stringResource(R.string.unit_form_field_name)) },
-                placeholder = { Text(stringResource(R.string.unit_form_field_name_placeholder)) },
-                isError = state.showValidation && !state.isNameValid,
-                supportingText = {
-                    if (state.showValidation && !state.isNameValid)
-                        Text(
-                            stringResource(R.string.unit_form_error_name_required),
-                            color = MaterialTheme.colorScheme.error
-                        )
-                },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.unit_form_field_name),
+                placeholder = stringResource(R.string.unit_form_field_name_placeholder),
+                errorText = if (state.showValidation && !state.isNameValid)
+                    stringResource(R.string.unit_form_error_name_required)
+                else null
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = state.serialNumber,
                 onValueChange = { formEvent(MechanicalUnitFormEvent.SerialNumberChanged(it)) },
-                label = { Text(stringResource(R.string.unit_form_field_serial)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.unit_form_field_serial)
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = state.model,
                 onValueChange = { formEvent(MechanicalUnitFormEvent.ModelChanged(it)) },
-                label = { Text(stringResource(R.string.unit_form_field_model)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.unit_form_field_model)
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = state.notes,
                 onValueChange = { formEvent(MechanicalUnitFormEvent.NotesChanged(it)) },
-                label = { Text(stringResource(R.string.unit_form_field_notes)) },
+                label = stringResource(R.string.unit_form_field_notes),
+                singleLine = false,
                 minLines = 2,
-                maxLines = 5,
-                modifier = Modifier.fillMaxWidth()
+                maxLines = 5
             )
 
             Button(
@@ -150,29 +141,13 @@ fun MechanicalUnitFormScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun UnitTypeDropdown(selected: UnitType, onSelected: (UnitType) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-        OutlinedTextField(
-            value = stringResource(selected.labelResId),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.unit_form_field_type)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            UnitType.entries.forEach { type ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(type.labelResId)) },
-                    onClick = { onSelected(type); expanded = false }
-                )
-            }
-        }
-    }
+    QrDropdownField(
+        selected = selected,
+        options = UnitType.entries,
+        label = stringResource(R.string.unit_form_field_type),
+        optionLabel = { stringResource(it.labelResId) },
+        onSelect = onSelected
+    )
 }

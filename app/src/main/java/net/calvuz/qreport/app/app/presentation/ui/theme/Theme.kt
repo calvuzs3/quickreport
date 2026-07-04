@@ -16,31 +16,42 @@ import androidx.core.view.WindowCompat
 
 import androidx.compose.material3.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 
 /**
- * QReport Theme
+ * QReport Theme — Arancio e Technical Design
  *
- * Tema personalizzato per QReport basato su Material Design 3
- * con palette di colori ottimizzata per ambienti industriali.
+ * Tema personalizzato per QReport basato su Material Design 3, adattato dal
+ * design system condiviso con QuickStore (vedi design/design-system.md):
+ * arancio come unico accento di brand, grafite come inchiostro. I colori
+ * semantici di stato/criticità/modulo (Color.kt) restano indipendenti da
+ * questo tema, non sono influenzati dal color scheme M3.
  *
  * Features:
- * - Color scheme personalizzato (blu industriale)
- * - Typography ottimizzata per leggibilità
+ * - Color scheme arancio/grafite, dynamic color disattivato di default
+ * - Typography IBM Plex Sans/Mono su title/body/label/dati
  * - Dark/Light theme automatico
- * - Dynamic colors su Android 12+
  */
 
-// Primary colors - Blu industriale
-private val md_theme_light_primary = Color(0xFF1565C0)         // Blue 800
-private val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-private val md_theme_light_primaryContainer = Color(0xFFE3F2FD) // Blue 50
-private val md_theme_light_onPrimaryContainer = Color(0xFF0D47A1) // Blue 900
+// Primary colors - Arancio brand (riempimento). onPrimary = grafite, non
+// bianco: regola d'inchiostro, vedi design/design-system.md.
+private val md_theme_light_primary = TechnicalOrangeLight
+private val md_theme_light_onPrimary = TechnicalGraphite
+private val md_theme_light_primaryContainer = Color(0xFFFBE3C2)
+private val md_theme_light_onPrimaryContainer = TechnicalGraphite
 
-// Secondary colors - Arancione di accento
-private val md_theme_light_secondary = Color(0xFFFF8A65)        // Deep Orange 300
-private val md_theme_light_onSecondary = Color(0xFFFFFFFF)
-private val md_theme_light_secondaryContainer = Color(0xFFFFF3E0) // Orange 50
-private val md_theme_light_onSecondaryContainer = Color(0xFFE65100) // Orange 900
+// Secondary colors - ruolo neutro (nessun secondo hue): grigio graphite-toned
+private val md_theme_light_secondary = TechnicalSlate
+private val md_theme_light_onSecondary = TechnicalSurfaceLight
+private val md_theme_light_secondaryContainer = TechnicalPaper
+private val md_theme_light_onSecondaryContainer = TechnicalGraphite
+
+// Tertiary colors - sfumatura più scura dell'arancio (stesso hue). onTertiary
+// = grafite, non bianco: stesso motivo di onPrimary.
+private val md_theme_light_tertiary = TechnicalOrangeDarkerLight
+private val md_theme_light_onTertiary = TechnicalGraphite
+private val md_theme_light_tertiaryContainer = Color(0xFFFBE3C2)
+private val md_theme_light_onTertiaryContainer = TechnicalGraphite
 
 // Error colors - Rosso per NOK status
 private val md_theme_light_error = Color(0xFFD32F2F)           // Red 700
@@ -60,36 +71,43 @@ val QReportAmberContainer = Color(0xFFFFF8E1)                  // Amber 50
 val QReportOnAmber = Color(0xFF000000)
 val QReportOnAmberContainer = Color(0xFFFF6F00)                // Amber 900
 
-// Surface colors
-private val md_theme_light_background = Color(0xFFFCFCFC)      // Quasi bianco
-private val md_theme_light_onBackground = Color(0xFF1A1A1A)
-private val md_theme_light_surface = Color(0xFFFFFFFF)
-private val md_theme_light_onSurface = Color(0xFF1A1A1A)
-private val md_theme_light_surfaceVariant = Color(0xFFF5F5F5)  // Grey 100
-private val md_theme_light_onSurfaceVariant = Color(0xFF424242) // Grey 800
+// Surface colors - Paper/grafite (vedi design/design-system.md)
+private val md_theme_light_background = TechnicalPaper
+private val md_theme_light_onBackground = TechnicalGraphite
+private val md_theme_light_surface = TechnicalSurfaceLight
+private val md_theme_light_onSurface = TechnicalGraphite
+private val md_theme_light_surfaceVariant = TechnicalPaper
+private val md_theme_light_onSurfaceVariant = TechnicalSlate
+private val md_theme_light_outline = TechnicalBorder
 
-// Dark theme colors
-private val md_theme_dark_primary = Color(0xFF90CAF9)          // Blue 200
-private val md_theme_dark_onPrimary = Color(0xFF0D47A1)        // Blue 900
-private val md_theme_dark_primaryContainer = Color(0xFF1976D2) // Blue 600
-private val md_theme_dark_onPrimaryContainer = Color(0xFFE3F2FD) // Blue 50
+// Dark theme colors - Arancio/grafite (vedi design/design-system.md)
+private val md_theme_dark_primary = TechnicalOrangeDark
+private val md_theme_dark_onPrimary = TechnicalGraphite // grafite anche in dark: 5.9:1, regola d'inchiostro
+private val md_theme_dark_primaryContainer = Color(0xFF4A3417)
+private val md_theme_dark_onPrimaryContainer = TechnicalTextDark
 
-private val md_theme_dark_secondary = Color(0xFFFFAB91)        // Deep Orange 200
-private val md_theme_dark_onSecondary = Color(0xFFE65100)      // Orange 900
-private val md_theme_dark_secondaryContainer = Color(0xFFFF7043) // Deep Orange 400
-private val md_theme_dark_onSecondaryContainer = Color(0xFFFFF3E0) // Orange 50
+private val md_theme_dark_secondary = TechnicalTextSecondaryDark
+private val md_theme_dark_onSecondary = TechnicalGraphite
+private val md_theme_dark_secondaryContainer = TechnicalSurfaceDark
+private val md_theme_dark_onSecondaryContainer = TechnicalTextDark
+
+private val md_theme_dark_tertiary = TechnicalOrangeDarkerDark
+private val md_theme_dark_onTertiary = TechnicalGraphite
+private val md_theme_dark_tertiaryContainer = Color(0xFF4A3417)
+private val md_theme_dark_onTertiaryContainer = TechnicalTextDark
 
 private val md_theme_dark_error = Color(0xFFEF5350)            // Red 400
 private val md_theme_dark_errorContainer = Color(0xFFD32F2F)   // Red 700
 private val md_theme_dark_onError = Color(0xFFFFFFFF)
 private val md_theme_dark_onErrorContainer = Color(0xFFFFEBEE) // Red 50
 
-private val md_theme_dark_background = Color(0xFF121212)       // Material dark
-private val md_theme_dark_onBackground = Color(0xFFE0E0E0)
-private val md_theme_dark_surface = Color(0xFF1E1E1E)
-private val md_theme_dark_onSurface = Color(0xFFE0E0E0)
-private val md_theme_dark_surfaceVariant = Color(0xFF2E2E2E)
-private val md_theme_dark_onSurfaceVariant = Color(0xFFBDBDBD) // Grey 400
+private val md_theme_dark_background = TechnicalBackgroundDark
+private val md_theme_dark_onBackground = TechnicalTextDark
+private val md_theme_dark_surface = TechnicalSurfaceDark
+private val md_theme_dark_onSurface = TechnicalTextDark
+private val md_theme_dark_surfaceVariant = TechnicalSurfaceDark
+private val md_theme_dark_onSurfaceVariant = TechnicalTextSecondaryDark
+private val md_theme_dark_outline = TechnicalBorderDark
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -100,6 +118,10 @@ private val LightColors = lightColorScheme(
     onSecondary = md_theme_light_onSecondary,
     secondaryContainer = md_theme_light_secondaryContainer,
     onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    tertiary = md_theme_light_tertiary,
+    onTertiary = md_theme_light_onTertiary,
+    tertiaryContainer = md_theme_light_tertiaryContainer,
+    onTertiaryContainer = md_theme_light_onTertiaryContainer,
     error = md_theme_light_error,
     errorContainer = md_theme_light_errorContainer,
     onError = md_theme_light_onError,
@@ -110,6 +132,7 @@ private val LightColors = lightColorScheme(
     onSurface = md_theme_light_onSurface,
     surfaceVariant = md_theme_light_surfaceVariant,
     onSurfaceVariant = md_theme_light_onSurfaceVariant,
+    outline = md_theme_light_outline,
 )
 
 private val DarkColors = darkColorScheme(
@@ -121,6 +144,10 @@ private val DarkColors = darkColorScheme(
     onSecondary = md_theme_dark_onSecondary,
     secondaryContainer = md_theme_dark_secondaryContainer,
     onSecondaryContainer = md_theme_dark_onSecondaryContainer,
+    tertiary = md_theme_dark_tertiary,
+    onTertiary = md_theme_dark_onTertiary,
+    tertiaryContainer = md_theme_dark_tertiaryContainer,
+    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
     error = md_theme_dark_error,
     errorContainer = md_theme_dark_errorContainer,
     onError = md_theme_dark_onError,
@@ -131,6 +158,7 @@ private val DarkColors = darkColorScheme(
     onSurface = md_theme_dark_onSurface,
     surfaceVariant = md_theme_dark_surfaceVariant,
     onSurfaceVariant = md_theme_dark_onSurfaceVariant,
+    outline = md_theme_dark_outline,
 )
 
 /**
@@ -139,7 +167,11 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun QReportTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true, // Available on Android 12+
+    // La palette arancio/grafite è una scelta di brand deliberata (vedi
+    // design/design-system.md) e i colori di stato (OK/NOK/Pending, vedi
+    // Color.kt) sono segnali di sicurezza: devono restare identici su ogni
+    // device, non essere sovrascritti dai colori del wallpaper.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -156,8 +188,8 @@ fun QReportTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            //window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
@@ -194,115 +226,3 @@ val ColorScheme.warningContainer: Color
 
 val ColorScheme.onWarningContainer: Color
     @Composable get() = QReportOnAmberContainer
-
-
-
-// Colori QReport - Brand industriale professionale
-private val QReportLightColors = lightColorScheme(
-    primary = QReportBlue,
-    onPrimary = QReportWhite,
-    primaryContainer = QReportBlueLight,
-    onPrimaryContainer = QReportBlueDark,
-    secondary = QReportOrange,
-    onSecondary = QReportWhite,
-    secondaryContainer = QReportOrangeLight,
-    onSecondaryContainer = QReportOrangeDark,
-    tertiary = QReportGreen,
-    onTertiary = QReportWhite,
-    tertiaryContainer = QReportGreenLight,
-    onTertiaryContainer = QReportGreenDark,
-    error = QReportRed,
-    onError = QReportWhite,
-    errorContainer = QReportRedLight,
-    onErrorContainer = QReportRedDark,
-    background = QReportGrey50,
-    onBackground = QReportGrey900,
-    surface = QReportWhite,
-    onSurface = QReportGrey900,
-    surfaceVariant = QReportGrey100,
-    onSurfaceVariant = QReportGrey700,
-    outline = QReportGrey400,
-    outlineVariant = QReportGrey200,
-    scrim = QReportBlack,
-    inverseSurface = QReportGrey900,
-    inverseOnSurface = QReportGrey50,
-    inversePrimary = QReportBlueLight,
-    surfaceDim = QReportGrey100,
-    surfaceBright = QReportWhite,
-    surfaceContainerLowest = QReportWhite,
-    surfaceContainerLow = QReportGrey50,
-    surfaceContainer = QReportGrey100,
-    surfaceContainerHigh = QReportGrey200,
-    surfaceContainerHighest = QReportGrey300
-)
-
-private val QReportDarkColors = darkColorScheme(
-    primary = QReportBlueLight,
-    onPrimary = QReportBlueDark,
-    primaryContainer = QReportBlueDark,
-    onPrimaryContainer = QReportBlueLight,
-    secondary = QReportOrangeLight,
-    onSecondary = QReportOrangeDark,
-    secondaryContainer = QReportOrangeDark,
-    onSecondaryContainer = QReportOrangeLight,
-    tertiary = QReportGreenLight,
-    onTertiary = QReportGreenDark,
-    tertiaryContainer = QReportGreenDark,
-    onTertiaryContainer = QReportGreenLight,
-    error = QReportRedLight,
-    onError = QReportRedDark,
-    errorContainer = QReportRedDark,
-    onErrorContainer = QReportRedLight,
-    background = QReportBlack,
-    onBackground = QReportGrey100,
-    surface = QReportGrey900,
-    onSurface = QReportGrey100,
-    surfaceVariant = QReportGrey800,
-    onSurfaceVariant = QReportGrey300,
-    outline = QReportGrey600,
-    outlineVariant = QReportGrey800,
-    scrim = QReportBlack,
-    inverseSurface = QReportGrey100,
-    inverseOnSurface = QReportGrey900,
-    inversePrimary = QReportBlue,
-    surfaceDim = QReportGrey900,
-    surfaceBright = QReportGrey700,
-    surfaceContainerLowest = QReportBlack,
-    surfaceContainerLow = QReportGrey900,
-    surfaceContainer = QReportGrey800,
-    surfaceContainerHigh = QReportGrey700,
-    surfaceContainerHighest = QReportGrey600
-)
-
-//@Composable
-//fun QReportTheme(
-//    darkTheme: Boolean = isSystemInDarkTheme(),
-//    // Dynamic color su Android 12+
-//    dynamicColor: Boolean = false, // Disabilitiamo per mantenere brand consistency
-//    content: @Composable () -> Unit
-//) {
-//    val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//
-//        darkTheme -> QReportDarkColors
-//        else -> QReportLightColors
-//    }
-//
-//    val view = LocalView.current
-//    if (!view.isInEditMode) {
-//        SideEffect {
-//            val window = (view.context as Activity).window
-//            window.statusBarColor = colorScheme.primary.toArgb()
-//            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-//        }
-//    }
-//
-//    MaterialTheme(
-//        colorScheme = colorScheme,
-//        typography = QReportTypography,
-//        content = content
-//    )
-//}

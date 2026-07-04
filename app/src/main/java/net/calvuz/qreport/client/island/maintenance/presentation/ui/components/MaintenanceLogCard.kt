@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import net.calvuz.qreport.app.app.presentation.ui.theme.onSuccessContainer
 import net.calvuz.qreport.app.app.presentation.ui.theme.onWarningContainer
@@ -41,8 +42,8 @@ fun MaintenanceLogCard(
 ) {
     var expanded by remember(log.id) { mutableStateOf(initiallyExpanded) }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
+    QReportCard(
+        modifier = modifier,
         onClick = { expanded = !expanded }
     ) {
         Column(

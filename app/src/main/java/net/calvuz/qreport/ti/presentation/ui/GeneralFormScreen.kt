@@ -23,6 +23,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.ti.domain.model.WorkLocationType
 
@@ -204,56 +206,46 @@ private fun CustomerDataSection(
             }
 
             // Customer name (required)
-            OutlinedTextField(
+            QrFormField(
                 value = customerName,
                 onValueChange = onCustomerNameChange,
-                label = { Text(stringResource(R.string.intervention_form_customer_name_label)) },
-                isError = customerName.isBlank(),
-                supportingText = if (customerName.isBlank()) {
-                    { Text(stringResource(R.string.err_field_required), color = MaterialTheme.colorScheme.error) }
-                } else null,
-                enabled = !isEditMode,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.intervention_form_customer_name_label),
+                errorText = if (customerName.isBlank()) stringResource(R.string.err_field_required) else null,
+                enabled = !isEditMode
             )
 
             // Customer contact (optional)
-            OutlinedTextField(
+            QrFormField(
                 value = customerContact,
                 onValueChange = onCustomerContactChange,
-                label = { Text(stringResource(R.string.intervention_form_customer_contact_label)) },
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.intervention_form_customer_contact_label)
             )
 
             // Ticket number (required)
-            OutlinedTextField(
+            QrFormField(
                 value = ticketNumber,
                 onValueChange = onTicketNumberChange,
-                label = { Text(stringResource(R.string.intervention_form_ticket_number_label)) },
-                isError = ticketNumber.isBlank(),
-                supportingText = if (ticketNumber.isBlank()) {
-                    { Text(stringResource(R.string.err_field_required), color = MaterialTheme.colorScheme.error) }
-                } else null,
-                enabled = !isEditMode,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.intervention_form_ticket_number_label),
+                errorText = if (ticketNumber.isBlank()) stringResource(R.string.err_field_required) else null,
+                enabled = !isEditMode
             )
 
             // Customer order number (optional)
-            OutlinedTextField(
+            QrFormField(
                 value = customerOrderNumber,
                 onValueChange = onCustomerOrderNumberChange,
-                label = { Text(stringResource(R.string.intervention_general_customer_order_number_label)) },
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.intervention_general_customer_order_number_label)
             )
 
             // Notes (optional)
-            OutlinedTextField(
+            QrFormField(
                 value = notes,
                 onValueChange = onNotesChange,
-                label = { Text(stringResource(R.string.intervention_form_notes_label)) },
-                placeholder = { Text(stringResource(R.string.intervention_general_notes_placeholder)) },
+                label = stringResource(R.string.intervention_form_notes_label),
+                placeholder = stringResource(R.string.intervention_general_notes_placeholder),
+                singleLine = false,
                 minLines = 2,
-                maxLines = 4,
-                modifier = Modifier.fillMaxWidth()
+                maxLines = 4
             )
         }
     }
@@ -303,33 +295,27 @@ private fun RobotDataSection(
             }
 
             // Serial number (required)
-            OutlinedTextField(
+            QrFormField(
                 value = serialNumber,
                 onValueChange = onSerialNumberChange,
-                label = { Text(stringResource(R.string.intervention_form_serial_number_label)) },
-                isError = serialNumber.isBlank(),
-                supportingText = if (serialNumber.isBlank()) {
-                    { Text(stringResource(R.string.err_field_required), color = MaterialTheme.colorScheme.error) }
-                } else null,
-                enabled = !isEditMode,
-                modifier = Modifier.fillMaxWidth()
+                label = stringResource(R.string.intervention_form_serial_number_label),
+                errorText = if (serialNumber.isBlank()) stringResource(R.string.err_field_required) else null,
+                enabled = !isEditMode
             )
 
             // Hours of duty (editable in both modes - can be updated)
-            OutlinedTextField(
+            QrFormField(
                 value = hoursOfDuty,
                 onValueChange = onHoursOfDutyChange,
-                label = { Text(stringResource(R.string.intervention_form_hours_of_duty_label)) },
+                label = stringResource(R.string.intervention_form_hours_of_duty_label),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = hoursOfDuty.isBlank() || hoursOfDuty.toIntOrNull() == null,
-                supportingText = if (hoursOfDuty.isBlank()) {
-                    { Text(stringResource(R.string.err_field_required), color = MaterialTheme.colorScheme.error) }
+                errorText = if (hoursOfDuty.isBlank()) {
+                    stringResource(R.string.err_field_required)
                 } else if (hoursOfDuty.toIntOrNull() == null) {
-                    { Text(stringResource(R.string.err_invalid_number), color = MaterialTheme.colorScheme.error) }
+                    stringResource(R.string.err_invalid_number)
                 } else {
                     null
-                },
-                modifier = Modifier.fillMaxWidth()
+                }
             )
         }
     }
@@ -370,50 +356,21 @@ private fun WorkLocationSection(
             }
 
             // Work location dropdown
-            var expanded by remember { mutableStateOf(false) }
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = workLocation.displayName.asString(),
-                    onValueChange = { },
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.intervention_form_work_location_label)) },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    WorkLocationType.entries.forEach { locationType ->
-                        DropdownMenuItem(
-                            text = { Text(locationType.displayName.asString()) },
-                            onClick = {
-                                onWorkLocationChange(locationType)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
+            QrDropdownField(
+                selected = workLocation,
+                options = WorkLocationType.entries,
+                label = stringResource(R.string.intervention_form_work_location_label),
+                optionLabel = { it.displayName.asString() },
+                onSelect = onWorkLocationChange
+            )
 
             // Custom location field (only when OTHER is selected)
             if (workLocation == WorkLocationType.OTHER) {
-                OutlinedTextField(
+                QrFormField(
                     value = customLocation,
                     onValueChange = onCustomLocationChange,
-                    label = { Text(stringResource(R.string.intervention_form_custom_location_label)) },
-                    placeholder = { Text(stringResource(R.string.intervention_form_custom_location_placeholder)) },
-                    modifier = Modifier.fillMaxWidth()
+                    label = stringResource(R.string.intervention_form_custom_location_label),
+                    placeholder = stringResource(R.string.intervention_form_custom_location_placeholder)
                 )
             }
         }

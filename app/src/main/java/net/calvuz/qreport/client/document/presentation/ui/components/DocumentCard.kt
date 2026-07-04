@@ -15,8 +15,6 @@ import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import net.calvuz.qreport.app.util.SizeUtils.getFormattedSize
 import net.calvuz.qreport.client.document.domain.model.DocumentCategory
@@ -61,20 +60,13 @@ fun DocumentCard(
     onDelete: ((Document) -> Unit)? = null,
     onLongPress: ((Document) -> Unit)? = null
 ) {
-    val containerColor = if (isSelected)
-        MaterialTheme.colorScheme.primaryContainer
-    else
-        MaterialTheme.colorScheme.surfaceVariant
-
-    Card(
+    QReportCard(
         modifier = modifier
-            .fillMaxWidth()
             .combinedClickable(
                 onClick    = { onOpen(document) },
                 onLongClick = { onLongPress?.invoke(document) }
             ),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 1.dp)
+        isSelected = isSelected
     ) {
         when (variant) {
             DocumentCardVariant.MINIMAL  -> MinimalContent(document, isSelected)

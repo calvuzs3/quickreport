@@ -20,6 +20,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.app.app.presentation.components.QReportFormAddressSection
+import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -156,37 +158,17 @@ fun ClientFormScreen(
                 // Action buttons
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        OutlinedButton(
-                            onClick = onNavigateBack,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(stringResource(R.string.client_form_button_cancel))
-                        }
-
-                        Button(
-                            onClick = viewModel::saveClient,
-                            enabled = uiState.canSave && !uiState.isSaving,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            if (uiState.isSaving) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Text(
-                                    if (clientId == null)
-                                        stringResource(R.string.client_form_button_create)
-                                    else
-                                        stringResource(R.string.client_form_button_save_changes)
-                                )
-                            }
-                        }
-                    }
+                    QrFormActionsRow(
+                        onCancel = onNavigateBack,
+                        onSave = viewModel::saveClient,
+                        saveEnabled = uiState.canSave,
+                        isSaving = uiState.isSaving,
+                        cancelText = stringResource(R.string.client_form_button_cancel),
+                        saveText = if (clientId == null)
+                            stringResource(R.string.client_form_button_create)
+                        else
+                            stringResource(R.string.client_form_button_save_changes)
+                    )
                 }
             }
         }
@@ -222,20 +204,15 @@ private fun CompanyDataSection(
                 fontWeight = FontWeight.SemiBold
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = companyName,
                 onValueChange = { onEvent(ClientFormEvent.CompanyNameChanged(it)) },
-                label = { Text(stringResource(R.string.client_form_field_company_name)) },
-                modifier = Modifier.fillMaxWidth(),
+                label = stringResource(R.string.client_form_field_company_name),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Characters
                 ),
-                singleLine = true,
-                isError = companyNameError != null,
-                supportingText = companyNameError?.let {
-                    { Text(it.asString(), color = MaterialTheme.colorScheme.error) }
-                }
+                errorText = companyNameError?.asString()
             )
         }
     }
@@ -258,14 +235,14 @@ private fun NotesSection(
                 fontWeight = FontWeight.SemiBold
             )
 
-            OutlinedTextField(
+            QrFormField(
                 value = notes,
                 onValueChange = { onEvent(ClientFormEvent.NotesChanged(it)) },
-                label = { Text(stringResource(R.string.client_form_field_notes)) },
-                modifier = Modifier.fillMaxWidth(),
+                label = stringResource(R.string.client_form_field_notes),
+                placeholder = stringResource(R.string.client_form_field_notes_placeholder),
+                singleLine = false,
                 minLines = 3,
                 maxLines = 5,
-                placeholder = { Text(stringResource(R.string.client_form_field_notes_placeholder)) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Sentences

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
@@ -113,7 +114,7 @@ fun CheckUpListScreen(
             query = uiState.searchQuery,
             onQueryChange = viewModel::updateSearchQuery,
             placeholder = stringResource(R.string.checkup_screen_list_search_placeholder),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(Spacing.lg)
         )
 
         // Filter chips
@@ -125,7 +126,7 @@ fun CheckUpListScreen(
                 avoidSort = CheckUpSortOrder.RECENT_FIRST.getDisplayName(),
                 onClearFilter = { viewModel.updateFilter(CheckUpFilter.ALL) },
                 onClearSort = { viewModel.updateSortOrder(CheckUpSortOrder.RECENT_FIRST) },
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = Spacing.lg)
             )
         }
 
@@ -201,7 +202,7 @@ fun CheckUpListScreen(
                 onClick = onCreateNewCheckUp,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp)
+                    .padding(Spacing.lg)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -224,8 +225,8 @@ private fun CheckupListContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         // Extra bottom padding so the FAB doesn't cover the last item
-        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 88.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        contentPadding = PaddingValues(start = Spacing.lg, top = Spacing.lg, end = Spacing.lg, bottom = 88.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm)
     ) {
         items(
             items = checkups,
