@@ -30,6 +30,7 @@ import net.calvuz.qreport.client.contact.domain.model.ContactMethod
 import timber.log.Timber
 import net.calvuz.qreport.R
 import net.calvuz.qreport.client.contact.presentation.model.getDisplayName
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * Screen per la creazione/modifica di un contatto
@@ -499,7 +500,7 @@ private fun ContactFormSection(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Column(

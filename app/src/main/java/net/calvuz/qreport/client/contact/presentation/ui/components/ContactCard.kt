@@ -175,7 +175,7 @@ private fun FullContactCard(
                                 Icon(
                                     imageVector = Icons.Outlined.Star,
                                     contentDescription = stringResource(R.string.action_set_as_primary),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -190,7 +190,7 @@ private fun FullContactCard(
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = stringResource(R.string.action_edit),
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -316,7 +316,7 @@ private fun CompactContactCard(
                         imageVector = Icons.Default.Star,
                         contentDescription = stringResource(R.string.contact_primary_facility),
                         modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -327,7 +327,7 @@ private fun CompactContactCard(
                     Text(
                         text = role,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -348,13 +348,13 @@ private fun CompactContactCard(
                             Icon(
                                 Icons.Default.Call,
                                 contentDescription = stringResource(R.string.action_call),
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(20.dp)
                             )
                             Text(
                                 text = phone,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -377,12 +377,12 @@ private fun CompactContactCard(
                             Icon(
                                 Icons.Default.Email,
                                 contentDescription = stringResource(R.string.action_send_email),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = email,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -415,7 +415,7 @@ private fun MinimalContactCard(contact: Contact) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = stringResource(R.string.contact_primary_contact),
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(14.dp)
                     )
                 }

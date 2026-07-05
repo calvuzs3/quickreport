@@ -27,6 +27,7 @@ import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.app.app.presentation.components.SectionCard
 import net.calvuz.qreport.settings.presentation.ui.TechnicianSettingsViewModel
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Dialog per l'editing delle informazioni dell'header del check-up

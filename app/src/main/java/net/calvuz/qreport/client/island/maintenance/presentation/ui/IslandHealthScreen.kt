@@ -160,7 +160,7 @@ private fun SummaryHeaderCard(summary: IslandHealthSummary) {
                     text = summary.totalLogs.toString(),
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Column(horizontalAlignment = Alignment.End) {
                     summary.lastLogDate?.let {

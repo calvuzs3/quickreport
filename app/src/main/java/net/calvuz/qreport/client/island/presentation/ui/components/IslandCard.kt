@@ -30,6 +30,7 @@ import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
 import net.calvuz.qreport.client.island.presentation.model.resolveIslandTypeDisplay
 import net.calvuz.qreport.settings.domain.model.ListViewMode
 import net.calvuz.qreport.client.unit.presentation.ui.components.MechanicalUnitCard
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * Island Card — three variants (FULL / COMPACT / MINIMAL).
@@ -110,8 +111,7 @@ fun IslandCard(
             text = { Text(stringResource(R.string.island_card_restore_dialog_message, island.customName ?: island.serialNumber)) },
             confirmButton = {
                 TextButton(
-                    onClick = { onRestore(); showRestoreDialog = false },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+                    onClick = { onRestore(); showRestoreDialog = false }
                 ) {
                     Text(stringResource(R.string.action_restore))
                     }
@@ -275,14 +275,14 @@ private fun CompactIslandCard(
             imageVector = typeDisplay.icon,
             contentDescription = null,
             modifier = Modifier.size(22.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 text = typeDisplay.label,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = island.customName ?: island.serialNumber,
@@ -459,7 +459,7 @@ private fun IslandActionButtons(onEdit: (() -> Unit)?, onDelete: (() -> Unit)?, 
     Row {
         if (onEdit != null) {
             IconButton(onClick = onEdit, modifier = Modifier.size(buttonSize)) {
-                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(iconSize))
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.action_edit), tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(iconSize))
             }
         }
         if (onDelete != null) {

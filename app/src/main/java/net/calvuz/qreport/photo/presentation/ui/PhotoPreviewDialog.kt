@@ -25,6 +25,7 @@ import coil.request.ImageRequest
 import net.calvuz.qreport.photo.domain.model.Photo
 import net.calvuz.qreport.photo.presentation.model.PhotoPreviewUiState
 import net.calvuz.qreport.photo.presentation.model.PhotoDisplayModel
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Dialog fullscreen per la preview delle foto con capacità di navigazione, editing e gestione.

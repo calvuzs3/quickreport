@@ -53,7 +53,7 @@ fun ContractListItem(
                         Icon(
                             Icons.Default.Star,
                             contentDescription = stringResource(R.string.label_valid),
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -68,7 +68,7 @@ fun ContractListItem(
                     Text(
                         text = name,
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -76,7 +76,7 @@ fun ContractListItem(
                     Text(
                         text = desc,
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -119,7 +119,7 @@ fun ContractListItem(
                     Icon(
                         Icons.Default.Edit,
                         contentDescription = stringResource(R.string.action_edit),
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(18.dp)
                     )
                 }

@@ -3,6 +3,7 @@ package net.calvuz.qreport.settings.data.local
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -10,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import net.calvuz.qreport.settings.domain.model.HomePreferences
 import net.calvuz.qreport.settings.domain.model.ListViewMode
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,6 +49,45 @@ class AppSettingsDataStore @Inject constructor(
         private fun viewModeKey(listKey: String): Preferences.Key<String> {
             return stringPreferencesKey("view_mode_$listKey")
         }
+
+        // Home dashboard visibility toggles
+        private val HOME_SHOW_CLIENT_STATS = booleanPreferencesKey("home_show_client_stats")
+        private val HOME_SHOW_ISLAND_STATS = booleanPreferencesKey("home_show_island_stats")
+        private val HOME_SHOW_RECENT_CLIENTS = booleanPreferencesKey("home_show_recent_clients")
+        private val HOME_SHOW_RECENT_ISLANDS = booleanPreferencesKey("home_show_recent_islands")
+    }
+
+    /** Observe the Home dashboard visibility preferences (all default false). */
+    fun getHomePreferences(): Flow<HomePreferences> {
+        return context.appSettingsDataStore.data
+            .catch { exception ->
+                Timber.e(exception, "Error reading home preferences")
+                emit(androidx.datastore.preferences.core.emptyPreferences())
+            }
+            .map { preferences ->
+                HomePreferences(
+                    showClientStats = preferences[HOME_SHOW_CLIENT_STATS] ?: false,
+                    showIslandStats = preferences[HOME_SHOW_ISLAND_STATS] ?: false,
+                    showRecentClients = preferences[HOME_SHOW_RECENT_CLIENTS] ?: false,
+                    showRecentIslands = preferences[HOME_SHOW_RECENT_ISLANDS] ?: false
+                )
+            }
+    }
+
+    suspend fun setHomeShowClientStats(value: Boolean) {
+        context.appSettingsDataStore.edit { it[HOME_SHOW_CLIENT_STATS] = value }
+    }
+
+    suspend fun setHomeShowIslandStats(value: Boolean) {
+        context.appSettingsDataStore.edit { it[HOME_SHOW_ISLAND_STATS] = value }
+    }
+
+    suspend fun setHomeShowRecentClients(value: Boolean) {
+        context.appSettingsDataStore.edit { it[HOME_SHOW_RECENT_CLIENTS] = value }
+    }
+
+    suspend fun setHomeShowRecentIslands(value: Boolean) {
+        context.appSettingsDataStore.edit { it[HOME_SHOW_RECENT_ISLANDS] = value }
     }
 
     /**

@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.*
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Gestore unificato per i permessi camera.

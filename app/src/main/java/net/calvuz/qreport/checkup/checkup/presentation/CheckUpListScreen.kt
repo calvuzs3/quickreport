@@ -40,6 +40,7 @@ import net.calvuz.qreport.settings.presentation.model.getCardVariantIcon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckUpListScreen(
+    onNavigateBack: () -> Unit,
     onNavigateToCheckUpDetail: (String) -> Unit,
     onNavigateToEditCheckUp: (String) -> Unit,
     onCreateNewCheckUp: () -> Unit,
@@ -55,6 +56,14 @@ fun CheckUpListScreen(
         // Top App Bar con ricerca
         TopAppBar(
             title = { Text(stringResource(R.string.checkup_screen_list_title)) },
+            navigationIcon = {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = stringResource(R.string.client_form_action_back)
+                    )
+                }
+            },
             actions = {
                 var showFilterMenu by remember { mutableStateOf(false) }
                 var showSortMenu by remember { mutableStateOf(false) }

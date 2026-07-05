@@ -24,7 +24,9 @@
        I riempimenti (sfondi di pulsanti/chip/badge/strisce/mire) restano arancio pieno
        sempre, anche su pagina chiara: la regola vincola l'inchiostro, non le forme piene. */
     --accent-fill: var(--color-orange);   /* sfondo di pulsanti/chip/badge/strisce */
-    --accent-on: var(--color-graphite);   /* inchiostro SOPRA accent-fill: grafite, mai bianco */
+    --accent-on: var(--color-graphite);   /* inchiostro SOPRA accent-fill (chip/badge/tile): grafite */
+    --accent-on-button: #FFFFFF;          /* ECCEZIONE dopo verifica su device: sul pulsante primario
+                                              il grafite appesantiva troppo in chiaro — qui bianco */
     --accent-ink: var(--color-graphite);  /* inchiostro "libero" (non su fill): in chiaro e' grafite */
 
     /* Severita' codificata per intensita' dell'unico accento, non per tinta */
@@ -39,6 +41,7 @@
       --text: #F2F2F2; --text-secondary: #ABABAB;
       --color-orange: #F0993A;
       --accent-ink: var(--color-orange); /* qui ammesso: lo sfondo pagina e' grafite/scuro */
+      --accent-on-button: var(--color-graphite); /* in scuro il pulsante resta grafite: il bianco ci starebbe anche peggio */
     }
   }
   :root[data-theme="dark"] {
@@ -46,12 +49,14 @@
     --text: #F2F2F2; --text-secondary: #ABABAB;
     --color-orange: #F0993A;
     --accent-ink: var(--color-orange);
+    --accent-on-button: var(--color-graphite);
   }
   :root[data-theme="light"] {
     --bg: #F4F4F4; --surface: #FFFFFF; --surface-2: #ECECEC; --border: #E3E3E3;
     --text: #333333; --text-secondary: #707070;
     --color-orange: #E88706;
     --accent-ink: var(--color-graphite);
+    --accent-on-button: #FFFFFF;
   }
 
   * { box-sizing: border-box; }
@@ -115,7 +120,7 @@
   .comp-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: var(--sp-sm); }
 
   .btn { font-family: var(--font-body); font-weight: 600; font-size: 13px; border-radius: var(--radius-sm); padding: 6px 12px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-  .btn-primary { background: var(--accent-fill); color: var(--accent-on); }
+  .btn-primary { background: var(--accent-fill); color: var(--accent-on-button); }
   .btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
   .btn-text { background: transparent; color: var(--accent-ink); padding-left: 2px; padding-right: 2px; }
   .btn:focus-visible { outline: 2px solid var(--color-orange); outline-offset: 2px; }
@@ -265,8 +270,8 @@
       <p>Invariata da QuickStore — solo la regola d'inchiostro cambia, non il carattere.</p>
     </div>
     <div class="type-row"><div class="type-tag">Display<br>Big Shoulders</div><div class="type-sample-display">12 CHECK-UP APERTI</div></div>
-    <div class="type-row"><div class="type-tag">Title<br>IBM Plex Sans 600</div><div class="type-sample-title">Check-up POLY Move — Isola IS-0042</div></div>
-    <div class="type-row"><div class="type-tag">Body<br>IBM Plex Sans 400</div><div class="type-sample-body">Impossibile completare il check-up: 2 voci critiche risultano ancora "NOK". Risolvi le anomalie prima dell'esportazione.</div></div>
+    <div class="type-row"><div class="type-tag">Title<br>Inter 600</div><div class="type-sample-title">Check-up POLY Move — Isola IS-0042</div></div>
+    <div class="type-row"><div class="type-tag">Body<br>Inter 400</div><div class="type-sample-body">Impossibile completare il check-up: 2 voci critiche risultano ancora "NOK". Risolvi le anomalie prima dell'esportazione.</div></div>
     <div class="type-row"><div class="type-tag">Mono / dati<br>IBM Plex Mono</div><div class="type-sample-mono">SAF_001 · 3HAC025396-001 · 07:44</div></div>
   </section>
 
@@ -490,7 +495,7 @@
           <li>Plugin gratuito <b>Tokens Studio for Figma</b></li>
           <li>Import → incolla <code style="font-family:var(--font-mono)">design/tokens-orange-technical.json</code></li>
           <li>"Create Styles/Variables"</li>
-          <li>Font: "Big Shoulders Display", "IBM Plex Sans", "IBM Plex Mono" — già su Google Fonts</li>
+          <li>Font: "Inter", "IBM Plex Mono" — già su Google Fonts</li>
         </ol>
         <h3 style="margin-top:var(--sp-md)">Riuso per la web app</h3>
         <p>Le variabili CSS in cima a questo file sono la stessa fonte del token JSON — copiabili come base del foglio di stile.</p>

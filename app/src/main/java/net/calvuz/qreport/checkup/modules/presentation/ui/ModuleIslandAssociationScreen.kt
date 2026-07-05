@@ -127,7 +127,7 @@ private fun IslandTypeModulesRow(
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = stringResource(R.string.action_edit),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

@@ -96,7 +96,7 @@ private fun MinimalContent(
             Icon(
                 imageVector = Icons.Default.Description,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -131,7 +131,7 @@ private fun CompactContent(
             Icon(
                 imageVector = Icons.Default.Description,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -190,7 +190,7 @@ private fun FullContent(
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -262,7 +262,7 @@ private fun FullContent(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(R.string.action_edit),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -279,7 +279,7 @@ private fun FullContent(
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.OpenInNew,
                     contentDescription = stringResource(R.string.action_open),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

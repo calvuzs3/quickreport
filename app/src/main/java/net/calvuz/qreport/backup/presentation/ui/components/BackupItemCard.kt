@@ -91,7 +91,7 @@ fun BackupItemCard(
                         text = backup.totalSize.getFormattedSize(),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     if (backup.includesPhotos) {
                         Row(
@@ -179,7 +179,7 @@ fun BackupItemCard(
                         Icon(
                             imageVector = Icons.Default.Download,
                             contentDescription = stringResource(R.string.backup_item_card_cd_download),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

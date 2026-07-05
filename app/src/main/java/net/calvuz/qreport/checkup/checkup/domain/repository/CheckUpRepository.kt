@@ -30,5 +30,8 @@ interface CheckUpRepository {
     suspend fun getCheckUpStatistics(id: String): CheckUpSingleStatistics
 
     suspend fun getCheckUpProgress(id: String): CheckUpProgress
+
+    // Numero di check-up distinti con almeno una voce critica non risolta (dashboard Home).
+    fun observeCriticalCheckUpsCount(): Flow<Int>
 }
 

@@ -205,7 +205,7 @@ private fun CompactMechanicalUnitCard(
             Text(
                 text = stringResource(unit.unitType.labelResId),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = unit.name,
@@ -361,7 +361,7 @@ private fun UnitActionButtons(
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = stringResource(R.string.action_edit),
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(iconSize)
                 )
             }

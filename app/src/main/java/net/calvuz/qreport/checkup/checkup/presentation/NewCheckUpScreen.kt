@@ -19,6 +19,8 @@ import net.calvuz.qreport.R
 import net.calvuz.qreport.checkup.checkup.presentation.components.ClientFacilityIslandSelectorDialog
 import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
 import net.calvuz.qreport.client.island.presentation.model.IslandTypeIconRegistry
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Screen per la creazione guidata di un nuovo check-up
@@ -206,7 +208,7 @@ private fun SourceSelectionSection(
                     Icon(
                         imageVector = Icons.Default.Link,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = stringResource(
@@ -372,7 +374,7 @@ private fun IslandTypeOption(
                 imageVector = IslandTypeIconRegistry.iconFor(islandType.label),
                 contentDescription = null,
                 tint = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
+                    MaterialTheme.colorScheme.onSurface
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 }

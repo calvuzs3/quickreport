@@ -226,13 +226,13 @@ private fun TechnicianSignatureSection(
                 Icon(
                     imageVector = Icons.Default.Engineering,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.intervention_signatures_form_technician_section_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -309,13 +309,13 @@ private fun CustomerSignatureSection(
                 Icon(
                     imageVector = Icons.Default.Business,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.intervention_signatures_form_customer_section_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -495,13 +495,13 @@ private fun ReadyForSignaturesCard(
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.Assignment,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.intervention_signatures_form_document_status_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -628,14 +628,14 @@ private fun CompletionSummaryCard(
                     Icon(
                         imageVector = Icons.Default.TaskAlt,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(24.dp)
                     )
                     Text(
                         text = stringResource(R.string.intervention_signatures_form_process_complete),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -656,7 +656,7 @@ private fun SignatureChecklistItem(
             imageVector = if (isComplete) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
             contentDescription = null,
             tint = if (isComplete)
-                MaterialTheme.colorScheme.primary
+                MaterialTheme.colorScheme.onSurface
             else
                 MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp)

@@ -1,5 +1,6 @@
 package net.calvuz.qreport.app.app.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,12 +34,25 @@ fun QReportCard(
 ) {
     val cardModifier = (if (tickColor != null) modifier.cornerRegistrationMarks(tickColor) else modifier)
         .fillMaxWidth()
-    val shape = RoundedCornerShape(12.dp)
-    val elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 8.dp else 2.dp)
+    val shape = RoundedCornerShape(9.dp) // via di mezzo tra i 12dp iniziali e i 7dp (troppo squadrati), richiesta esplicita dopo verifica su device
+    // Design piatto (design/mockup-orange-technical.html: .comp-card/.nameplate/.stat
+    // non hanno mai box-shadow, solo `border: 1px solid var(--border)`) — niente
+    // ombra Material, la separazione dalla pagina la fa il bordo sottile.
+    val elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    val border = BorderStroke(
+        1.dp,
+        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+    )
+    // CardDefaults.cardColors() SENZA argomenti non usa colorScheme.surface:
+    // la Card "filled" di Material3 di default prende containerColor dal
+    // token FilledCardTokens.ContainerColor = surfaceContainerHighest, che
+    // qui coincide col colore del bordo (outline) — bordo e sfondo identici,
+    // il bordo spariva e la card sembrava un blocco grigio pieno. Va sempre
+    // passato containerColor esplicito.
     val colors = if (isSelected) {
         CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
     } else {
-        CardDefaults.cardColors()
+        CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     }
     val innerContent: @Composable ColumnScope.() -> Unit = {
         content()
@@ -46,9 +60,9 @@ fun QReportCard(
     }
 
     if (onClick != null) {
-        Card(onClick = onClick, modifier = cardModifier, shape = shape, elevation = elevation, colors = colors, content = innerContent)
+        Card(onClick = onClick, modifier = cardModifier, shape = shape, elevation = elevation, colors = colors, border = border, content = innerContent)
     } else {
-        Card(modifier = cardModifier, shape = shape, elevation = elevation, colors = colors, content = innerContent)
+        Card(modifier = cardModifier, shape = shape, elevation = elevation, colors = colors, border = border, content = innerContent)
     }
 }
 

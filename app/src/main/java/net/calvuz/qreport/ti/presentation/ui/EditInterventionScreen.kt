@@ -24,6 +24,7 @@ import net.calvuz.qreport.R
 import net.calvuz.qreport.app.app.presentation.ui.theme.warning
 import net.calvuz.qreport.app.result.domain.QrResult
 import timber.log.Timber
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * Edit screen for TechnicalIntervention with tabbed interface

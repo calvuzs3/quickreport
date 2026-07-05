@@ -17,6 +17,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import net.calvuz.qreport.backup.presentation.ui.BackupScreen
 import net.calvuz.qreport.app.app.presentation.ui.home.HomeScreen
+import net.calvuz.qreport.app.app.presentation.ui.home.HomePreferencesScreen
 import net.calvuz.qreport.checkup.checkup.presentation.CheckUpListScreen
 import net.calvuz.qreport.checkup.checkup.presentation.NewCheckUpScreen
 import net.calvuz.qreport.checkup.checkup.presentation.CheckUpDetailScreen
@@ -126,6 +127,7 @@ object QReportRoutes {
     const val TI_EDIT = "ti_edit_form/{interventionId}"
 
     // Settings routes
+    const val HOME_PREFERENCES = "home_preferences"
     const val TECHNICIAN_SETTINGS = "technician_settings"
     const val ISLAND_TYPES_MANAGEMENT = "island_types_management"
     const val MODULE_TYPES_MANAGEMENT = "module_types_management"
@@ -332,11 +334,21 @@ fun QReportNavigation(
                         onNavigateToCheckUpDetail = { checkUpId ->
                             navController.navigate(QReportRoutes.checkupDetail(checkUpId))
                         },
+                        onNavigateToHomePreferences = {
+                            navController.navigate(QReportRoutes.HOME_PREFERENCES)
+                        }
+                    )
+                }
+
+                composable(QReportRoutes.HOME_PREFERENCES) {
+                    HomePreferencesScreen(
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
 
                 composable(QReportRoutes.CLIENTS) {
                     ClientListScreen(
+                        onNavigateBack = { navController.popBackStack() },
                         onNavigateToClientDetail = { clientId, clientName ->
                             navController.navigate(
                                 QReportRoutes.clientDetail(
@@ -356,6 +368,7 @@ fun QReportNavigation(
 
                 composable(QReportRoutes.CHECKUPS) {
                     CheckUpListScreen(
+                        onNavigateBack = { navController.popBackStack() },
                         onNavigateToCheckUpDetail = { checkUpId ->
                             navController.navigate(QReportRoutes.checkupDetail(checkUpId))
                         },
@@ -373,6 +386,7 @@ fun QReportNavigation(
 
                 composable(QReportRoutes.SETTINGS) {
                     SettingsScreen(
+                        onNavigateBack = { navController.popBackStack() },
                         onNavigateToBackup = {
                             navController.navigate(QReportRoutes.BACKUP)
                         },
@@ -381,6 +395,9 @@ fun QReportNavigation(
                         },
                         onNavigateToSyncSettings = {
                             navController.navigate(QReportRoutes.SYNC_SETTINGS)
+                        },
+                        onNavigateToHomePreferences = {
+                            navController.navigate(QReportRoutes.HOME_PREFERENCES)
                         }
                     )
                 }

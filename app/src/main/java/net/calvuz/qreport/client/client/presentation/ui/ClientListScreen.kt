@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.outlined.Factory
 import androidx.compose.material3.Button
@@ -69,6 +70,7 @@ import net.calvuz.qreport.settings.presentation.model.getCardVariantIcon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClientListScreen(
+    onNavigateBack: () -> Unit,
     onNavigateToClientDetail: (String, String) -> Unit,
     onNavigateToEditClient: (String) -> Unit,
     onCreateNewClient: () -> Unit,
@@ -82,7 +84,14 @@ fun ClientListScreen(
     ) {
         // Top App Bar con azioni
         TopAppBar(
-            navigationIcon = { ClientPkg.icon },
+            navigationIcon = {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = stringResource(R.string.client_form_action_back)
+                    )
+                }
+            },
             title = { Text(stringResource(ClientPkg.titleResId)) },
             actions = {
                 var showFilterMenu by remember { mutableStateOf(false) }

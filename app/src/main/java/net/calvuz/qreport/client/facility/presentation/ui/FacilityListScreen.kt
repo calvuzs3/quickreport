@@ -42,6 +42,7 @@ import net.calvuz.qreport.client.facility.presentation.model.FacilitySortOrder
 import net.calvuz.qreport.client.facility.presentation.ui.components.FacilityListContent
 import net.calvuz.qreport.settings.presentation.model.getCardVariantDescription
 import net.calvuz.qreport.settings.presentation.model.getCardVariantIcon
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 @Suppress("ParamsComparedByRef")
 @OptIn(ExperimentalMaterial3Api::class)

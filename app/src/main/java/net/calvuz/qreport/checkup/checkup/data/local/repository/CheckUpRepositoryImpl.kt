@@ -116,6 +116,9 @@ class CheckUpRepositoryImpl @Inject constructor(
         )
     }
 
+    override fun observeCriticalCheckUpsCount(): Flow<Int> =
+        checkItemDao.observeCriticalCheckUpsCount()
+
     override suspend fun getCheckUpStatistics(id: String): CheckUpSingleStatistics {
 
         // CheckItemDao queries

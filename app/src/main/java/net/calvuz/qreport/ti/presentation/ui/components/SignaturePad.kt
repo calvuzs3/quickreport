@@ -28,6 +28,7 @@ import net.calvuz.qreport.R
 import timber.log.Timber
 import java.io.File
 import androidx.core.graphics.createBitmap
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Global state holder for signature capture
@@ -392,7 +393,7 @@ fun SignatureStatusCard(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
                 }

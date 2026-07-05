@@ -14,16 +14,26 @@ import net.calvuz.qreport.app.app.presentation.components.SettingsSection
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit,
     onNavigateToBackup: () -> Unit,
     onNavigateToTechnicianSettings: () -> Unit,
-    onNavigateToSyncSettings: () -> Unit
+    onNavigateToSyncSettings: () -> Unit,
+    onNavigateToHomePreferences: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
         TopAppBar(
             title = { Text(stringResource(R.string.settings_screen_main_title)) },
+            navigationIcon = {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = stringResource(R.string.client_form_action_back)
+                    )
+                }
+            },
         )
 
         // Technician info
@@ -53,6 +63,16 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.settings_screen_main_sync_subtitle),
                 icon = Icons.Default.CloudSync,
                 onClick = onNavigateToSyncSettings
+            )
+        }
+
+        // Home
+        SettingsSection(title = stringResource(R.string.settings_screen_main_section_home)) {
+            SettingsItem(
+                title = stringResource(R.string.settings_screen_main_home_preferences_title),
+                subtitle = stringResource(R.string.settings_screen_main_home_preferences_subtitle),
+                icon = Icons.Default.Dashboard,
+                onClick = onNavigateToHomePreferences
             )
         }
     }

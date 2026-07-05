@@ -22,6 +22,8 @@ import net.calvuz.qreport.export.presentation.model.getDisplayName
 import net.calvuz.qreport.app.util.SizeUtils.getFormattedSize
 import net.calvuz.qreport.export.domain.reposirory.ExportFormat
 import net.calvuz.qreport.export.domain.reposirory.ExportResult
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Dialog per mostrare il risultato dell'export

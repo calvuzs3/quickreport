@@ -19,6 +19,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import net.calvuz.qreport.R
 import timber.log.Timber
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Dialog for collecting digital signature with full-screen signature pad
@@ -93,7 +95,7 @@ fun SignatureCollectionDialog(
                                     SignaturePad(
                                         modifier = Modifier.fillMaxSize(),
                                         onSignatureChanged = { hasSignature = it },
-                                        strokeColor = MaterialTheme.colorScheme.primary,
+                                        strokeColor = MaterialTheme.colorScheme.onSurface,
                                         strokeWidth = 4.0f,
                                         backgroundColor = Color.White
                                     )
@@ -174,7 +176,7 @@ private fun SignatureDialogHeader(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(32.dp)
             )
 

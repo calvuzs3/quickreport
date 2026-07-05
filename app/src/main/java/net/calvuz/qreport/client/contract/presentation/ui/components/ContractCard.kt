@@ -149,7 +149,7 @@ class ContractContentProvider : BaseCardContentProvider<ContractCardData>() {
                         Text(
                             text = "${stringResource(R.string.label_maintenance)} ✔️",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -177,7 +177,7 @@ class ContractContentProvider : BaseCardContentProvider<ContractCardData>() {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = stringResource(R.string.label_maintenance),
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(14.dp)
                 )
             }
@@ -322,7 +322,7 @@ private fun ContractItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (isValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = if (isValid) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(18.dp)
         )
 
@@ -339,7 +339,7 @@ private fun ContractItem(
                 Text(
                     text = value,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 

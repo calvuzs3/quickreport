@@ -18,6 +18,7 @@ import net.calvuz.qreport.backup.presentation.model.RestoreStrategyExt.getDescri
 import net.calvuz.qreport.backup.presentation.model.RestoreStrategyExt.getDisplayName
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import net.calvuz.qreport.app.util.SizeUtils.getFormattedSize
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * FASE 5.4 - BACKUP DIALOG COMPONENTS
@@ -54,7 +55,7 @@ fun RestoreBackupConfirmationDialog(
                 Icon(
                     imageVector = Icons.Default.Restore,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.backup_restore_confirm_title),

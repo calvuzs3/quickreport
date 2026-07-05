@@ -112,7 +112,7 @@ fun ContactMethodItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (isPrimary) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = if (isPrimary) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(18.dp)
         )
 
@@ -131,7 +131,7 @@ fun ContactMethodItem(
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = stringResource(R.string.label_preferred),
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(12.dp)
                     )
                 }
@@ -140,7 +140,7 @@ fun ContactMethodItem(
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 

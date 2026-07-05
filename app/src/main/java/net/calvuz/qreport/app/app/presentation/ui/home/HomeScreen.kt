@@ -3,15 +3,18 @@
 
 package net.calvuz.qreport.app.app.presentation.ui.home
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,17 +26,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrListStatItem
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
-import net.calvuz.qreport.app.app.presentation.ui.theme.onSuccessContainer
-import net.calvuz.qreport.app.app.presentation.ui.theme.onWarningContainer
+import net.calvuz.qreport.app.app.presentation.components.StatItemOrientation
 import net.calvuz.qreport.app.app.presentation.ui.theme.success
-import net.calvuz.qreport.app.app.presentation.ui.theme.successContainer
-import net.calvuz.qreport.app.app.presentation.ui.theme.warningContainer
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
-import net.calvuz.qreport.checkup.checkup.presentation.components.CheckupStatusChip
 import net.calvuz.qreport.checkup.checkup.presentation.model.CheckupPkg
 import net.calvuz.qreport.checkup.status.domain.model.CheckUpStatusMaster
+import net.calvuz.qreport.client.client.domain.model.Client
 import net.calvuz.qreport.client.client.presentation.model.ClientPkg
 import net.calvuz.qreport.client.island.domain.model.Island
 import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
@@ -50,6 +51,7 @@ fun HomeScreen(
     onNavigateToTechnicalInterventions: () -> Unit,
     @Suppress("unused") onNavigateToNewCheckUp: () -> Unit,
     @Suppress("unused") onNavigateToCheckUpDetail: (String) -> Unit,
+    onNavigateToHomePreferences: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -63,6 +65,7 @@ fun HomeScreen(
         HomeHeader(
             onRefresh = viewModel::refresh,
             isLoading = uiState.isLoading,
+            onNavigateToPreferences = onNavigateToHomePreferences,
             modifier = Modifier
                 .statusBarsPadding()
                 .padding(horizontal = Spacing.lg, vertical = 12.dp)
@@ -78,91 +81,7 @@ fun HomeScreen(
                 contentPadding = PaddingValues(Spacing.lg),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
-                // ── CHECK-UP ─────────────────────────────────────────────────
-                item {
-                    DashboardSectionCard(
-                        tileTitle = stringResource(R.string.home_section_checkup),
-                        tileIcon = CheckupPkg.icon,
-                        accentColor = MaterialTheme.colorScheme.primary,
-                        onTileClick = onNavigateToCheckUps,
-                        chips = {
-                            val stats = uiState.checkupStats
-                            if (stats != null) {
-                                QrListStatItem(value = stats.totalCheckUps.toString(), label = stringResource(R.string.home_checkup_stat_total), containerColor = MaterialTheme.colorScheme.primary, color = MaterialTheme.colorScheme.onPrimary)
-                                QrListStatItem(value = stats.activeCheckUps.toString(), label = stringResource(R.string.home_checkup_stat_active), containerColor = MaterialTheme.colorScheme.secondary, color = MaterialTheme.colorScheme.onSecondary)
-                                QrListStatItem(value = stats.completedThisWeek.toString(), label = stringResource(R.string.home_checkup_stat_week), containerColor = MaterialTheme.colorScheme.successContainer, color = MaterialTheme.colorScheme.onSuccessContainer)
-                            }
-                        }
-                    ) {
-                        if (uiState.recentCheckUps.isEmpty()) {
-                            PreviewEmptyRow(stringResource(R.string.home_checkup_empty))
-                        } else {
-                            uiState.recentCheckUps.take(3).forEach { checkUp ->
-                                CheckUpPreviewRow(
-                                    checkUp = checkUp,
-                                    statusMasters = uiState.statusMasters,
-                                    onClick = { viewModel.navigateToCheckUp(checkUp.id) }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // ── CLIENTI ──────────────────────────────────────────────────
-                item {
-                    DashboardSectionCard(
-                        tileTitle = stringResource(R.string.home_section_clients),
-                        tileIcon = ClientPkg.icon,
-                        accentColor = MaterialTheme.colorScheme.secondary,
-                        onTileClick = onNavigateToClients,
-                        chips = {
-                            val stats = uiState.clientStats
-                            if (stats != null) {
-                                QrListStatItem(value = stats.totalClient.toString(), label = stringResource(R.string.home_clients_stat_total), containerColor = MaterialTheme.colorScheme.primary, color = MaterialTheme.colorScheme.onPrimary)
-                                QrListStatItem(value = stats.activeClient.toString(), label = stringResource(R.string.home_clients_stat_active), containerColor = MaterialTheme.colorScheme.successContainer, color = MaterialTheme.colorScheme.onSuccessContainer)
-                            }
-                        }
-                    ) {
-                        // No preview list for clients — the stats are sufficient at a glance
-                        if (uiState.clientStats == null || uiState.clientStats.totalClient == 0) {
-                            PreviewEmptyRow(stringResource(R.string.home_clients_empty))
-                        }
-                    }
-                }
-
-                // ── ISOLE ─────────────────────────────────────────────────────
-                item {
-                    val islandWarning = uiState.islandStats.maintenanceSoon > 0
-                    DashboardSectionCard(
-                        tileTitle = stringResource(R.string.home_section_islands),
-                        tileIcon = IslandPkg.icon,
-                        accentColor = if (islandWarning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.success,
-                        onTileClick = onNavigateToIslands,
-                        chips = {
-                            with(uiState.islandStats) {
-                                QrListStatItem(value = total.toString(), label = stringResource(R.string.home_islands_stat_total), containerColor = MaterialTheme.colorScheme.primary, color = MaterialTheme.colorScheme.onPrimary)
-                                QrListStatItem(value = operational.toString(), label = stringResource(R.string.home_islands_stat_operational), containerColor = MaterialTheme.colorScheme.successContainer, color = MaterialTheme.colorScheme.onSuccessContainer)
-                                if (maintenanceSoon > 0) {
-                                    QrListStatItem(value = maintenanceSoon.toString(), label = stringResource(R.string.home_islands_stat_maintenance), containerColor = MaterialTheme.colorScheme.warningContainer, color = MaterialTheme.colorScheme.onWarningContainer)
-                                }
-                            }
-                        }
-                    ) {
-                        if (uiState.recentIslands.isEmpty()) {
-                            PreviewEmptyRow(stringResource(R.string.home_islands_empty))
-                        } else {
-                            uiState.recentIslands.forEach { island ->
-                                IslandPreviewRow(
-                                    island = island,
-                                    islandTypes = uiState.islandTypes,
-                                    onClick = { onNavigateToIslandDetail(island.facilityId, island.id) }
-                                )
-                            }
-                        }
-                    }
-                }
-
+                
                 // ── ACCESSO RAPIDO ────────────────────────────────────────────
                 item {
                     Text(
@@ -173,12 +92,242 @@ fun HomeScreen(
                         modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
                     )
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                        NavTile(modifier = Modifier.weight(1f), title = stringResource(ClientPkg.titleResId), icon = ClientPkg.icon, onClick = onNavigateToClients, isHighlighted = true)
+                        NavTile(modifier = Modifier.weight(1f), title = stringResource(ClientPkg.titleResId), icon = ClientPkg.icon, onClick = onNavigateToClients)
                         //NavTile(modifier = Modifier.weight(1f), title = stringResource(CheckupPkg.titleResId), icon = CheckupPkg.icon, onClick = onNavigateToCheckUps)
                         NavTile(modifier = Modifier.weight(1f), title = (CheckupPkg.title), icon = CheckupPkg.icon, onClick = onNavigateToCheckUps)
                         NavTile(modifier = Modifier.weight(1f), title = stringResource(R.string.home_nav_interventions_title), icon = Icons.Default.Workspaces, onClick = onNavigateToTechnicalInterventions)
                     }
                 }
+
+                item { Spacer(modifier = Modifier.height(Spacing.md)) }
+
+                // ── CHECK-UP ─────────────────────────────────────────────────
+                item {
+                    Text(
+                        text = stringResource(R.string.home_section_checkup),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = Spacing.sm)
+                    )
+
+                    val stats = uiState.checkupStats
+                    if (stats != null) {
+                        val hasCritical = stats.criticalCheckUps > 0
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+                        ) {
+                            QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
+                                QrListStatItem(
+                                    value = stats.totalCheckUps.toString(),
+                                    label = stringResource(R.string.home_checkup_stat_total),
+                                    orientation = StatItemOrientation.Vertical,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                )
+                            }
+                            QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
+                                QrListStatItem(
+                                    value = stats.activeCheckUps.toString(),
+                                    label = stringResource(R.string.home_checkup_stat_active),
+                                    orientation = StatItemOrientation.Vertical,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                )
+                            }
+                            QReportCard(
+                                modifier = Modifier.weight(1f),
+                                tickColor = if (hasCritical) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                            ) {
+                                QrListStatItem(
+                                    value = stats.criticalCheckUps.toString(),
+                                    label = stringResource(R.string.home_checkup_stat_critical),
+                                    orientation = StatItemOrientation.Vertical,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(Spacing.md))
+
+                    Text(
+                        text = stringResource(R.string.home_section_checkup_recent),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = Spacing.sm)
+                    )
+
+                    if (uiState.recentCheckUps.isEmpty()) {
+                        PreviewEmptyRow(stringResource(R.string.home_checkup_empty))
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                            uiState.recentCheckUps.take(3).forEach { checkUp ->
+                                CheckUpPreviewRow(
+                                    checkUp = checkUp,
+                                    statusMasters = uiState.statusMasters,
+                                    criticalIssues = uiState.recentCheckUpsCriticalCounts[checkUp.id] ?: 0,
+                                    onClick = { viewModel.navigateToCheckUp(checkUp.id) }
+                                )
+                            }
+                        }
+                    }
+                }
+                
+                item { Spacer(modifier = Modifier.height(Spacing.md)) }
+
+                // ── CLIENTI (parametrizzata da Preferenze Home) ───────────────
+                val prefs = uiState.homePreferences
+                if (prefs.showClientStats || prefs.showRecentClients) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.home_section_clients),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = Spacing.sm)
+                        )
+
+                        val clientStats = uiState.clientStats
+                        if (prefs.showClientStats && clientStats != null) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+                            ) {
+                                QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
+                                    QrListStatItem(
+                                        value = clientStats.totalClient.toString(),
+                                        label = stringResource(R.string.home_clients_stat_total),
+                                        orientation = StatItemOrientation.Vertical,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                    )
+                                }
+                                QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
+                                    QrListStatItem(
+                                        value = clientStats.activeClient.toString(),
+                                        label = stringResource(R.string.home_clients_stat_active),
+                                        orientation = StatItemOrientation.Vertical,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                    )
+                                }
+                            }
+                        }
+
+                        if (prefs.showRecentClients) {
+                            if (prefs.showClientStats) {
+                                Spacer(modifier = Modifier.height(Spacing.md))
+                            }
+                            Text(
+                                text = stringResource(R.string.home_section_clients_recent),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(bottom = Spacing.sm)
+                            )
+                            if (uiState.recentClients.isEmpty()) {
+                                PreviewEmptyRow(stringResource(R.string.home_clients_empty))
+                            } else {
+                                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                                    uiState.recentClients.forEach { client ->
+                                        ClientPreviewRow(
+                                            client = client,
+                                            onClick = onNavigateToClients
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                item { Spacer(modifier = Modifier.height(Spacing.md)) }
+                
+                // ── ISOLE (parametrizzata da Preferenze Home) ─────────────────
+                if (prefs.showIslandStats || prefs.showRecentIslands) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.home_section_islands),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = Spacing.sm)
+                        )
+
+                        if (prefs.showIslandStats) {
+                            val islandStats = uiState.islandStats
+                            val hasMaintenance = islandStats.maintenanceSoon > 0
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+                            ) {
+                                QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
+                                    QrListStatItem(
+                                        value = islandStats.total.toString(),
+                                        label = stringResource(R.string.home_islands_stat_total),
+                                        orientation = StatItemOrientation.Vertical,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                    )
+                                }
+                                QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
+                                    QrListStatItem(
+                                        value = islandStats.operational.toString(),
+                                        label = stringResource(R.string.home_islands_stat_operational),
+                                        orientation = StatItemOrientation.Vertical,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                    )
+                                }
+                                QReportCard(
+                                    modifier = Modifier.weight(1f),
+                                    tickColor = if (hasMaintenance) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                                ) {
+                                    QrListStatItem(
+                                        value = islandStats.maintenanceSoon.toString(),
+                                        label = stringResource(R.string.home_islands_stat_maintenance),
+                                        orientation = StatItemOrientation.Vertical,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
+                                    )
+                                }
+                            }
+                        }
+
+                        if (prefs.showRecentIslands) {
+                            if (prefs.showIslandStats) {
+                                Spacer(modifier = Modifier.height(Spacing.md))
+                            }
+                            Text(
+                                text = stringResource(R.string.home_section_islands_recent),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(bottom = Spacing.sm)
+                            )
+
+                            if (uiState.recentIslands.isEmpty()) {
+                                PreviewEmptyRow(stringResource(R.string.home_islands_empty))
+                            } else {
+                                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                                    uiState.recentIslands.forEach { island ->
+                                        IslandPreviewRow(
+                                            island = island,
+                                            islandTypes = uiState.islandTypes,
+                                            onClick = { onNavigateToIslandDetail(island.facilityId, island.id) }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                item { Spacer(modifier = Modifier.height(Spacing.md)) }
             }
         }
     }
@@ -189,79 +338,24 @@ fun HomeScreen(
 // =============================================================================
 
 @Composable
-private fun HomeHeader(@Suppress("unused") onRefresh: () -> Unit, @Suppress("unused") isLoading: Boolean, modifier: Modifier = Modifier) {
+private fun HomeHeader(
+    @Suppress("unused") onRefresh: () -> Unit,
+    @Suppress("unused") isLoading: Boolean,
+    onNavigateToPreferences: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         Column {
-            Text(text = "QReport", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.app_name), style = MaterialTheme.typography
+                .headlineMedium, fontWeight = FontWeight.Bold)
             Text(text = stringResource(R.string.home_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-    }
-}
-
-// =============================================================================
-// SECTION CARD — tile header + chips + preview list
-// =============================================================================
-
-/**
- * Dashboard section card — uniform appearance across all sections.
- *
- * The tile header always uses [MaterialTheme.colorScheme.surfaceContainerHigh()]
- * so all sections look consistent in both light and dark theme.
- * [accentColor] is applied only to the icon, giving each section
- * its distinct identity without overwhelming color variation.
- *
- * ┌─────────────────────────────────────┐
- * │ [Icon  Title            Apri →    ] │  ← tile: surfaceContainerHigh
- * │  [chip][chip][content]              │
- * │ ─────────────────────────────────── │
- * │  preview row 1                      │
- * └─────────────────────────────────────┘
- */
-@Composable
-private fun DashboardSectionCard(
-    tileTitle: String,
-    tileIcon: ImageVector,
-    accentColor: Color,            // used for icon tint only
-    onTileClick: () -> Unit,
-    chips: @Composable RowScope.() -> Unit,
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val tileContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-    val tileContentColor = MaterialTheme.colorScheme.onSurface
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column {
-            // ── Tile header ──────────────────────────────────────────────────
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onTileClick,
-                color = tileContainerColor,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = Spacing.lg, vertical = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Icon(imageVector = tileIcon, contentDescription = null, modifier = Modifier.size(26.dp), tint = accentColor)
-                        Text(text = tileTitle, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = tileContentColor)
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = stringResource(R.string.home_action_open), style = MaterialTheme.typography.labelMedium, color = tileContentColor.copy(alpha = 0.6f))
-                        Icon(Icons.Default.ChevronRight, contentDescription = null, modifier = Modifier.size(18.dp), tint = tileContentColor.copy(alpha = 0.6f))
-                    }
-                }
-            }
-
-            // ── Chips + preview ──────────────────────────────────────────────
-            Column(modifier = Modifier.padding(horizontal = Spacing.lg, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { chips() }
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { content() }
-            }
+        IconButton(onClick = onNavigateToPreferences) {
+            Icon(
+                imageVector = Icons.Default.Tune,
+                contentDescription = stringResource(R.string.home_action_preferences),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -281,14 +375,92 @@ private fun PreviewEmptyRow(message: String) {
 }
 
 @Suppress("ParamsComparedByRef")@Composable
-private fun CheckUpPreviewRow(checkUp: CheckUp, statusMasters: List<CheckUpStatusMaster>, onClick: () -> Unit) {
-    Surface(modifier = Modifier.fillMaxWidth(), onClick = onClick, shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)) {
-        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = checkUp.header.clientInfo.companyName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = checkUp.updatedAt.toLocalDateTime(TimeZone.currentSystemDefault()).date.toString(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun CheckUpPreviewRow(checkUp: CheckUp, statusMasters: List<CheckUpStatusMaster>, criticalIssues: Int, onClick: () -> Unit) {
+    // Striscia = severità (design-system.md: "striscia neutra = normale, striscia
+    // arancio piena = attenzione"), NON il colore configurato per lo stato — un
+    // check-up "In corso" senza criticità resta neutro come uno "Completato".
+    val statusMaster = statusMasters.find { it.id == checkUp.status }
+    val hasCritical = criticalIssues > 0
+    val stripeColor = if (hasCritical) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+    val subtitle = buildString {
+        append(checkUp.updatedAt.toLocalDateTime(TimeZone.currentSystemDefault()).date.toString())
+        append(" · ")
+        append(statusMaster?.label ?: "?")
+        if (hasCritical) {
+            append(" — $criticalIssues ")
+            append(if (criticalIssues == 1) "critica" else "critiche")
+        }
+    }
+    QReportCard(onClick = onClick) {
+        // IntrinsicSize.Min: senza, la Row riceve un vincolo di altezza
+        // illimitato dalla Column del Card, e fillMaxHeight() sul Box della
+        // striscia collassa a zero invece di adattarsi al contenuto (stesso
+        // pattern corretto già in uso in CheckUpDetailScreen.kt).
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .fillMaxHeight()
+                    .background(stripeColor)
+            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = Spacing.md, vertical = Spacing.sm)
+            ) {
+                Text(
+                    text = checkUp.header.clientInfo.companyName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
-            CheckupStatusChip(statusMaster = statusMasters.find { it.id == checkUp.status })
+        }
+    }
+}
+
+@Suppress("ParamsComparedByRef")@Composable
+private fun ClientPreviewRow(client: Client, onClick: () -> Unit) {
+    val statusColor = if (client.isActive) MaterialTheme.colorScheme.success else MaterialTheme.colorScheme.outline
+    QReportCard(onClick = onClick) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .fillMaxHeight()
+                    .background(statusColor)
+            )
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    Icon(imageVector = ClientPkg.icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                    Column {
+                        Text(text = client.displayName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        client.headquarters?.city?.let { city ->
+                            Text(text = city, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+                }
+                Icon(
+                    imageVector = if (client.isActive) Icons.Default.CheckCircle else Icons.Default.PauseCircle,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }
@@ -296,21 +468,36 @@ private fun CheckUpPreviewRow(checkUp: CheckUp, statusMasters: List<CheckUpStatu
 @Suppress("ParamsComparedByRef")@Composable
 private fun IslandPreviewRow(island: Island, islandTypes: List<IslandTypeMaster>, onClick: () -> Unit) {
     val typeDisplay = resolveIslandTypeDisplay(island.islandTypeId, islandTypes)
-    Surface(modifier = Modifier.fillMaxWidth(), onClick = onClick, shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)) {
-        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                Icon(imageVector = typeDisplay.icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
-                Column {
-                    Text(text = island.customName ?: island.serialNumber , style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(text = typeDisplay.label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Icon(
-                imageVector = if (island.needsMaintenance()) Icons.Default.Warning else Icons.Default.CheckCircle,
-                contentDescription = null,
-                tint = if (island.needsMaintenance()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.success,
-                modifier = Modifier.size(18.dp)
+    val statusColor = if (island.needsMaintenance()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.success
+    QReportCard(onClick = onClick) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .fillMaxHeight()
+                    .background(statusColor)
             )
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    Icon(imageVector = typeDisplay.icon, contentDescription = null, modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurface)
+                    Column {
+                        Text(text = island.customName ?: island.serialNumber, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(text = typeDisplay.label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+                Icon(
+                    imageVector = if (island.needsMaintenance()) Icons.Default.Warning else Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
 }
@@ -320,14 +507,48 @@ private fun IslandPreviewRow(island: Island, islandTypes: List<IslandTypeMaster>
 // =============================================================================
 
 @Composable
-private fun NavTile(title: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier, isHighlighted: Boolean = false) {
-    val containerColor = if (isHighlighted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-    val contentColor = if (isHighlighted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-    Card(modifier = modifier.height(72.dp), colors = CardDefaults.cardColors(containerColor = containerColor), onClick = onClick) {
-        Column(modifier = Modifier.fillMaxSize().padding(Spacing.sm), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Icon(imageVector = icon, contentDescription = title, modifier = Modifier.size(22.dp), tint = contentColor)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = title, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, color = contentColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
+private fun NavTile(title: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    // Stessa "quick-action" del mockup (design/mockup-orange-technical.html,
+    // .quick-action/.ic-tile): card piatta bordo 1dp, icona su tile arancio
+    // pieno con inchiostro grafite — nessun "highlight" speciale, le 3 tile
+    // sono equivalenti.
+    Card(
+        modifier = modifier,
+        onClick = onClick,
+        shape = RoundedCornerShape(9.dp), // stesso raggio di QReportCard
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = Spacing.sm),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.xs)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    modifier = Modifier.size(22.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+//                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

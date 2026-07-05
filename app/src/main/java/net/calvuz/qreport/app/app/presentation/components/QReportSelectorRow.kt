@@ -78,7 +78,7 @@ fun <T : QReportFilter> QReportSelectorRow(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = selectedItem.getDisplayName().asString(),

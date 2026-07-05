@@ -22,6 +22,7 @@ import coil.request.ImageRequest
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.photo.domain.model.PhotoPerspective
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Screen per preview e configurazione di una foto importata dalla galleria.
@@ -247,7 +248,7 @@ private fun PerspectiveDropdownCard(
                 Icon(
                     imageVector = Icons.Default.ViewInAr,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.photo_import_perspective_required_label),
@@ -354,7 +355,7 @@ private fun PerspectiveDropdownSelector(
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = stringResource(R.string.photo_import_cd_selected),
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -389,7 +390,7 @@ private fun CaptionInputCard(
                 Icon(
                     imageVector = Icons.Default.Description,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.photo_import_description_label),

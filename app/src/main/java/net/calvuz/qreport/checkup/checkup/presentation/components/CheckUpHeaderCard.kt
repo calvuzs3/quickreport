@@ -90,7 +90,7 @@ fun CheckUpHeaderCard(
                                     R.string.checkup_component_header_action_manage_association
                                 ),
                                 tint = if (associations.isNotEmpty())
-                                    MaterialTheme.colorScheme.primary
+                                    MaterialTheme.colorScheme.onSurface
                                 else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -104,7 +104,7 @@ fun CheckUpHeaderCard(
                                 contentDescription = stringResource(
                                     R.string.checkup_component_header_action_edit
                                 ),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }

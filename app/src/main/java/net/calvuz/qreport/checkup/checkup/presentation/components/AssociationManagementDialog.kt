@@ -27,6 +27,7 @@ import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
 import net.calvuz.qreport.client.island.presentation.model.resolveIslandTypeDisplay
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import timber.log.Timber
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * ✅ DIALOG COMPLETO per gestione associazioni CheckUp-Isole
@@ -326,7 +327,7 @@ internal fun SelectionStepCard(
                             text = stepNumber.toString(),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -391,7 +392,7 @@ internal fun SelectionItem(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = stringResource(R.string.checkup_component_association_dialog_selected),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             } else if (isClickable) {
                 Icon(

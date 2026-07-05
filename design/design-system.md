@@ -44,6 +44,16 @@ al limite della leggibilità; passare a testo grafite lo risolve e, applicato
 in modo sistematico, dà a QReport un'identità visiva distinta pur restando
 nella stessa famiglia.
 
+**Eccezione deliberata (dopo verifica su device)**: sui riempimenti pieni più
+grandi/ad alta enfasi — pulsante primario e "tertiary" (`onPrimary`/
+`onTertiary` in `Theme.kt`) — il tema **chiaro** è tornato a testo bianco: il
+grafite lì appesantiva troppo visivamente, secondo il giudizio dell'utente su
+device reale. È un'eccezione consapevole alla soglia di contrasto AA (resta
+sotto 4.5:1), applicata solo a quei due ruoli, solo in chiaro — chip, badge,
+mire d'angolo e tutto il resto restano su testo grafite come da regola. Il
+tema **scuro** resta su grafite per `onPrimary`/`onTertiary` (l'arancio più
+chiaro usato in dark renderebbe il bianco ancora meno leggibile, ~2.1:1).
+
 ### Conseguenza pratica per i componenti "densità severità"
 
 In QuickStore i valori numerici che segnalano attenzione/criticità (quantità,
@@ -72,13 +82,22 @@ testo secondario `#ABABAB`.
 Invariati da QuickStore:
 
 - Display/headline su **font di sistema** (Roboto, solo pesi più alti),
-  **IBM Plex Sans** su title/body/label, **IBM Plex Mono** su codici
-  articolo/voce e timestamp. Big Shoulders Display esiste solo nell'opzione
-  "Nameplate industriale" (opzione 2) di QuickStore: per l'opzione arancio/
-  technical è stato provato e scartato — troppo condensato per restare
-  leggibile su titoli reali (codici, descrizioni voce) — e il titolo/display
-  è tornato al font di sistema. Vedi `Type.kt` di QuickStore per il commento
-  che documenta questa scelta.
+  **IBM Plex Mono** su codici articolo/voce e timestamp. Big Shoulders
+  Display esiste solo nell'opzione "Nameplate industriale" (opzione 2) di
+  QuickStore: per l'opzione arancio/technical è stato provato e scartato —
+  troppo condensato per restare leggibile su titoli reali (codici,
+  descrizioni voce) — e il titolo/display è tornato al font di sistema. Vedi
+  `Type.kt` di QuickStore per il commento che documenta questa scelta.
+- **Title/body/label su Inter** (non più IBM Plex Sans, cambiato dopo
+  verifica su device): Plex Sans era bundlato come font variabile ma
+  caricato senza istanziare l'asse "wght" per i pesi richiesti, quindi
+  renderizzava tutto al peso di default — troppo sottile, poco leggibile
+  alle dimensioni piccole. Inter è pensato apposta per la leggibilità su
+  schermo a dimensioni piccole; bundlato come due pesi statici reali
+  (Regular 400, SemiBold 600, licenza SIL OFL) in `res/font/`. I ruoli che
+  usavano peso Medium (500, non disponibile come faccia reale) sono passati
+  esplicitamente a SemiBold, dando anche il tono leggermente più "bold"
+  richiesto.
 - Scala di spaziatura `xs=4 · sm=8 · md=12 · lg=16 · xl=24 · xxl=32` —
   componenti su xs/sm, titoli e ritmo tra sezioni su lg/xl/xxl. QReport non ha
   ancora un file token dedicato analogo a `Spacing.kt` di QuickStore: questa è
@@ -112,7 +131,8 @@ Identico al procedimento di QuickStore:
 1. Plugin gratuito **Tokens Studio for Figma**.
 2. Import → incolla `design/tokens-orange-technical.json` di QReport.
 3. "Create Styles/Variables".
-4. Font: IBM Plex Sans/IBM Plex Mono nativi in Figma; display/headline restano
+4. Font: Inter (nativo in Figma, è uno dei font di default del prodotto) su
+   title/body/label, IBM Plex Mono su dati/codici; display/headline restano
    sul font di sistema del progetto Figma (Roboto), non Big Shoulders Display.
 5. Ricostruisci i componenti della sezione "Componenti" del mockup come
    componenti Figma (Auto Layout) usando gli Styles/Variables appena creati.

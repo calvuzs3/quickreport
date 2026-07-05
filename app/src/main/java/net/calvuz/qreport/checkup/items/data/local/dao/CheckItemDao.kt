@@ -55,6 +55,10 @@ interface CheckItemDao {
     @Query("SELECT COUNT(*) FROM check_items WHERE checkup_id = :checkUpId AND status = 'NOK' AND criticality = :criticality")
     suspend fun getCriticalIssuesCount(checkUpId: String, criticality: String): Int
 
+    // Numero di check-up distinti con almeno una voce critica non risolta (dashboard Home).
+    @Query("SELECT COUNT(DISTINCT checkup_id) FROM check_items WHERE status = 'NOK' AND criticality = 'CRITICAL'")
+    fun observeCriticalCheckUpsCount(): Flow<Int>
+
     // ============================================================
     // METODI PER MODULI (richiesti dal Repository)
     // ============================================================

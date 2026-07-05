@@ -165,7 +165,7 @@ private fun ShareOptionsContent(
                     text = stringResource(R.string.share_backup_dialog_section_file_options),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -190,7 +190,7 @@ private fun ShareOptionsContent(
                     text = stringResource(R.string.share_backup_dialog_section_app_options),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -252,14 +252,14 @@ private fun EnhancedShareOptionItem(
                     imageVector = option.ivIcon,  // ✅ Use both enums
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             } else {
                 Icon(
                     imageVector = getIconForOption(option.type, option.shareMethod),  // ✅ Use both enums
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -325,7 +325,7 @@ private fun ShareInfoFooter() {
             Icon(
                 Icons.Default.Info,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(20.dp)
             )
             Text(
@@ -365,7 +365,7 @@ private fun ShareModeChip(
         enabled = false,
         colors = AssistChipDefaults.assistChipColors(
             disabledContainerColor = color.copy(alpha = 0.12f),
-            disabledLabelColor = color
+            disabledLabelColor = MaterialTheme.colorScheme.onSurface
         )
     )
 }

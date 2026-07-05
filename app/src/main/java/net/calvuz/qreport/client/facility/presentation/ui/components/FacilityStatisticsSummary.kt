@@ -57,7 +57,7 @@ fun FacilityStatisticsSummary(
                 icon = Icons.Default.CheckCircle,
                 value = activeIslands.toString(),
                 label = stringResource(R.string.facility_stat_islands_active),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

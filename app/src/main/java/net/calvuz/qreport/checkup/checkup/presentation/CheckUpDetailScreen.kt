@@ -61,6 +61,7 @@ import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
 import net.calvuz.qreport.photo.presentation.ui.components.PhotoCountBadge
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import timber.log.Timber
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * Check up Detail Screen

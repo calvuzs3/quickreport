@@ -25,7 +25,7 @@ fun IslandStatisticsHeader(
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(text = stringResource(R.string.island_stats_header_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                StatisticItem(icon = Icons.Default.Analytics, label = stringResource(R.string.island_stats_total), value = statistics.totalIslands.toString(), color = MaterialTheme.colorScheme.primary)
+                StatisticItem(icon = Icons.Default.Analytics, label = stringResource(R.string.island_stats_total), value = statistics.totalIslands.toString(), color = MaterialTheme.colorScheme.onSurface)
                 StatisticItem(icon = Icons.Default.CheckCircle, label = stringResource(R.string.island_stats_active), value = statistics.activeIslands.toString(), color = MaterialTheme.colorScheme.tertiary)
                 StatisticItem(icon = Icons.Default.Warning, label = stringResource(R.string.island_stats_maintenance), value = statistics.islandsDueMaintenance.toString(), color = MaterialTheme.colorScheme.error)
                 StatisticItem(icon = Icons.Default.Shield, label = stringResource(R.string.island_stats_warranty), value = statistics.islandsUnderWarranty.toString(), color = MaterialTheme.colorScheme.secondary)

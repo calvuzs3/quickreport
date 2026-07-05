@@ -19,6 +19,7 @@ import kotlinx.coroutines.delay
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.settings.domain.model.TechnicianInfo
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * Screen per gestire le impostazioni del tecnico
@@ -170,7 +171,7 @@ private fun InfoBannerCard() {
             Icon(
                 Icons.Default.Info,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(24.dp)
             )
             Column {
@@ -212,7 +213,7 @@ private fun TechnicianFormCard(
                 Icon(
                     Icons.Default.Engineering,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.settings_screen_technician_form_title),
@@ -309,7 +310,7 @@ private fun PreviewCard(technicianInfo: TechnicianInfo) {
                 Icon(
                     Icons.Default.Preview,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(20.dp)
                 )
                 Text(

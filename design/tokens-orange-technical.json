@@ -22,7 +22,7 @@
     },
     "fontFamilies": {
       "display": { "value": "Big Shoulders Display", "type": "fontFamilies" },
-      "body": { "value": "IBM Plex Sans", "type": "fontFamilies" },
+      "body": { "value": "Inter", "type": "fontFamilies" },
       "mono": { "value": "IBM Plex Mono", "type": "fontFamilies" }
     }
   },
@@ -33,7 +33,7 @@
     "text": { "value": "{global.color.graphite}", "type": "color" },
     "textSecondary": { "value": "{global.color.slate}", "type": "color" },
     "accentFill": { "value": "{global.color.orange}", "type": "color", "description": "Sfondo di pulsanti/chip/badge/strisce" },
-    "accentOn": { "value": "{global.color.graphite}", "type": "color", "description": "Testo/icona sopra accentFill — grafite, non bianco (contrasto 4.76:1 vs 2.66:1 del bianco)" },
+    "accentOn": { "value": "{global.color.graphite}", "type": "color", "description": "Testo/icona sopra accentFill — grafite, non bianco (contrasto 4.76:1 vs 2.66:1 del bianco). ECCEZIONE deliberata dopo verifica su device: sul pulsante primario e sul ruolo 'tertiary' (onPrimary/onTertiary in Theme.kt) il tema chiaro usa bianco — il grafite appesantiva troppo quei due elementi. Chip/badge/strisce/mire restano su questo valore (grafite)." },
     "accentInk": { "value": "{global.color.graphite}", "type": "color", "description": "Inchiostro 'accento' libero (non su riempimento): in chiaro coincide col testo normale, l'arancio non è ammesso qui" }
   },
   "dark": {

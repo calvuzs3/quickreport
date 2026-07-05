@@ -12,14 +12,19 @@ import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpStatusCodes
 import net.calvuz.qreport.checkup.checkup.domain.usecase.CreateCheckUpUseCase
+import net.calvuz.qreport.checkup.checkup.domain.usecase.GetCheckUpStatsUseCase
 import net.calvuz.qreport.checkup.checkup.domain.usecase.GetCheckUpsUseCase
+import net.calvuz.qreport.checkup.checkup.domain.usecase.ObserveCriticalCheckUpsCountUseCase
 import net.calvuz.qreport.checkup.status.domain.model.CheckUpStatusMaster
 import net.calvuz.qreport.checkup.status.domain.usecase.ObserveActiveCheckUpStatusesUseCase
+import net.calvuz.qreport.client.client.domain.model.Client
 import net.calvuz.qreport.client.client.domain.usecase.ObserveClientsUseCase
 import net.calvuz.qreport.client.island.domain.model.Island
 import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
 import net.calvuz.qreport.client.island.domain.usecase.ObserveIslandTypesUseCase
 import net.calvuz.qreport.client.island.domain.usecase.ObserveIslandsUseCase
+import net.calvuz.qreport.settings.domain.model.HomePreferences
+import net.calvuz.qreport.settings.domain.repository.AppSettingsRepository
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.days
@@ -33,14 +38,17 @@ data class DashboardCheckupStatistics(
     val totalCheckUps: Int,
     val activeCheckUps: Int,
     val completedThisWeek: Int,
+    val criticalCheckUps: Int,
     val averageCompletionTime: Int // in hours
 )
 
 data class DashboardCheckupData(
     val recentCheckUps: List<CheckUp>,
+    val recentCheckUpsCriticalCounts: Map<String, Int>,
     val inProgressCheckUps: List<CheckUp>,
     val draftCheckUps: List<CheckUp>,
-    val completedCheckUps: List<CheckUp>
+    val completedCheckUps: List<CheckUp>,
+    val criticalCheckUps: Int
 )
 
 // =============================================================================
@@ -70,18 +78,23 @@ data class HomeUiState(
     val isLoading: Boolean = false,
     val checkupStats: DashboardCheckupStatistics? = null,
     val recentCheckUps: List<CheckUp> = emptyList(),
+    val recentCheckUpsCriticalCounts: Map<String, Int> = emptyMap(),
     val inProgressCheckUps: List<CheckUp> = emptyList(),
     val selectedCheckUpId: String? = null,
     val quickCreatedCheckUpId: String? = null,
 
     // Clients
     val clientStats: DashboardClientStatistics? = null,
+    val recentClients: List<Client> = emptyList(),
 
     // Islands
     val islandStats: DashboardIslandStatistics = DashboardIslandStatistics(),
     val recentIslands: List<Island> = emptyList(),
     val islandTypes: List<IslandTypeMaster> = emptyList(),
     val statusMasters: List<CheckUpStatusMaster> = emptyList(),
+
+    // Dashboard visibility preferences
+    val homePreferences: HomePreferences = HomePreferences(),
 
     val error: UiText? = null
 )
@@ -98,6 +111,9 @@ class HomeViewModel @Inject constructor(
     private val observeIslandsUseCase: ObserveIslandsUseCase,
     private val observeIslandTypesUseCase: ObserveIslandTypesUseCase,
     private val observeActiveCheckUpStatusesUseCase: ObserveActiveCheckUpStatusesUseCase,
+    private val observeCriticalCheckUpsCountUseCase: ObserveCriticalCheckUpsCountUseCase,
+    private val getCheckUpStatsUseCase: GetCheckUpStatsUseCase,
+    private val appSettingsRepository: AppSettingsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -110,6 +126,7 @@ class HomeViewModel @Inject constructor(
         observeIslands()
         observeIslandTypes()
         observeCheckUpStatuses()
+        observeHomePreferences()
     }
 
     // =========================================================================
@@ -139,13 +156,20 @@ class HomeViewModel @Inject constructor(
                     loadRecentCheckUps(),
                     loadInProgressCheckUps(),
                     loadDraftCheckUps(),
-                    loadCompletedCheckUps()
-                ) { recent, inProgress, drafts, completed ->
+                    loadCompletedCheckUps(),
+                    observeCriticalCheckUpsCountUseCase()
+                ) { recent, inProgress, drafts, completed, criticalCount ->
+                    val recentCriticalCounts = recent.take(3).associate { checkUp ->
+                        val count = getCheckUpStatsUseCase(checkUp.id).getOrNull()?.criticalIssues ?: 0
+                        checkUp.id to count
+                    }
                     DashboardCheckupData(
                         recentCheckUps = recent,
+                        recentCheckUpsCriticalCounts = recentCriticalCounts,
                         inProgressCheckUps = inProgress,
                         draftCheckUps = drafts,
-                        completedCheckUps = completed
+                        completedCheckUps = completed,
+                        criticalCheckUps = criticalCount
                     )
                 }.collect { data ->
                     _uiState.update {
@@ -155,9 +179,11 @@ class HomeViewModel @Inject constructor(
                                 totalCheckUps = data.recentCheckUps.size,
                                 activeCheckUps = data.inProgressCheckUps.size + data.draftCheckUps.size,
                                 completedThisWeek = data.completedCheckUps.take(10).size,
+                                criticalCheckUps = data.criticalCheckUps,
                                 averageCompletionTime = 0
                             ),
                             recentCheckUps = data.recentCheckUps,
+                            recentCheckUpsCriticalCounts = data.recentCheckUpsCriticalCounts,
                             inProgressCheckUps = data.inProgressCheckUps,
                             error = null
                         )
@@ -198,9 +224,24 @@ class HomeViewModel @Inject constructor(
                             clientStats = DashboardClientStatistics(
                                 totalClient = clients.size,
                                 activeClient = clients.count { c -> c.isActive }
-                            )
+                            ),
+                            recentClients = clients.sortedByDescending { c -> c.updatedAt }.take(3)
                         )
                     }
+                }
+        }
+    }
+
+    // =========================================================================
+    // PREFERENCES
+    // =========================================================================
+
+    private fun observeHomePreferences() {
+        viewModelScope.launch {
+            appSettingsRepository.getHomePreferences()
+                .catch { e -> Timber.e(e, "Failed to observe home preferences") }
+                .collect { preferences ->
+                    _uiState.update { it.copy(homePreferences = preferences) }
                 }
         }
     }

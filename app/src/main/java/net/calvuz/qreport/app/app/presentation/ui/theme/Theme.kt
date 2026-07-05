@@ -33,10 +33,12 @@ import androidx.compose.ui.graphics.toArgb
  * - Dark/Light theme automatico
  */
 
-// Primary colors - Arancio brand (riempimento). onPrimary = grafite, non
-// bianco: regola d'inchiostro, vedi design/design-system.md.
+// Primary colors - Arancio brand (riempimento). onPrimary = bianco in tema
+// chiaro (il grafite appesantiva troppo i pulsanti pieni, richiesta esplicita
+// dopo verifica su device — contrasto 2.66:1, sotto la regola d'inchiostro
+// "pura" di design/design-system.md ma scelta deliberata qui).
 private val md_theme_light_primary = TechnicalOrangeLight
-private val md_theme_light_onPrimary = TechnicalGraphite
+private val md_theme_light_onPrimary = TechnicalSurfaceLight
 private val md_theme_light_primaryContainer = Color(0xFFFBE3C2)
 private val md_theme_light_onPrimaryContainer = TechnicalGraphite
 
@@ -47,9 +49,9 @@ private val md_theme_light_secondaryContainer = TechnicalPaper
 private val md_theme_light_onSecondaryContainer = TechnicalGraphite
 
 // Tertiary colors - sfumatura più scura dell'arancio (stesso hue). onTertiary
-// = grafite, non bianco: stesso motivo di onPrimary.
+// = bianco in chiaro, stesso motivo di onPrimary.
 private val md_theme_light_tertiary = TechnicalOrangeDarkerLight
-private val md_theme_light_onTertiary = TechnicalGraphite
+private val md_theme_light_onTertiary = TechnicalSurfaceLight
 private val md_theme_light_tertiaryContainer = Color(0xFFFBE3C2)
 private val md_theme_light_onTertiaryContainer = TechnicalGraphite
 
@@ -79,10 +81,31 @@ private val md_theme_light_onSurface = TechnicalGraphite
 private val md_theme_light_surfaceVariant = TechnicalPaper
 private val md_theme_light_onSurfaceVariant = TechnicalSlate
 private val md_theme_light_outline = TechnicalBorder
+private val md_theme_light_outlineVariant = TechnicalBorder
+
+// Surface container family + ruoli "inverse"/scrim/tint — NON lasciarli mai
+// impostati implicitamente: senza un valore esplicito, lightColorScheme()/
+// darkColorScheme() li derivano dalla palette viola di riferimento di
+// Material3 (surfaceTint incluso), non dalla nostra arancio/grafite — è
+// quello che ha reso le DashboardSectionCard (surfaceContainerHigh) e
+// altri elementi verificati su device chiaramente viola/lavanda invece che
+// grigio neutro. Scala di grigi coerente con paper/border/grafite.
+private val md_theme_light_surfaceContainerLowest = Color(0xFFFFFFFF)
+private val md_theme_light_surfaceContainerLow = Color(0xFFF8F8F8)
+private val md_theme_light_surfaceContainer = TechnicalPaper       // #F4F4F4
+private val md_theme_light_surfaceContainerHigh = Color(0xFFECECEC)
+private val md_theme_light_surfaceContainerHighest = TechnicalBorder // #E3E3E3
+private val md_theme_light_surfaceDim = TechnicalBorder
+private val md_theme_light_surfaceBright = Color(0xFFFFFFFF)
+private val md_theme_light_surfaceTint = TechnicalOrangeLight
+private val md_theme_light_inverseSurface = TechnicalGraphite
+private val md_theme_light_inverseOnSurface = TechnicalPaper
+private val md_theme_light_inversePrimary = TechnicalOrangeDark
+private val md_theme_light_scrim = Color(0xFF000000)
 
 // Dark theme colors - Arancio/grafite (vedi design/design-system.md)
 private val md_theme_dark_primary = TechnicalOrangeDark
-private val md_theme_dark_onPrimary = TechnicalGraphite // grafite anche in dark: 5.9:1, regola d'inchiostro
+private val md_theme_dark_onPrimary = TechnicalGraphite // grafite in dark (non bianco come in chiaro): l'arancio di tema scuro è più chiaro, il bianco ci starebbe anche peggio (~2.1:1) del chiaro (2.66:1)
 private val md_theme_dark_primaryContainer = Color(0xFF4A3417)
 private val md_theme_dark_onPrimaryContainer = TechnicalTextDark
 
@@ -108,6 +131,21 @@ private val md_theme_dark_onSurface = TechnicalTextDark
 private val md_theme_dark_surfaceVariant = TechnicalSurfaceDark
 private val md_theme_dark_onSurfaceVariant = TechnicalTextSecondaryDark
 private val md_theme_dark_outline = TechnicalBorderDark
+private val md_theme_dark_outlineVariant = TechnicalBorderDark
+
+// Vedi commento sopra (light) — stessa ragione, scala di grigi dark coerente.
+private val md_theme_dark_surfaceContainerLowest = Color(0xFF141414)
+private val md_theme_dark_surfaceContainerLow = Color(0xFF1F1F1F)
+private val md_theme_dark_surfaceContainer = TechnicalSurfaceDark        // #262626
+private val md_theme_dark_surfaceContainerHigh = Color(0xFF2F2F2F)
+private val md_theme_dark_surfaceContainerHighest = TechnicalBorderDark  // #3A3A3A
+private val md_theme_dark_surfaceDim = TechnicalBackgroundDark
+private val md_theme_dark_surfaceBright = Color(0xFF3A3A3A)
+private val md_theme_dark_surfaceTint = TechnicalOrangeDark
+private val md_theme_dark_inverseSurface = TechnicalPaper
+private val md_theme_dark_inverseOnSurface = TechnicalGraphite
+private val md_theme_dark_inversePrimary = TechnicalOrangeLight
+private val md_theme_dark_scrim = Color(0xFF000000)
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -133,6 +171,19 @@ private val LightColors = lightColorScheme(
     surfaceVariant = md_theme_light_surfaceVariant,
     onSurfaceVariant = md_theme_light_onSurfaceVariant,
     outline = md_theme_light_outline,
+    outlineVariant = md_theme_light_outlineVariant,
+    surfaceContainerLowest = md_theme_light_surfaceContainerLowest,
+    surfaceContainerLow = md_theme_light_surfaceContainerLow,
+    surfaceContainer = md_theme_light_surfaceContainer,
+    surfaceContainerHigh = md_theme_light_surfaceContainerHigh,
+    surfaceContainerHighest = md_theme_light_surfaceContainerHighest,
+    surfaceDim = md_theme_light_surfaceDim,
+    surfaceBright = md_theme_light_surfaceBright,
+    surfaceTint = md_theme_light_surfaceTint,
+    inverseSurface = md_theme_light_inverseSurface,
+    inverseOnSurface = md_theme_light_inverseOnSurface,
+    inversePrimary = md_theme_light_inversePrimary,
+    scrim = md_theme_light_scrim,
 )
 
 private val DarkColors = darkColorScheme(
@@ -159,6 +210,19 @@ private val DarkColors = darkColorScheme(
     surfaceVariant = md_theme_dark_surfaceVariant,
     onSurfaceVariant = md_theme_dark_onSurfaceVariant,
     outline = md_theme_dark_outline,
+    outlineVariant = md_theme_dark_outlineVariant,
+    surfaceContainerLowest = md_theme_dark_surfaceContainerLowest,
+    surfaceContainerLow = md_theme_dark_surfaceContainerLow,
+    surfaceContainer = md_theme_dark_surfaceContainer,
+    surfaceContainerHigh = md_theme_dark_surfaceContainerHigh,
+    surfaceContainerHighest = md_theme_dark_surfaceContainerHighest,
+    surfaceDim = md_theme_dark_surfaceDim,
+    surfaceBright = md_theme_dark_surfaceBright,
+    surfaceTint = md_theme_dark_surfaceTint,
+    inverseSurface = md_theme_dark_inverseSurface,
+    inverseOnSurface = md_theme_dark_inverseOnSurface,
+    inversePrimary = md_theme_dark_inversePrimary,
+    scrim = md_theme_dark_scrim,
 )
 
 /**

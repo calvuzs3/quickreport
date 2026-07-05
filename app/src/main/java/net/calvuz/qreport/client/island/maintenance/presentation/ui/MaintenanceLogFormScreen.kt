@@ -26,6 +26,7 @@ import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceOperationType
 import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceOutcome
 import net.calvuz.qreport.client.unit.domain.model.MechanicalUnit
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

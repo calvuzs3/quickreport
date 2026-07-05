@@ -24,6 +24,9 @@
     <string name="settings_screen_main_criticality_levels_subtitle">Gestisci i livelli di criticità della checklist</string>
     <string name="settings_screen_main_check_item_templates_title">Template checklist</string>
     <string name="settings_screen_main_check_item_templates_subtitle">Gestisci i template della checklist per tipo isola</string>
+    <string name="settings_screen_main_section_home">Home</string>
+    <string name="settings_screen_main_home_preferences_title">Preferenze Home</string>
+    <string name="settings_screen_main_home_preferences_subtitle">Scegli le sezioni visibili nella schermata Home</string>
 
     <!-- ======================================================= -->
     <!-- TechnicianSettingsScreen                                 -->

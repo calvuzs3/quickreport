@@ -158,7 +158,7 @@ private fun FullFacilityCard(
                                 Icons.Default.LocationOn,
                                 contentDescription = stringResource(R.string.facility_card_action_open_maps),
                                 modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -167,7 +167,7 @@ private fun FullFacilityCard(
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = stringResource(R.string.facility_card_action_edit),
-                                tint = MaterialTheme.colorScheme.primary,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -208,12 +208,12 @@ private fun FullFacilityCard(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = if (mapsClickable) stringResource(R.string.facility_card_action_open_maps) else null,
                 modifier = Modifier.size(16.dp),
-                tint = if (mapsClickable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                tint = if (mapsClickable) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = facility.addressDisplay ?: "",
                 style = MaterialTheme.typography.bodySmall,
-                color = if (mapsClickable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (mapsClickable) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -222,7 +222,7 @@ private fun FullFacilityCard(
                     imageVector = Icons.AutoMirrored.Default.OpenInNew,
                     contentDescription = null,
                     modifier = Modifier.size(12.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -293,14 +293,14 @@ private fun CompactFacilityCard(
             imageVector = facility.facilityType.icon(),
             contentDescription = null,
             modifier = Modifier.size(22.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.onSurface
         )
 
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
                 text = stringResource(facility.facilityType.labelResId),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -319,14 +319,14 @@ private fun CompactFacilityCard(
                         imageVector = Icons.Default.Star,
                         contentDescription = stringResource(R.string.facility_card_primary_badge),
                         modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
             Text(
                 text = facility.address?.city ?: "",
                 style = MaterialTheme.typography.bodySmall,
-                color = if (onOpenMaps != null && facility.address?.isComplete() == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (onOpenMaps != null && facility.address?.isComplete() == true) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 modifier = if (onOpenMaps != null && facility.address?.isComplete() == true) Modifier.clickable { onOpenMaps() } else Modifier)
         }
@@ -377,7 +377,7 @@ private fun MinimalFacilityCard(facility: Facility) {
                         imageVector = Icons.Default.Star,
                         contentDescription = stringResource(R.string.facility_card_primary_badge),
                         modifier = Modifier.size(14.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

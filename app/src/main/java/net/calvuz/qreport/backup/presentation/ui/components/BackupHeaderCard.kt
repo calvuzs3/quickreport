@@ -25,6 +25,7 @@ import net.calvuz.qreport.backup.presentation.model.BackupModeExt.getDisplayName
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import net.calvuz.qreport.app.util.SizeUtils.getFormattedSize
 import kotlin.math.roundToInt
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * BACKUP UI COMPONENTS - FASE 5.4
@@ -81,7 +82,7 @@ fun BackupHeaderCard(
                     imageVector = Icons.Outlined.Backup,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -356,7 +357,7 @@ private fun BackupSizeIndicator(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.width(4.dp))
@@ -372,7 +373,7 @@ private fun BackupSizeIndicator(
             text = estimatedSize.getFormattedSize(),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -533,7 +534,7 @@ private fun BackupActionContent(
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
@@ -541,7 +542,7 @@ private fun BackupActionContent(
                         Text(
                             text = stringResource(R.string.backup_action_completed),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                     }

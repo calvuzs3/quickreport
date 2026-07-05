@@ -28,6 +28,8 @@ import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.checkup.checkup.presentation.components.ClientFacilityIslandSelectorDialog
 import net.calvuz.qreport.ti.domain.model.WorkLocationType
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
+import net.calvuz.qreport.app.app.presentation.components.QrOutlinedButton as OutlinedButton
 
 /**
  * Screen for creating a new TechnicalIntervention
@@ -244,7 +246,7 @@ private fun TiSourceSelectionSection(
                 Icon(
                     imageVector = Icons.Default.Link,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(
@@ -309,13 +311,13 @@ private fun CustomerDataSection(
             Icon(
                 imageVector = Icons.Default.Business,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = stringResource(R.string.intervention_form_section_customer),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -384,13 +386,13 @@ private fun RobotDataSection(
             Icon(
                 imageVector = Icons.Default.PrecisionManufacturing,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = stringResource(R.string.intervention_form_section_robot),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 

@@ -31,6 +31,7 @@ import net.calvuz.qreport.photo.presentation.util.rememberPhotoPickerLauncher
 import timber.log.Timber
 import java.io.File
 import kotlin.math.abs
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * ✅ GALLERY AGGIORNATA: Con debugging completo dei nuovi metadati PhotoStorageManager

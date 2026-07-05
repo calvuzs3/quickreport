@@ -21,6 +21,7 @@ import net.calvuz.qreport.app.app.presentation.ui.theme.onSuccessContainer
 import net.calvuz.qreport.app.app.presentation.ui.theme.onWarningContainer
 import net.calvuz.qreport.app.app.presentation.ui.theme.success
 import net.calvuz.qreport.app.app.presentation.ui.theme.warning
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 // ============================================================
 // 1. ERROR/INFO DIALOG - Solo informativo

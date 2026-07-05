@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * Confirmation dialog for restore operations.
@@ -26,7 +27,7 @@ fun QReportConfirmRestoreDialog(
             Icon(
                 imageVector = Icons.Default.RestoreFromTrash,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurface
             )
         },
         title = {

@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
 import net.calvuz.qreport.ti.domain.model.WorkDay
+import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * List content for WorkDays tab.
@@ -227,7 +228,7 @@ private fun WorkDayCard(
                     Icon(
                         imageVector = Icons.Default.CalendarToday,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
