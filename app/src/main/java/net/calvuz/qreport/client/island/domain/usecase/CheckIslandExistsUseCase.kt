@@ -22,7 +22,7 @@ class CheckIslandExistsUseCase @Inject constructor(
         islandId: String
     ): QrResult<Island, QrError.IslandError> {
 
-        Timber.d("Check island exists")
+        Timber.v("Check island exists")
 
         if (islandId.isBlank()) {
             Timber.d("Island id is blank")
@@ -41,7 +41,7 @@ class CheckIslandExistsUseCase @Inject constructor(
                         QrResult.Error(QrError.IslandError.AlreadyDeleted())
                     }
                     else -> {
-                        Timber.d("Island successfully retrieved: $island")
+                        Timber.v("Island successfully retrieved: ${island.id}")
                         QrResult.Success(island)
                     }
                 }

@@ -107,7 +107,7 @@ import net.calvuz.qreport.checkup.spareparts.data.local.entity.CheckUpSparePartE
         TiMaintenanceLogAssociationEntity::class,
         // Island type definitions (server-authoritative, populated via sync)
         IslandTypeEntity::class,
-        // Checklist master data (local-only, no server sync)
+        // Checklist master data (server-authoritative, populated via sync)
         ModuleTypeEntity::class,
         CriticalityEntity::class,
         CheckItemTemplateEntity::class,
@@ -166,6 +166,14 @@ abstract class QReportDatabase : RoomDatabase() {
         val MIGRATION_10_11 = net.calvuz.qreport.app.database.data.local.migrations.MIGRATION_10_11
         val MIGRATION_11_12 = net.calvuz.qreport.app.database.data.local.migrations.MIGRATION_11_12
 
-        val CALLBACK = object : Callback() {}
+        val CALLBACK = object : Callback() {
+            override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                super.onCreate(db)
+                // Fresh install: Room creates tables straight from the current schema and
+                // never runs any Migration.migrate() body, so migration-seeded defaults
+                // (see MIGRATION_7_8) need to be repeated here too.
+                net.calvuz.qreport.app.database.data.local.migrations.CheckUpStatusDefaults.seedCurrentSchema(db)
+            }
+        }
     }
 }

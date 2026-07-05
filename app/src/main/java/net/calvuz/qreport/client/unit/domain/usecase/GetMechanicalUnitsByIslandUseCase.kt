@@ -22,11 +22,11 @@ class GetMechanicalUnitsByIslandUseCase @Inject constructor(
         islandId: String
     ): QrResult<List<MechanicalUnit>, QrError.UnitError> {
 
-        Timber.d("Get mechanical unit by island id")
+        Timber.v("Get mechanical units by island id")
 
         // Check input
         if (islandId.isBlank()) {
-            Timber.d("MecIsland id is blank")
+            Timber.d("Island ID is blank")
             return QrResult.Error(QrError.UnitError.IslandNotFound())
         }
 
@@ -42,10 +42,10 @@ class GetMechanicalUnitsByIslandUseCase @Inject constructor(
         // Get
         return repository.getUnitsByIsland(islandId).fold(
             onSuccess = {
-                Timber.d("Successfully retrieved mechanical unit: $it")
+                Timber.v("Successfully retrieved ${it.size } mechanical units")
                 QrResult.Success(it) },
             onFailure = {
-                Timber.d("Error in retrieving mechanical unit: ${it.message}")
+                Timber.d("Error in retrieving mechanical units: ${it.message}")
                 QrResult.Error(QrError.UnitError.LoadError(it.message)) }
         )
     }

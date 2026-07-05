@@ -3,6 +3,7 @@ package net.calvuz.qreport.client.client.domain.usecase
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
 import net.calvuz.qreport.checkup.checkup.domain.repository.CheckUpRepository
+import net.calvuz.qreport.checkup.checkup.domain.usecase.GetAssociationStatisticsUseCase
 import net.calvuz.qreport.client.client.domain.repository.ClientRepository
 import net.calvuz.qreport.client.client.presentation.model.ClientStatistics
 import timber.log.Timber
@@ -11,12 +12,13 @@ import javax.inject.Inject
 /**
  * Returns statistics for a single client (used in list cards and detail screen).
  *
- * CheckUp statistics are optional: if [checkUpRepository] is null or the call
- * fails, zeroed placeholders are used and the use case still succeeds.
+ * CheckUp statistics are optional: if [associationStatisticsUseCase] or
+ * [checkUpRepository] fail, zeroed placeholders are used and the use case still succeeds.
  */
 class GetClientStatisticsUseCase @Inject constructor(
     private val clientRepository: ClientRepository,
     private val checkClientExists: CheckClientExistsUseCase,
+    private val associationStatisticsUseCase: GetAssociationStatisticsUseCase,
     private val checkUpRepository: CheckUpRepository? = null
 ) {
     suspend operator fun invoke(clientId: String): QrResult<ClientStatistics, QrError.ClientError> {
@@ -48,10 +50,13 @@ class GetClientStatisticsUseCase @Inject constructor(
 
         // CheckUp stats are optional — failures produce zeroed placeholders
         val (totalCheckUps, completedCheckUps, lastCheckUpDate) = try {
-            // TODO: uncomment when CheckUpRepository.getCheckUpsByClient() is available
-            // val checkUps = checkUpRepository?.getCheckUpsByClient(clientId)?.getOrElse { emptyList() } ?: emptyList()
-            // Triple(checkUps.size, checkUps.count { it.status.isCompleted() }, checkUps.maxByOrNull { it.updatedAt }?.updatedAt)
-            Triple(0, 0, null)
+            val total = associationStatisticsUseCase.getCheckUpCountForClient(clientId)
+            val lastDate = associationStatisticsUseCase.getRecentAssociationsForClient(clientId, limit = 1)
+                .firstOrNull()
+                ?.let { checkUpRepository?.getCheckUpById(it.checkupId) }
+                ?.updatedAt
+            // TODO: completedCheckUps needs per-checkup status aggregation (recent-only isn't enough)
+            Triple(total, 0, lastDate)
         } catch (e: Exception) {
             Timber.e(e, "Failed to get check-ups for client $clientId")
             Triple(0, 0, null)

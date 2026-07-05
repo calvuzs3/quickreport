@@ -297,6 +297,8 @@
     <string name="island_stats_uptime_label">Uptime</string>
     <string name="island_stats_uptime_value">%1$d%%</string>
     <string name="island_stats_age_days">%1$d giorni attivi</string>
+    <string name="island_stats_checkups_label">Check-up</string>
+    <string name="island_stats_checkups_value">%1$d</string>
 
     <!-- ======================================================= -->
     <!-- PerformanceMetricsCard                                   -->

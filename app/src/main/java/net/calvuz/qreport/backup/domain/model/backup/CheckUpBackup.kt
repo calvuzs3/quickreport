@@ -35,8 +35,11 @@ data class CheckUpBackup(
     val headerNotes: String,
 
     val islandType: String,
+    val islandTypeId: String? = null,
     val status: String,
     @Contextual val createdAt: Instant,
     @Contextual val updatedAt: Instant,
-    @Contextual val completedAt: Instant?
+    @Contextual val completedAt: Instant?,
+    val syncedAt: Long? = null,
+    val isDeleted: Boolean = false
 )

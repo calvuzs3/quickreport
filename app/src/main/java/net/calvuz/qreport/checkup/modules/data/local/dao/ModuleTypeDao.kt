@@ -36,6 +36,20 @@ interface ModuleTypeDao {
     @Query("UPDATE module_types SET is_active = 1, updated_at = :ts WHERE id = :id")
     suspend fun restore(id: String, ts: Long)
 
+    @Query("DELETE FROM module_types")
+    suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM module_types")
+    suspend fun count(): Int
+
+    // ===== BACKUP =====
+
+    @Query("SELECT * FROM module_types ORDER BY created_at ASC")
+    suspend fun getAllForBackup(): List<ModuleTypeEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllFromBackup(types: List<ModuleTypeEntity>)
+
     /** Which modules a given island type pulls into a new checkup's checklist. */
     @Query("SELECT module_type_id FROM module_type_island_types WHERE island_type_id = :islandTypeId")
     suspend fun getModuleTypeIdsForIslandType(islandTypeId: String): List<String>
@@ -48,6 +62,9 @@ interface ModuleTypeDao {
 
     @Query("DELETE FROM module_type_island_types WHERE island_type_id = :islandTypeId")
     suspend fun deleteModuleIslandLinksForIslandType(islandTypeId: String)
+
+    @Query("SELECT COUNT(*) FROM module_type_island_types")
+    suspend fun countModuleIslandLinks(): Int
 
     @Transaction
     suspend fun replaceModuleIslandLinks(islandTypeId: String, moduleTypeIds: List<String>) {

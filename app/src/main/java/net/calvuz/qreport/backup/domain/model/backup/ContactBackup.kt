@@ -25,5 +25,7 @@ data class ContactBackup(
     val preferredContactMethod: String?,
     val notes: String?,
     @Contextual val createdAt: Instant,
-    @Contextual val updatedAt: Instant
+    @Contextual val updatedAt: Instant,
+    val syncedAt: Long? = null,
+    val isDeleted: Boolean = false
 )

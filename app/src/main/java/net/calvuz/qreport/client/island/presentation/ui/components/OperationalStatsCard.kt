@@ -2,6 +2,7 @@ package net.calvuz.qreport.client.island.presentation.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Schedule
@@ -43,6 +44,11 @@ fun OperationalStatsCard(statistics: SingleIslandStatistics) {
                     subtitle = if (statistics.operationalStats.ageInDays > 0)
                         stringResource(R.string.island_stats_age_days, statistics.operationalStats.ageInDays)
                     else ""
+                )
+                OperationalStatItem(
+                    icon = Icons.AutoMirrored.Default.Assignment,
+                    label = stringResource(R.string.island_stats_checkups_label),
+                    value = stringResource(R.string.island_stats_checkups_value, statistics.totalCheckUps)
                 )
             }
         }

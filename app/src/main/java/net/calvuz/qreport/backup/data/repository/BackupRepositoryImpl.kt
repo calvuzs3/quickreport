@@ -320,7 +320,7 @@ class BackupRepositoryImpl @Inject constructor(
                                 backupPath = backupPath,
                                 totalSize = finalBackupData.metadata.totalSize,
                                 duration = duration,
-                                tablesBackedUp = 14
+                                tablesBackedUp = net.calvuz.qreport.backup.domain.model.backup.DatabaseBackup.TABLE_NAMES.size
                             )
                         )
                     }

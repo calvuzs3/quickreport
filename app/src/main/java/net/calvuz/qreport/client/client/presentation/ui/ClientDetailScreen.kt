@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.automirrored.filled.FactCheck
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
@@ -61,6 +62,7 @@ import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianCreatedAt
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDateTime
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianLastModified
+import net.calvuz.qreport.client.client.presentation.model.ClientStatistics
 import net.calvuz.qreport.client.client.presentation.model.ClientWithDetails
 import net.calvuz.qreport.client.contact.domain.model.Contact
 import net.calvuz.qreport.client.contact.domain.model.ContactStatistics
@@ -287,6 +289,7 @@ private fun ClientDetailContent(
             ClientDetailTab.INFO -> InfoTabContent(
                 modifier = Modifier.weight(1f),
                 clientDetails = uiState.clientDetails!!,
+                statistics = uiState.statistics,
                 onEdit = onEdit
             )
 
@@ -329,7 +332,10 @@ private fun ClientDetailContent(
 @Suppress("ParamsComparedByRef")
 @Composable
 private fun InfoTabContent(
-    modifier: Modifier = Modifier, clientDetails: ClientWithDetails, onEdit: () -> Unit = {}
+    modifier: Modifier = Modifier,
+    clientDetails: ClientWithDetails,
+    statistics: ClientStatistics? = null,
+    onEdit: () -> Unit = {}
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Row(
@@ -383,6 +389,29 @@ private fun InfoTabContent(
                         InfoItem(
                             label = stringResource(R.string.client_detail_info_field_address),
                             value = address.toDisplayString()
+                        )
+                    }
+                }
+            }
+
+            statistics?.let { stats ->
+                item {
+                    InfoCard(
+                        title = stringResource(R.string.client_detail_info_card_checkups),
+                        icon = Icons.AutoMirrored.Default.FactCheck
+                    ) {
+                        InfoItem(
+                            label = stringResource(R.string.client_detail_info_field_total_checkups),
+                            value = stats.totalCheckUps.toString()
+                        )
+                        stats.lastCheckUpDate?.let {
+                            InfoItem(
+                                label = stringResource(R.string.client_detail_info_field_last_checkup),
+                                value = it.toItalianDateTime()
+                            )
+                        } ?: InfoItem(
+                            label = stringResource(R.string.client_detail_info_field_last_checkup),
+                            value = stringResource(R.string.client_detail_info_no_checkups)
                         )
                     }
                 }

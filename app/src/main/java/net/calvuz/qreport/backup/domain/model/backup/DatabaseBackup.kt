@@ -10,14 +10,13 @@ import kotlinx.serialization.Serializable
  * ===== CHECKLIST: aggiungere una nuova tabella al backup =====
  * Non esiste un registry: ogni tabella va wired a mano nei seguenti punti:
  * 1. DTO `XxxBackup.kt` in `backup/domain/model/backup/`
- * 2. Campo qui in [DatabaseBackup] + [getTotalRecordCount] + [empty]
+ * 2. Campo qui in [DatabaseBackup] + [getTotalRecordCount] + [empty] + [TABLE_NAMES]
  * 3. `DatabaseExporter`: DAO nel costruttore, export + mapper `toBackup()`
  * 4. `DatabaseImporter`: DAO nel costruttore, `clearAllTablesInOrder()` (ordine FK
  *    inverso), `importAllTablesInOrder()` (ordine FK), `validateImportedData()`,
  *    `logImportStatistics()`, mapper `toEntity()`
  * 5. Il DAO deve esporre `getAllForBackup/insertAllFromBackup/deleteAll/count`
  * 6. `DatabaseExportRepositoryImpl.clearAllTables()` - empty literal
- * 7. `BackupJsonSerializer.validateBackupJson()` - `expectedTables` (opzionale)
  * ================================================================
  */
 @Serializable
@@ -50,6 +49,16 @@ data class DatabaseBackup(
     // ===== DOCUMENTS =====
     val documents: List<DocumentBackup> = emptyList(),
 
+    // ===== CHECKUP MASTER DATA =====
+    val islandTypes: List<IslandTypeBackup> = emptyList(),
+    val moduleTypes: List<ModuleTypeBackup> = emptyList(),
+    val moduleTypeIslandTypeLinks: List<ModuleTypeIslandTypeLinkBackup> = emptyList(),
+    val criticalityLevels: List<CriticalityBackup> = emptyList(),
+    val checkItemTemplates: List<CheckItemTemplateBackup> = emptyList(),
+    val checkUpStatuses: List<CheckUpStatusBackup> = emptyList(),
+    val checkUpStatusTransitions: List<CheckUpStatusTransitionBackup> = emptyList(),
+    val checkUpSpareParts: List<CheckUpSparePartBackup> = emptyList(),
+
     // ===== METADATA =====
     @Contextual val exportedAt: Instant
 ) {
@@ -72,7 +81,15 @@ data class DatabaseBackup(
                 tiMaintenanceLogAssociations.size +
                 technicalInterventions.size +
                 maintenanceLogs.size +
-                documents.size
+                documents.size +
+                islandTypes.size +
+                moduleTypes.size +
+                moduleTypeIslandTypeLinks.size +
+                criticalityLevels.size +
+                checkItemTemplates.size +
+                checkUpStatuses.size +
+                checkUpStatusTransitions.size +
+                checkUpSpareParts.size
     }
 
     /**
@@ -83,6 +100,17 @@ data class DatabaseBackup(
     }
 
     companion object {
+        /** Nomi dei campi/tabelle del backup, usati per validazione JSON e conteggi UI. */
+        val TABLE_NAMES = listOf(
+            "checkUps", "checkItems", "photos",
+            "clients", "contacts", "contracts", "facilities", "facilityIslands",
+            "mechanicalUnits", "checkUpAssociations",
+            "tiIslandAssociations", "checkUpMaintenanceLogAssociations", "tiMaintenanceLogAssociations",
+            "technicalInterventions", "maintenanceLogs", "documents",
+            "islandTypes", "moduleTypes", "moduleTypeIslandTypeLinks", "criticalityLevels",
+            "checkItemTemplates", "checkUpStatuses", "checkUpStatusTransitions", "checkUpSpareParts"
+        )
+
         fun empty(): DatabaseBackup {
             return DatabaseBackup(
                 checkUps = emptyList(),
@@ -101,6 +129,14 @@ data class DatabaseBackup(
                 technicalInterventions = emptyList(),
                 maintenanceLogs = emptyList(),
                 documents = emptyList(),
+                islandTypes = emptyList(),
+                moduleTypes = emptyList(),
+                moduleTypeIslandTypeLinks = emptyList(),
+                criticalityLevels = emptyList(),
+                checkItemTemplates = emptyList(),
+                checkUpStatuses = emptyList(),
+                checkUpStatusTransitions = emptyList(),
+                checkUpSpareParts = emptyList(),
                 exportedAt = Instant.fromEpochMilliseconds(0)
             )
         }

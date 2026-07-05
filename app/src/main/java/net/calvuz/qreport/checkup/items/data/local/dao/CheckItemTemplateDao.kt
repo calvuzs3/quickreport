@@ -52,6 +52,20 @@ interface CheckItemTemplateDao {
     @Query("UPDATE check_item_templates SET is_active = 1, updated_at = :ts WHERE id = :id")
     suspend fun restore(id: String, ts: Long)
 
+    @Query("DELETE FROM check_item_templates")
+    suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM check_item_templates")
+    suspend fun count(): Int
+
+    // ===== BACKUP =====
+
+    @Query("SELECT * FROM check_item_templates ORDER BY created_at ASC")
+    suspend fun getAllForBackup(): List<CheckItemTemplateEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllFromBackup(templates: List<CheckItemTemplateEntity>)
+
     // ===== SYNC =====
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

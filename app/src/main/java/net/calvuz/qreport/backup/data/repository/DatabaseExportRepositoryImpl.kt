@@ -75,22 +75,7 @@ class DatabaseExportRepositoryImpl @Inject constructor(
         Timber.w("Clear all tables")
 
         return try {
-            val emptyBackup = DatabaseBackup(
-                checkUps = emptyList(),
-                checkItems = emptyList(),
-                photos = emptyList(),
-                clients = emptyList(),
-                contacts = emptyList(),
-                contracts = emptyList(),
-                facilities = emptyList(),
-                facilityIslands = emptyList(),
-                mechanicalUnits = emptyList(),
-                checkUpAssociations = emptyList(),
-                technicalInterventions = emptyList(),
-                maintenanceLogs = emptyList(),
-                documents = emptyList(),
-                exportedAt = Clock.System.now()
-            )
+            val emptyBackup = DatabaseBackup.empty().copy(exportedAt = Clock.System.now())
 
             // Import empty backup with strategy REPLACE_ALL
             databaseImporter.importAllTables(emptyBackup, RestoreStrategy.REPLACE_ALL)

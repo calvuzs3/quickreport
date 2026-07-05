@@ -36,6 +36,29 @@ interface CheckUpStatusDao {
     @Query("UPDATE checkup_statuses SET is_active = 1, updated_at = :ts WHERE id = :id")
     suspend fun restore(id: String, ts: Long)
 
+    @Query("DELETE FROM checkup_statuses")
+    suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM checkup_statuses")
+    suspend fun count(): Int
+
+    // ===== BACKUP =====
+
+    @Query("SELECT * FROM checkup_statuses ORDER BY created_at ASC")
+    suspend fun getAllForBackup(): List<CheckUpStatusEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllFromBackup(statuses: List<CheckUpStatusEntity>)
+
+    @Query("SELECT * FROM checkup_status_transitions")
+    suspend fun getAllTransitionsOnce(): List<CheckUpStatusTransitionCrossRef>
+
+    @Query("DELETE FROM checkup_status_transitions")
+    suspend fun deleteAllTransitions()
+
+    @Query("SELECT COUNT(*) FROM checkup_status_transitions")
+    suspend fun countTransitions(): Int
+
     @Query("SELECT * FROM checkup_status_transitions")
     fun observeAllTransitions(): Flow<List<CheckUpStatusTransitionCrossRef>>
 

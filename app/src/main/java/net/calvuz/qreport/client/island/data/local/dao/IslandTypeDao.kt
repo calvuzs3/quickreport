@@ -50,6 +50,17 @@ interface IslandTypeDao {
     @Query("DELETE FROM island_types")
     suspend fun deleteAll()
 
+    @Query("SELECT COUNT(*) FROM island_types")
+    suspend fun count(): Int
+
+    // ===== BACKUP =====
+
+    @Query("SELECT * FROM island_types ORDER BY created_at ASC")
+    suspend fun getAllForBackup(): List<IslandTypeEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllFromBackup(types: List<IslandTypeEntity>)
+
     // ===== SYNC =====
 
     @Query("""

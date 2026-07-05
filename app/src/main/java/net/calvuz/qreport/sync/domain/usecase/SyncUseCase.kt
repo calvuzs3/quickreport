@@ -188,6 +188,7 @@ class SyncUseCase @Inject constructor(
             checkupStatuses = if (isAdmin) checkUpStatusDao.getPendingSync().map { syncMapper.checkUpStatusToDto(it) } else emptyList(),
             checkItemTemplates = if (isAdmin) checkItemTemplateDao.getPendingSync().map { syncMapper.checkItemTemplateToDto(it) } else emptyList(),
             moduleTypeIslandTypeLinks = if (isAdmin) moduleTypeDao.getAllModuleIslandLinksOnce().map { syncMapper.moduleIslandLinkToDto(it) } else emptyList(),
+            checkUpStatusTransitions = if (isAdmin) checkUpStatusDao.getAllTransitionsOnce().map { syncMapper.checkUpStatusTransitionToDto(it) } else emptyList(),
             checkups = (pendingCheckups + deletedCheckups).map { syncMapper.checkUpToDto(it) },
             checkupIslandAssociations = checkUpAssociationDao.getPendingSync().map { syncMapper.checkUpIslandAssociationToDto(it) },
             checkupItems = if (pendingCheckupIds.isNotEmpty())
@@ -249,6 +250,12 @@ class SyncUseCase @Inject constructor(
             moduleTypeDao.deleteAllModuleIslandLinks()
             moduleTypeDao.insertModuleIslandLinks(payload.moduleTypeIslandTypeLinks.map {
                 syncMapper.moduleIslandLinkToEntity(it)
+            })
+        }
+        if (payload.checkUpStatusTransitions.isNotEmpty()) {
+            checkUpStatusDao.deleteAllTransitions()
+            checkUpStatusDao.insertTransitions(payload.checkUpStatusTransitions.map {
+                syncMapper.checkUpStatusTransitionToEntity(it)
             })
         }
         if (payload.checkups.isNotEmpty()) checkUpDao.upsertAll(payload.checkups.map {

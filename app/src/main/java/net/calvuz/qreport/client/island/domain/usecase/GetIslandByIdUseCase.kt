@@ -15,7 +15,8 @@ class GetIslandByIdUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(islandId: String): QrResult<Island, QrError.IslandError> {
 
-        Timber.d("Get island by id")
+        Timber.v("Get island by id")
+        
         if (islandId.isBlank()) {
             Timber.d("Island id is blank")
             return QrResult.Error(QrError.IslandError.NotFound())
@@ -24,7 +25,7 @@ class GetIslandByIdUseCase @Inject constructor(
         return islandRepository.getIslandById(islandId).fold(
             onSuccess = { island ->
                 if (island != null) {
-                    Timber.d("Successfully retrieved island: $island")
+                    Timber.v("Successfully retrieved island: ${island.id}")
                     QrResult.Success(island)
                 }
                 else {
@@ -33,7 +34,7 @@ class GetIslandByIdUseCase @Inject constructor(
                 }
             },
             onFailure = {
-                Timber.d("Error in deleting islans: ${it.message}")
+                Timber.d("Error in deleting island: ${it.message}")
                 QrResult.Error(QrError.IslandError.LoadError(it.message)) }
         )
     }

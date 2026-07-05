@@ -159,13 +159,7 @@ class BackupJsonSerializer @Inject constructor() {
 
             // Check database if present
             jsonObject["database"]?.jsonObject?.let { database ->
-                val expectedTables = listOf(
-                    "checkUps", "checkItems", "photos",
-                    "clients", "contacts", "contracts", "facilities", "facilityIslands",
-                    "mechanicalUnits", "checkUpAssociations",
-                    "tiIslandAssociations", "checkUpMaintenanceLogAssociations", "tiMaintenanceLogAssociations",
-                    "technicalInterventions", "maintenanceLogs", "documents"
-                )
+                val expectedTables = net.calvuz.qreport.backup.domain.model.backup.DatabaseBackup.TABLE_NAMES
 
                 for (table in expectedTables) {
                     if (table !in database) {

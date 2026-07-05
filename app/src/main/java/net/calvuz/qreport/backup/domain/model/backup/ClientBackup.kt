@@ -15,5 +15,7 @@ data class ClientBackup(
     val headquartersJson: String?,
     val isActive: Boolean,
     @Contextual val createdAt: Instant,
-    @Contextual val updatedAt: Instant
+    @Contextual val updatedAt: Instant,
+    val syncedAt: Long? = null,
+    val isDeleted: Boolean = false
 )

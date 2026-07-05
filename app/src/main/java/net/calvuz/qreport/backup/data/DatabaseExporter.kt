@@ -22,6 +22,14 @@ import net.calvuz.qreport.backup.domain.model.backup.MechanicalUnitBackup
 import net.calvuz.qreport.backup.domain.model.backup.TechnicalInterventionBackup
 import net.calvuz.qreport.backup.domain.model.backup.MaintenanceLogBackup
 import net.calvuz.qreport.backup.domain.model.backup.DocumentBackup
+import net.calvuz.qreport.backup.domain.model.backup.IslandTypeBackup
+import net.calvuz.qreport.backup.domain.model.backup.ModuleTypeBackup
+import net.calvuz.qreport.backup.domain.model.backup.ModuleTypeIslandTypeLinkBackup
+import net.calvuz.qreport.backup.domain.model.backup.CriticalityBackup
+import net.calvuz.qreport.backup.domain.model.backup.CheckItemTemplateBackup
+import net.calvuz.qreport.backup.domain.model.backup.CheckUpStatusBackup
+import net.calvuz.qreport.backup.domain.model.backup.CheckUpStatusTransitionBackup
+import net.calvuz.qreport.backup.domain.model.backup.CheckUpSparePartBackup
 import net.calvuz.qreport.checkup.checkup.data.local.dao.CheckUpMaintenanceLogAssociationDao
 import net.calvuz.qreport.client.island.maintenance.data.local.dao.MaintenanceLogDao
 import net.calvuz.qreport.client.island.maintenance.data.local.entity.MaintenanceLogEntity
@@ -54,6 +62,20 @@ import net.calvuz.qreport.ti.data.local.dao.TechnicalInterventionDao
 import net.calvuz.qreport.ti.data.local.entity.TechnicalInterventionEntity
 import net.calvuz.qreport.ti.data.local.entity.TiIslandAssociationEntity
 import net.calvuz.qreport.ti.data.local.entity.TiMaintenanceLogAssociationEntity
+import net.calvuz.qreport.client.island.data.local.dao.IslandTypeDao
+import net.calvuz.qreport.client.island.data.local.entity.IslandTypeEntity
+import net.calvuz.qreport.checkup.modules.data.local.dao.ModuleTypeDao
+import net.calvuz.qreport.checkup.modules.data.local.entity.ModuleTypeEntity
+import net.calvuz.qreport.checkup.modules.data.local.entity.ModuleTypeIslandTypeCrossRef
+import net.calvuz.qreport.checkup.criticality.data.local.dao.CriticalityDao
+import net.calvuz.qreport.checkup.criticality.data.local.entity.CriticalityEntity
+import net.calvuz.qreport.checkup.items.data.local.dao.CheckItemTemplateDao
+import net.calvuz.qreport.checkup.items.data.local.entity.CheckItemTemplateEntity
+import net.calvuz.qreport.checkup.status.data.local.dao.CheckUpStatusDao
+import net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusEntity
+import net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusTransitionCrossRef
+import net.calvuz.qreport.checkup.spareparts.data.local.dao.CheckUpSparePartDao
+import net.calvuz.qreport.checkup.spareparts.data.local.entity.CheckUpSparePartEntity
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -83,7 +105,13 @@ class DatabaseExporter @Inject constructor(
     private val tiMaintenanceLogAssociationDao: TiMaintenanceLogAssociationDao,
     private val technicalInterventionDao: TechnicalInterventionDao,
     private val maintenanceLogDao: MaintenanceLogDao,
-    private val documentDao: DocumentDao
+    private val documentDao: DocumentDao,
+    private val islandTypeDao: IslandTypeDao,
+    private val moduleTypeDao: ModuleTypeDao,
+    private val criticalityDao: CriticalityDao,
+    private val checkItemTemplateDao: CheckItemTemplateDao,
+    private val checkUpStatusDao: CheckUpStatusDao,
+    private val checkUpSparePartDao: CheckUpSparePartDao
 
 ) {
 
@@ -150,6 +178,30 @@ class DatabaseExporter @Inject constructor(
             val documents = documentDao.getAllForBackup().map { it.toBackup() }
             Timber.v("Exported ${documents.size} documents")
 
+            val islandTypes = islandTypeDao.getAllForBackup().map { it.toBackup() }
+            Timber.v("Exported ${islandTypes.size} island types")
+
+            val moduleTypes = moduleTypeDao.getAllForBackup().map { it.toBackup() }
+            Timber.v("Exported ${moduleTypes.size} module types")
+
+            val moduleTypeIslandTypeLinks = moduleTypeDao.getAllModuleIslandLinksOnce().map { it.toBackup() }
+            Timber.v("Exported ${moduleTypeIslandTypeLinks.size} module type island type links")
+
+            val criticalityLevels = criticalityDao.getAllForBackup().map { it.toBackup() }
+            Timber.v("Exported ${criticalityLevels.size} criticality levels")
+
+            val checkItemTemplates = checkItemTemplateDao.getAllForBackup().map { it.toBackup() }
+            Timber.v("Exported ${checkItemTemplates.size} check item templates")
+
+            val checkUpStatuses = checkUpStatusDao.getAllForBackup().map { it.toBackup() }
+            Timber.v("Exported ${checkUpStatuses.size} checkup statuses")
+
+            val checkUpStatusTransitions = checkUpStatusDao.getAllTransitionsOnce().map { it.toBackup() }
+            Timber.v("Exported ${checkUpStatusTransitions.size} checkup status transitions")
+
+            val checkUpSpareParts = checkUpSparePartDao.getAllForBackup().map { it.toBackup() }
+            Timber.v("Exported ${checkUpSpareParts.size} checkup spare parts")
+
             val databaseBackup = DatabaseBackup(
                 // Core entities
                 checkUps = checkUps,
@@ -179,6 +231,16 @@ class DatabaseExporter @Inject constructor(
                 // Documents
                 documents = documents,
 
+                // Checkup master data
+                islandTypes = islandTypes,
+                moduleTypes = moduleTypes,
+                moduleTypeIslandTypeLinks = moduleTypeIslandTypeLinks,
+                criticalityLevels = criticalityLevels,
+                checkItemTemplates = checkItemTemplates,
+                checkUpStatuses = checkUpStatuses,
+                checkUpStatusTransitions = checkUpStatusTransitions,
+                checkUpSpareParts = checkUpSpareParts,
+
                 // Metadata
                 exportedAt = Clock.System.now()
             )
@@ -196,7 +258,10 @@ class DatabaseExporter @Inject constructor(
                 append("Associations=${associations.size}")
                 append("TechnicalInterventions=${technicalInterventions.size}, ")
                 append("MaintenanceLogs=${maintenanceLogs.size}, ")
-                append("Documents=${documents.size}")
+                append("Documents=${documents.size}, ")
+                append("IslandTypes=${islandTypes.size}, ModuleTypes=${moduleTypes.size}, ")
+                append("CriticalityLevels=${criticalityLevels.size}, CheckItemTemplates=${checkItemTemplates.size}, ")
+                append("CheckUpStatuses=${checkUpStatuses.size}, CheckUpSpareParts=${checkUpSpareParts.size}")
             })
 
             databaseBackup
@@ -228,7 +293,13 @@ class DatabaseExporter @Inject constructor(
                 tiMaintenanceLogAssociationDao.count(),
                 technicalInterventionDao.count(),
                 maintenanceLogDao.count(),
-                documentDao.count()
+                documentDao.count(),
+                islandTypeDao.count(),
+                moduleTypeDao.count(),
+                criticalityDao.count(),
+                checkItemTemplateDao.count(),
+                checkUpStatusDao.count(),
+                checkUpSparePartDao.count()
             )
 
             val total = counts.sum()
@@ -327,10 +398,13 @@ fun CheckUpEntity.toBackup(): CheckUpBackup {
         checkUpDate = checkUpDate,
         headerNotes = headerNotes,
         islandType = islandType,
+        islandTypeId = islandTypeId,
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        completedAt = completedAt
+        completedAt = completedAt,
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
     )
 }
 
@@ -342,10 +416,12 @@ fun CheckItemEntity.toBackup(): CheckItemBackup {
         id = id,
         checkUpId = checkUpId,
         moduleType = moduleType,
+        moduleTypeId = moduleTypeId,
         itemCode = itemCode,
         description = description,
         status = status,
         criticality = criticality,
+        criticalityId = criticalityId,
         notes = notes,
         checkedAt = checkedAt,
         orderIndex = orderIndex
@@ -387,7 +463,9 @@ fun ClientEntity.toBackup(): ClientBackup {
         headquartersJson = headquartersJson,
         isActive = isActive,
         createdAt = Instant.fromEpochMilliseconds(createdAt),
-        updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+        updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
     )
 }
 
@@ -412,7 +490,9 @@ fun ContactEntity.toBackup(): ContactBackup {
         preferredContactMethod = preferredContactMethod,
         notes = notes,
         createdAt = Instant.fromEpochMilliseconds(createdAt),
-        updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+        updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
     )
 }
 
@@ -430,7 +510,9 @@ fun ContractEntity.toBackup(): ContractBackup {
         notes = notes,
         isActive = isActive,
         createdAt = Instant.fromEpochMilliseconds(createdAt),
-        updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+        updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
     )
 }
 
@@ -449,7 +531,9 @@ fun FacilityEntity.toBackup(): FacilityBackup {
         isPrimary = isPrimary,
         isActive = isActive,
         createdAt = Instant.fromEpochMilliseconds(createdAt),
-        updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+        updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
     )
 }
 
@@ -460,8 +544,11 @@ fun IslandEntity.toBackup(): FacilityIslandBackup {
     return FacilityIslandBackup(
         id = id,
         facilityId = facilityId,
+        commissioningNumber = commissioningNumber,
         islandType = islandType,
+        islandTypeId = islandTypeId,
         serialNumber = serialNumber,
+        modelNumber = modelNumber,
         model = model,
         installationDate = installationDate?.let { Instant.fromEpochMilliseconds(it) },
         warrantyExpiration = warrantyExpiration?.let { Instant.fromEpochMilliseconds(it) },
@@ -474,7 +561,9 @@ fun IslandEntity.toBackup(): FacilityIslandBackup {
         location = location,
         notes = notes,
         createdAt = Instant.fromEpochMilliseconds(createdAt),
-        updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+        updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
     )
 }
 
@@ -493,7 +582,9 @@ fun MechanicalUnitEntity.toBackup(): MechanicalUnitBackup {
         notes = notes,
         isActive = isActive,
         createdAt = Instant.fromEpochMilliseconds(createdAt),
-        updatedAt = Instant.fromEpochMilliseconds(updatedAt)
+        updatedAt = Instant.fromEpochMilliseconds(updatedAt),
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
     )
 }
 
@@ -628,5 +719,143 @@ fun DocumentEntity.toBackup(): DocumentBackup {
         isActive = isActive,
         isDeleted = isDeleted,
         syncedAt = syncedAt
+    )
+}
+
+/**
+ * Mapping da IslandTypeEntity a IslandTypeBackup
+ */
+fun IslandTypeEntity.toBackup(): IslandTypeBackup {
+    return IslandTypeBackup(
+        id = id,
+        code = code,
+        label = label,
+        description = description,
+        iconName = iconName,
+        maintenanceIntervalDays = maintenanceIntervalDays,
+        sortOrder = sortOrder,
+        isActive = isActive,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
+    )
+}
+
+/**
+ * Mapping da ModuleTypeEntity a ModuleTypeBackup
+ */
+fun ModuleTypeEntity.toBackup(): ModuleTypeBackup {
+    return ModuleTypeBackup(
+        id = id,
+        code = code,
+        label = label,
+        description = description,
+        iconName = iconName,
+        sortOrder = sortOrder,
+        isActive = isActive,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
+    )
+}
+
+/**
+ * Mapping da ModuleTypeIslandTypeCrossRef a ModuleTypeIslandTypeLinkBackup
+ */
+fun ModuleTypeIslandTypeCrossRef.toBackup(): ModuleTypeIslandTypeLinkBackup {
+    return ModuleTypeIslandTypeLinkBackup(
+        islandTypeId = islandTypeId,
+        moduleTypeId = moduleTypeId
+    )
+}
+
+/**
+ * Mapping da CriticalityEntity a CriticalityBackup
+ */
+fun CriticalityEntity.toBackup(): CriticalityBackup {
+    return CriticalityBackup(
+        id = id,
+        code = code,
+        label = label,
+        priority = priority,
+        colorHex = colorHex,
+        iconEmoji = iconEmoji,
+        sortOrder = sortOrder,
+        isActive = isActive,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
+    )
+}
+
+/**
+ * Mapping da CheckItemTemplateEntity a CheckItemTemplateBackup
+ */
+fun CheckItemTemplateEntity.toBackup(): CheckItemTemplateBackup {
+    return CheckItemTemplateBackup(
+        id = id,
+        moduleTypeId = moduleTypeId,
+        category = category,
+        description = description,
+        criticalityId = criticalityId,
+        orderIndex = orderIndex,
+        isActive = isActive,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
+    )
+}
+
+/**
+ * Mapping da CheckUpStatusEntity a CheckUpStatusBackup
+ */
+fun CheckUpStatusEntity.toBackup(): CheckUpStatusBackup {
+    return CheckUpStatusBackup(
+        id = id,
+        code = code,
+        label = label,
+        colorHex = colorHex,
+        iconEmoji = iconEmoji,
+        sortOrder = sortOrder,
+        isActive = isActive,
+        blocksDeletion = blocksDeletion,
+        marksCompletion = marksCompletion,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        syncedAt = syncedAt,
+        isDeleted = isDeleted
+    )
+}
+
+/**
+ * Mapping da CheckUpStatusTransitionCrossRef a CheckUpStatusTransitionBackup
+ */
+fun CheckUpStatusTransitionCrossRef.toBackup(): CheckUpStatusTransitionBackup {
+    return CheckUpStatusTransitionBackup(
+        fromStatusId = fromStatusId,
+        toStatusId = toStatusId
+    )
+}
+
+/**
+ * Mapping da CheckUpSparePartEntity a CheckUpSparePartBackup
+ */
+fun CheckUpSparePartEntity.toBackup(): CheckUpSparePartBackup {
+    return CheckUpSparePartBackup(
+        id = id,
+        checkupId = checkupId,
+        articleUuid = articleUuid,
+        name = name,
+        codeOem = codeOem,
+        codeErp = codeErp,
+        codeBm = codeBm,
+        unit = unit,
+        quantity = quantity,
+        notes = notes,
+        addedAt = addedAt
     )
 }

@@ -22,8 +22,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 val MIGRATION_7_8 = object : Migration(7, 8) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        val now = System.currentTimeMillis()
-
         db.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `checkup_statuses` (
@@ -57,57 +55,8 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
         )
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_checkup_status_transitions_to_status_id` ON `checkup_status_transitions` (`to_status_id`)")
 
-        // Seed checkup_statuses (id == code == the enum `.name` already stored in checkups.status)
-        data class Seed(
-            val code: String,
-            val label: String,
-            val colorHex: String,
-            val iconEmoji: String,
-            val sortOrder: Int,
-            val blocksDeletion: Boolean,
-            val marksCompletion: Boolean
-        )
-
-        val seeds = listOf(
-            Seed("DRAFT", "Bozza", "#EEEEEE", "📝", 0, blocksDeletion = false, marksCompletion = false),
-            Seed("IN_PROGRESS", "In corso", "#9E9E9E", "⏳", 1, blocksDeletion = false, marksCompletion = false),
-            Seed("COMPLETED", "Completato", "#1976D2", "✅", 2, blocksDeletion = true, marksCompletion = true),
-            Seed("EXPORTED", "Esportato", "#388E3C", "📤", 3, blocksDeletion = true, marksCompletion = false),
-            Seed("ARCHIVED", "Archiviato", "#C49000", "📦", 4, blocksDeletion = true, marksCompletion = false)
-        )
-
-        seeds.forEach { seed ->
-            db.execSQL(
-                """
-                INSERT INTO `checkup_statuses`
-                (`id`, `code`, `label`, `color_hex`, `icon_emoji`, `sort_order`, `is_active`, `blocks_deletion`, `marks_completion`, `created_at`, `updated_at`)
-                VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
-                """.trimIndent(),
-                arrayOf<Any>(
-                    seed.code, seed.code, seed.label, seed.colorHex, seed.iconEmoji, seed.sortOrder,
-                    if (seed.blocksDeletion) 1 else 0, if (seed.marksCompletion) 1 else 0, now, now
-                )
-            )
-        }
-
-        // Seed checkup_status_transitions — exact replica of the hardcoded matrix in
-        // UpdateCheckUpStatusUseCase before this migration. ARCHIVED gets no rows
-        // (was the hardcoded terminal state); from now on it stays terminal only
-        // until someone adds a transition from the new management screen.
-        val transitions = listOf(
-            "DRAFT" to "IN_PROGRESS",
-            "DRAFT" to "COMPLETED",
-            "IN_PROGRESS" to "DRAFT",
-            "IN_PROGRESS" to "COMPLETED",
-            "COMPLETED" to "EXPORTED",
-            "EXPORTED" to "ARCHIVED"
-        )
-
-        transitions.forEach { (from, to) ->
-            db.execSQL(
-                "INSERT INTO `checkup_status_transitions` (`from_status_id`, `to_status_id`) VALUES (?, ?)",
-                arrayOf<Any>(from, to)
-            )
-        }
+        // Seed both tables — shared with QReportDatabase.CALLBACK (fresh-install path),
+        // see CheckUpStatusDefaults.
+        CheckUpStatusDefaults.seedLegacySchema(db)
     }
 }

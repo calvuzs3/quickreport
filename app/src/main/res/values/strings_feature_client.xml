@@ -222,6 +222,10 @@
     <string name="client_detail_info_field_created">Creato</string>
     <string name="client_detail_info_field_updated">Ultima modifica</string>
     <string name="client_detail_info_field_status">Stato</string>
+    <string name="client_detail_info_card_checkups">Check-up</string>
+    <string name="client_detail_info_field_total_checkups">Totale check-up</string>
+    <string name="client_detail_info_field_last_checkup">Ultimo check-up</string>
+    <string name="client_detail_info_no_checkups">Nessun check-up registrato</string>
 
     <!-- FacilityError tab -->
     <string name="client_detail_facilities_header">Stabilimenti (%1$d)</string>

@@ -34,6 +34,20 @@ interface CriticalityDao {
     @Query("UPDATE criticality_levels SET is_active = 1, updated_at = :ts WHERE id = :id")
     suspend fun restore(id: String, ts: Long)
 
+    @Query("DELETE FROM criticality_levels")
+    suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM criticality_levels")
+    suspend fun count(): Int
+
+    // ===== BACKUP =====
+
+    @Query("SELECT * FROM criticality_levels ORDER BY created_at ASC")
+    suspend fun getAllForBackup(): List<CriticalityEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllFromBackup(levels: List<CriticalityEntity>)
+
     // ===== SYNC =====
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

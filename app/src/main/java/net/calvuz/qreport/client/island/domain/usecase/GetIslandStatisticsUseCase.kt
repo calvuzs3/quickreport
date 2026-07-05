@@ -5,6 +5,8 @@ import kotlinx.datetime.Instant
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
+import net.calvuz.qreport.checkup.checkup.domain.repository.CheckUpRepository
+import net.calvuz.qreport.checkup.checkup.domain.usecase.GetAssociationStatisticsUseCase
 import net.calvuz.qreport.client.island.domain.model.Island
 import net.calvuz.qreport.client.island.domain.model.IslandOperationalStatus
 import net.calvuz.qreport.client.island.domain.repository.IslandRepository
@@ -17,11 +19,12 @@ import javax.inject.Inject
  * [MaintenanceStatus] and [WarrantyStatus] carry [labelResId] so the
  * presentation layer resolves user-facing strings without any domain strings.
  *
- * CheckUp fields (totalCheckUps, lastCheckUpDate, issuesCount) are stubbed
- * to 0 / null until the CheckUp feature is implemented.
+ * [issuesCount] is stubbed to 0 until per-checkup criticality aggregation exists.
  */
 class GetIslandStatisticsUseCase @Inject constructor(
-    private val islandRepository: IslandRepository
+    private val islandRepository: IslandRepository,
+    private val associationStatisticsUseCase: GetAssociationStatisticsUseCase,
+    private val checkUpRepository: CheckUpRepository
 ) {
     suspend operator fun invoke(islandId: String): QrResult<SingleIslandStatistics, QrError.IslandError> {
 
@@ -37,6 +40,24 @@ class GetIslandStatisticsUseCase @Inject constructor(
         )
 
         val now = Clock.System.now()
+
+        val totalCheckUps = try {
+            associationStatisticsUseCase.getCheckUpCountForIsland(islandId)
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to get checkup count for island $islandId")
+            0
+        }
+
+        val lastCheckUpDate = try {
+            associationStatisticsUseCase.getRecentAssociationsForIsland(islandId, limit = 1)
+                .firstOrNull()
+                ?.let { checkUpRepository.getCheckUpById(it.checkupId) }
+                ?.updatedAt
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to get last checkup date for island $islandId")
+            null
+        }
+
         return QrResult.Success(
             SingleIslandStatistics(
                 islandId = island.id,
@@ -45,9 +66,9 @@ class GetIslandStatisticsUseCase @Inject constructor(
                 operationalStats = calculateOperationalStats(island, now),
                 maintenanceStats = calculateMaintenanceStats(island, now),
                 warrantyStats = calculateWarrantyStats(island, now),
-                totalCheckUps = 0,       // TODO: wire CheckUpRepository when available
-                lastCheckUpDate = null,  // TODO: wire CheckUpRepository when available
-                issuesCount = 0,         // TODO: wire CheckUpRepository when available
+                totalCheckUps = totalCheckUps,
+                lastCheckUpDate = lastCheckUpDate,
+                issuesCount = 0,         // TODO: wire per-checkup criticality aggregation when available
                 generatedAt = now
             )
         )

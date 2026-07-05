@@ -63,6 +63,7 @@ data class SyncPayloadDto(
     val checkupStatuses: List<CheckUpStatusDto> = emptyList(),
     val checkItemTemplates: List<CheckItemTemplateDto> = emptyList(),
     val moduleTypeIslandTypeLinks: List<ModuleTypeIslandTypeLinkDto> = emptyList(),
+    val checkUpStatusTransitions: List<CheckUpStatusTransitionDto> = emptyList(),
     // checkup records
     val checkups: List<CheckUpRecordDto> = emptyList(),
     val checkupIslandAssociations: List<CheckUpIslandAssociationDto> = emptyList(),
@@ -269,6 +270,12 @@ data class CheckUpStatusDto(
     val updatedAt: Long,
     val syncedAt: Long? = null,
     val isDeleted: Boolean = false
+)
+
+@Serializable
+data class CheckUpStatusTransitionDto(
+    val fromStatusId: String,
+    val toStatusId: String
 )
 
 @Serializable

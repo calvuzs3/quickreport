@@ -439,6 +439,18 @@ class SyncMapper @Inject constructor() {
             moduleTypeId = dto.moduleTypeId
         )
 
+    fun checkUpStatusTransitionToDto(entity: net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusTransitionCrossRef) =
+        net.calvuz.qreport.sync.data.remote.dto.CheckUpStatusTransitionDto(
+            fromStatusId = entity.fromStatusId,
+            toStatusId = entity.toStatusId
+        )
+
+    fun checkUpStatusTransitionToEntity(dto: net.calvuz.qreport.sync.data.remote.dto.CheckUpStatusTransitionDto) =
+        net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusTransitionCrossRef(
+            fromStatusId = dto.fromStatusId,
+            toStatusId = dto.toStatusId
+        )
+
     fun criticalityLevelToDto(entity: CriticalityEntity) = CriticalityLevelDto(
         id = entity.id,
         code = entity.code,

@@ -30,4 +30,18 @@ interface CheckUpSparePartDao {
 
     @Query("UPDATE checkup_spare_parts SET notes = :notes WHERE id = :id")
     suspend fun updateNotes(id: String, notes: String)
+
+    // ===== BACKUP =====
+
+    @Query("SELECT * FROM checkup_spare_parts ORDER BY added_at ASC")
+    suspend fun getAllForBackup(): List<CheckUpSparePartEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllFromBackup(parts: List<CheckUpSparePartEntity>)
+
+    @Query("DELETE FROM checkup_spare_parts")
+    suspend fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM checkup_spare_parts")
+    suspend fun count(): Int
 }
