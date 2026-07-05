@@ -18,6 +18,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class CheckItemTemplateMaster(
+    // id è anche il "codice" mostrato nei check item generati da questo template
+    // e nei report esportati (vedi CreateCheckUpUseCase) — editabile dal form,
+    // non generato solo automaticamente, per evitare di far trapelare UUID nei
+    // report (vedi anche export/data/model/ListCheckItemExt.kt).
     val id: String,
     val moduleTypeId: String,
     val category: String,

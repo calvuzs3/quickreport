@@ -301,6 +301,7 @@
     <string name="check_item_template_screen_title">Template checklist</string>
     <string name="check_item_template_dialog_title_create">Nuovo template</string>
     <string name="check_item_template_dialog_title_edit">Modifica template</string>
+    <string name="check_item_template_field_code">Codice</string>
     <string name="check_item_template_field_category">Categoria</string>
     <string name="check_item_template_field_description">Descrizione</string>
     <string name="check_item_template_field_module_type">Modulo</string>

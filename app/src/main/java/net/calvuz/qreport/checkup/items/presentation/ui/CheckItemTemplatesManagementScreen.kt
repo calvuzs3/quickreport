@@ -122,6 +122,11 @@ private fun CheckItemTemplateRow(
             QrStatusIndicator(isActive = template.isActive, onRestore = onRestore)
 
             Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = template.id,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Text(text = template.description, style = MaterialTheme.typography.bodyLarge)
                 Text(
                     text = "${template.category} · $moduleLabel · $criticalityLabel",

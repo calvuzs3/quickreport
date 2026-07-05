@@ -38,6 +38,14 @@ interface CheckItemTemplateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(template: CheckItemTemplateEntity)
 
+    /**
+     * Rimuove la riga con [id] — usata SOLO per il "rename" dell'id (delete + insert
+     * con il nuovo id), non per l'eliminazione normale di un template (quella è
+     * soft-delete via [deactivate]).
+     */
+    @Query("DELETE FROM check_item_templates WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     @Query("UPDATE check_item_templates SET is_active = 0, updated_at = :ts WHERE id = :id")
     suspend fun deactivate(id: String, ts: Long)
 

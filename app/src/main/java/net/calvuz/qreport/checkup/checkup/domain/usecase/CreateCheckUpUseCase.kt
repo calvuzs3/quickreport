@@ -85,6 +85,10 @@ class CreateCheckUpUseCase @Inject constructor(
                 // code == enum name by seed convention (Migration4to5) — find+fallback
                 // so a custom module/criticality created from Settings never crashes.
                 moduleTypeId = template.moduleTypeId,
+                // template.id è editabile dal form (vedi CheckItemTemplateFormDialog)
+                // proprio per poter essere usato come codice leggibile qui — se non
+                // ancora modificato resta l'UUID generato alla creazione del template
+                // (il generatore report ha comunque un guard, vedi displayCode).
                 itemCode = template.id,
                 description = template.description,
                 status = CheckItemStatus.PENDING,

@@ -7,16 +7,27 @@ import net.calvuz.qreport.checkup.items.domain.repository.CheckItemTemplateMaste
 import timber.log.Timber
 import javax.inject.Inject
 
-/** Creates a new checklist template after validating required fields. */
+/**
+ * Creates a new checklist template after validating required fields.
+ *
+ * [template.id] is user-editable (it doubles as the "codice" shown in reports,
+ * see [CheckItemTemplateMaster]) — since [CheckItemTemplateMasterRepositoryImpl]
+ * inserts with `OnConflictStrategy.REPLACE`, a colliding id would silently
+ * overwrite an unrelated existing template, so uniqueness is checked here.
+ */
 class CreateCheckItemTemplateUseCase @Inject constructor(
     private val repository: CheckItemTemplateMasterRepository
 ) {
     suspend operator fun invoke(template: CheckItemTemplateMaster): QrResult<Unit, QrError> {
 
-        if (template.category.isBlank() || template.description.isBlank() ||
+        if (template.id.isBlank() || template.category.isBlank() || template.description.isBlank() ||
             template.moduleTypeId.isBlank() || template.criticalityId.isBlank()
         ) {
             return QrResult.Error(QrError.ValidationError.EmptyField())
+        }
+
+        if (repository.getTemplateById(template.id) != null) {
+            return QrResult.Error(QrError.ValidationError.DuplicateId())
         }
 
         return repository.createTemplate(template).fold(

@@ -2,7 +2,6 @@ package net.calvuz.qreport.checkup.checkup.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.*
@@ -13,8 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
+import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
 import net.calvuz.qreport.checkup.items.domain.model.CheckItemStatus
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpIslandAssociation
@@ -33,12 +35,12 @@ fun CheckUpHeaderCard(
     statusMaster: CheckUpStatusMaster?,
     progress: CheckUpProgress,
     associations: List<CheckUpIslandAssociation> = emptyList(),
+    associationIslandNames: Map<String, String> = emptyMap(),
     onEditHeader: () -> Unit = {},
     onManageAssociation: () -> Unit = {}
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+    QReportCard(
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
@@ -49,16 +51,24 @@ fun CheckUpHeaderCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = Spacing.sm)
+                ) {
                     Text(
                         text = checkUp.header.clientInfo.companyName,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = checkUp.islandType,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = stringResource(
@@ -66,13 +76,15 @@ fun CheckUpHeaderCard(
                             checkUp.header.islandInfo.serialNumber
                         ),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
                     Row(horizontalArrangement = Arrangement.End) {
-                        CheckupStatusChip(statusMaster = statusMaster)
+                        CheckupStatusDot(statusMaster = statusMaster)
                     }
 
                     Row(
@@ -145,12 +157,13 @@ fun CheckUpHeaderCard(
 
             // Association
             if (associations.isNotEmpty()) {
+                val islandId = associations[0].islandId
                 InfoRow(
                     icon = Icons.Default.Link,
                     label = stringResource(R.string.checkup_component_header_association_title),
-                    value =stringResource(
+                    value = stringResource(
                         R.string.checkup_component_header_association_island,
-                        associations[0].islandId
+                        associationIslandNames[islandId] ?: islandId
                     ),
                 )
                 InfoRow(

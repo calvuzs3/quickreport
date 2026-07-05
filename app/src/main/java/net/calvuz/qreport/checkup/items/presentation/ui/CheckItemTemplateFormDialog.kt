@@ -28,6 +28,7 @@ import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.checkup.criticality.domain.model.CriticalityMaster
 import net.calvuz.qreport.checkup.items.domain.model.CheckItemTemplateMaster
 import net.calvuz.qreport.checkup.modules.domain.model.ModuleTypeMaster
+import java.util.UUID
 
 /**
  * Create/edit dialog for a checklist template — like
@@ -44,6 +45,7 @@ fun CheckItemTemplateFormDialog(
     errorMessage: String?,
     onDismiss: () -> Unit,
     onSave: (
+        code: String,
         category: String,
         description: String,
         moduleTypeId: String,
@@ -51,6 +53,11 @@ fun CheckItemTemplateFormDialog(
         orderIndex: Int
     ) -> Unit
 ) {
+    // "code" è l'id del template — editabile qui apposta, è quello usato come
+    // codice leggibile nei check item generati e nei report (vedi CreateCheckUpUseCase).
+    // Per un nuovo template si propone un UUID di default (comportamento invariato
+    // se l'utente non lo tocca), modificabile con un codice a scelta.
+    var code by remember { mutableStateOf(editingTemplate?.id ?: UUID.randomUUID().toString()) }
     var category by remember { mutableStateOf(editingTemplate?.category ?: "") }
     var description by remember { mutableStateOf(editingTemplate?.description ?: "") }
     var orderIndex by remember { mutableStateOf((editingTemplate?.orderIndex ?: 0).toString()) }
@@ -61,7 +68,7 @@ fun CheckItemTemplateFormDialog(
         mutableStateOf(editingTemplate?.criticalityId ?: criticalityLevels.firstOrNull()?.id)
     }
 
-    val isValid = category.isNotBlank() && description.isNotBlank() &&
+    val isValid = code.isNotBlank() && category.isNotBlank() && description.isNotBlank() &&
         selectedModuleTypeId != null && selectedCriticalityId != null
 
     AlertDialog(
@@ -79,6 +86,11 @@ fun CheckItemTemplateFormDialog(
                 modifier = Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                QrFormField(
+                    value = code,
+                    onValueChange = { code = it },
+                    label = stringResource(R.string.check_item_template_field_code)
+                )
                 QrFormField(
                     value = category,
                     onValueChange = { category = it },
@@ -131,6 +143,7 @@ fun CheckItemTemplateFormDialog(
                 enabled = isValid,
                 onClick = {
                     onSave(
+                        code.trim(),
                         category.trim(),
                         description.trim(),
                         selectedModuleTypeId!!,

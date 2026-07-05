@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
+import net.calvuz.qreport.export.data.model.displayCode
 import net.calvuz.qreport.export.data.photo.PhotoExportManager
 import net.calvuz.qreport.checkup.items.domain.model.CheckItem
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpSingleStatistics
@@ -229,7 +230,8 @@ class WordReportGenerator @Inject constructor(
             items.forEach { item ->
                 val itemParagraph = document.createParagraph()
                 itemParagraph.createRun().apply {
-                    setText("• ${item.itemCode /*.name*/}: ${item.status.getDisplayName(context)}")
+                    val code = item.displayCode.ifBlank { item.description }
+                    setText("• $code: ${item.status.getDisplayName(context)}")
                     if (item.notes.isNotBlank()) {
                         addBreak()
                         setText("  Note: ${item.notes}")

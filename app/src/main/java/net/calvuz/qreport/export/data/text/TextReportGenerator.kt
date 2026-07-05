@@ -14,6 +14,7 @@ import net.calvuz.qreport.checkup.items.presentation.model.CheckItemStatusExt.ge
 import net.calvuz.qreport.app.util.NumberUtils.toItalianPercentage
 import net.calvuz.qreport.checkup.modules.domain.model.ModuleTypeMaster
 import net.calvuz.qreport.checkup.status.domain.repository.CheckUpStatusMasterRepository
+import net.calvuz.qreport.export.data.model.displayCode
 import net.calvuz.qreport.export.domain.reposirory.ExportData
 import net.calvuz.qreport.export.domain.reposirory.ExportFormat
 import net.calvuz.qreport.export.domain.reposirory.ExportOptions
@@ -255,7 +256,10 @@ class TextReportGenerator @Inject constructor(
         }
 
         appendLine("${itemIndex}. ${item.description}")
-        appendLine("   Codice:      ${item.itemCode}")
+        val displayCode = item.displayCode
+        if (displayCode.isNotBlank()) {
+            appendLine("   Codice:      $displayCode")
+        }
         appendLine("   Stato:       $statusIcon ${item.status.getDisplayName(context)}")
         appendLine("   Criticità:   $criticalityIcon ${item.criticality.name}")
 

@@ -170,6 +170,7 @@ fun QrError.ValidationError.toUiText(): UiText {
         is QrError.ValidationError.EmptyField -> StringResources(R.string.err_validation_empty_field)
         is QrError.ValidationError.EmailAlreadyTaken -> StringResources(R.string.err_validation_email_already_taken)
         is QrError.ValidationError.PhoneAlreadyTaken -> StringResources(R.string.err_validation_phone_already_taken)
+        is QrError.ValidationError.DuplicateId -> StringResources(R.string.err_validation_duplicate_entry)
         is QrError.ValidationError.InvalidOperation -> StringResources(R.string.err_validation_invalid_operation)
         is QrError.ValidationError.IsNotActive -> StringResources(R.string.err_validation_is_not_active)
         is QrError.ValidationError.IsNotPrimary -> StringResources(R.string.err_validation_is_not_primary)

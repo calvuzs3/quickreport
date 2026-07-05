@@ -21,7 +21,6 @@ import net.calvuz.qreport.checkup.items.domain.usecase.RestoreCheckItemTemplateU
 import net.calvuz.qreport.checkup.items.domain.usecase.UpdateCheckItemTemplateUseCase
 import net.calvuz.qreport.checkup.modules.domain.model.ModuleTypeMaster
 import net.calvuz.qreport.checkup.modules.domain.usecase.ObserveActiveModuleTypesUseCase
-import java.util.UUID
 import javax.inject.Inject
 
 data class CheckItemTemplatesUiState(
@@ -84,6 +83,7 @@ class CheckItemTemplatesViewModel @Inject constructor(
     }
 
     fun onSave(
+        code: String,
         category: String,
         description: String,
         moduleTypeId: String,
@@ -96,6 +96,7 @@ class CheckItemTemplatesViewModel @Inject constructor(
 
             val template = if (current != null) {
                 current.copy(
+                    id = code,
                     category = category,
                     description = description,
                     moduleTypeId = moduleTypeId,
@@ -105,7 +106,7 @@ class CheckItemTemplatesViewModel @Inject constructor(
                 )
             } else {
                 CheckItemTemplateMaster(
-                    id = UUID.randomUUID().toString(),
+                    id = code,
                     moduleTypeId = moduleTypeId,
                     category = category,
                     description = description,
@@ -116,7 +117,7 @@ class CheckItemTemplatesViewModel @Inject constructor(
                 )
             }
 
-            val result = if (current != null) updateTemplate(template) else createTemplate(template)
+            val result = if (current != null) updateTemplate(current.id, template) else createTemplate(template)
 
             when (result) {
                 is QrResult.Success -> onDismissDialog()

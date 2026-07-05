@@ -20,6 +20,8 @@ data class CheckUpDetailUiState(
     // ============================================================
 
     val checkUpAssociations: List<CheckUpIslandAssociation> = emptyList(),
+    // islandId -> nome da mostrare (customName, altrimenti serialNumber) invece dell'id grezzo
+    val associationIslandNames: Map<String, String> = emptyMap(),
 
     // ============================================================
     // CORE CHECK-UP DATA

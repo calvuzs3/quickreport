@@ -40,6 +40,9 @@ class CheckItemTemplateMasterRepositoryImpl @Inject constructor(
         Result.failure(e)
     }
 
+    override suspend fun getTemplateById(id: String): CheckItemTemplateMaster? =
+        templateDao.getById(id)?.let { mapper.toDomain(it) }
+
     override suspend fun getTemplatesForModuleTypes(moduleTypeIds: List<String>): Result<List<CheckItemTemplateMaster>> = try {
         if (moduleTypeIds.isEmpty()) {
             Result.success(emptyList())
@@ -59,6 +62,14 @@ class CheckItemTemplateMasterRepositoryImpl @Inject constructor(
 
     override suspend fun updateTemplate(template: CheckItemTemplateMaster): Result<Unit> = try {
         templateDao.update(mapper.toEntity(template))
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
+    override suspend fun renameTemplate(originalId: String, updated: CheckItemTemplateMaster): Result<Unit> = try {
+        templateDao.deleteById(originalId)
+        templateDao.insert(mapper.toEntity(updated))
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)

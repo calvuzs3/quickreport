@@ -39,6 +39,7 @@ class CreateCheckUpFromTemplateUseCase @Inject constructor(
                     id = UUID.randomUUID().toString(),
                     checkUpId = checkUpId,
                     moduleTypeId = template.moduleTypeId,
+                    // template.id è editabile — vedi CreateCheckUpUseCase.
                     itemCode = template.id,
                     description = template.description,
                     status = CheckItemStatus.PENDING,

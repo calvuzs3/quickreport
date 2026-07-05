@@ -50,14 +50,17 @@ fun HomeScreen(
     onNavigateToIslandDetail: (facilityId: String, islandId: String) -> Unit,
     onNavigateToTechnicalInterventions: () -> Unit,
     @Suppress("unused") onNavigateToNewCheckUp: () -> Unit,
-    @Suppress("unused") onNavigateToCheckUpDetail: (String) -> Unit,
+    onNavigateToCheckUpDetail: (String) -> Unit,
     onNavigateToHomePreferences: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
 
     LaunchedEffect(uiState.selectedCheckUpId) {
-        uiState.selectedCheckUpId?.let { viewModel.navigateToCheckUp(it); viewModel.clearSelectedCheckUp() }
+        uiState.selectedCheckUpId?.let { checkUpId ->
+            onNavigateToCheckUpDetail(checkUpId)
+            viewModel.clearSelectedCheckUp()
+        }
     }
 
     Column(modifier = modifier.fillMaxSize()) {

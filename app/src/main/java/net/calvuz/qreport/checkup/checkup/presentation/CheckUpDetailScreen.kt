@@ -24,7 +24,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -55,9 +54,11 @@ import net.calvuz.qreport.checkup.items.presentation.components.CheckupItemStatu
 import net.calvuz.qreport.checkup.items.presentation.model.CheckItemStatusExt.getColor
 import net.calvuz.qreport.checkup.items.presentation.model.CheckItemStatusExt.getNextStatus
 import net.calvuz.qreport.app.app.presentation.components.ErrorDialog
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrListStatItem
 import net.calvuz.qreport.app.app.presentation.components.StatItemOrientation
 import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
+import net.calvuz.qreport.app.app.presentation.ui.theme.success
 import net.calvuz.qreport.photo.presentation.ui.components.PhotoCountBadge
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import timber.log.Timber
@@ -287,6 +288,7 @@ fun CheckUpDetailScreen(
                             progress = uiState.progress,
                             onEditHeader = viewModel::showEditHeaderDialog,
                             associations = uiState.checkUpAssociations,
+                            associationIslandNames = uiState.associationIslandNames,
                             onManageAssociation = viewModel::showAssociationDialog
                         )
                     }
@@ -377,56 +379,70 @@ private fun ProgressOverviewCard(
     statistics: CheckUpSingleStatistics,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(Spacing.lg),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.checkup_screen_detail_progress_title) ,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
+    val hasCritical = statistics.criticalIssues > 0
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+    ) {
+        Text(
+            text = stringResource(R.string.checkup_screen_detail_progress_title),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+        ) {
+            QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
                 QrListStatItem(
                     icon = Icons.AutoMirrored.Default.Assignment,
                     value = statistics.totalItems.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_total_label),
                     orientation = StatItemOrientation.Vertical,
-                    modifier = Modifier.weight(1f)
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
                 )
+            }
 
+            QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
                 QrListStatItem(
                     icon = Icons.Default.CheckCircle,
                     value = statistics.completedItems.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_completed_label),
-                    color = Color(0xFF4CAF50),
+                    color = MaterialTheme.colorScheme.success,
                     orientation = StatItemOrientation.Vertical,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
                 )
+            }
 
+            QReportCard(modifier = Modifier.weight(1f), tickColor = MaterialTheme.colorScheme.outline) {
                 QrListStatItem(
                     icon = Icons.Default.Error,
                     value = statistics.nokItems.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_nok_label),
-                    color = Color(0xFFF44336),
+                    color = MaterialTheme.colorScheme.error,
                     orientation = StatItemOrientation.Vertical,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
                 )
+            }
 
+            // Critici: la severità la porta la mira d'angolo (arancio), MAI
+            // il colore del testo — stessa regola d'inchiostro applicata alla
+            // Home (design/design-system.md, "severità per intensità").
+            QReportCard(
+                modifier = Modifier.weight(1f),
+                tickColor = if (hasCritical) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+            ) {
                 QrListStatItem(
                     icon = Icons.Default.Warning,
                     value = statistics.criticalIssues.toString(),
                     label = stringResource(R.string.checkup_screen_detail_progress_critical_label),
-                    color = if (statistics.criticalIssues > 0) Color(0xFFFF5722) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
                     orientation = StatItemOrientation.Vertical,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth().padding(Spacing.sm)
                 )
             }
         }
@@ -451,8 +467,9 @@ private fun ModuleSectionWithPhotos(
     val okCount = items.count { it.status == CheckItemStatus.OK }
     val nokCount = items.count { it.status == CheckItemStatus.NOK }
 
-    Card(
-        modifier = modifier.fillMaxWidth()
+    QReportCard(
+        modifier = modifier,
+        tickColor = if (nokCount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
     ) {
         Column(
             modifier = Modifier.padding(Spacing.lg),
@@ -540,13 +557,8 @@ private fun CheckItemCardWithPhotos(
 ) {
     var showNotesDialog by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    QReportCard(
+        modifier = modifier
     ) {
         Row(
             modifier = Modifier

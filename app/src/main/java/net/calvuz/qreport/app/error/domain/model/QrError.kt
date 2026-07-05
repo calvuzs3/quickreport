@@ -24,6 +24,7 @@ interface QrError {
         data class IsNotPrimary(val message: String? = null) : ValidationError
         data class EmailAlreadyTaken(val message: String? = null) : ValidationError
         data class PhoneAlreadyTaken(val message: String? = null) : ValidationError
+        data class DuplicateId(val message: String? = null) : ValidationError
         data class InvalidOperation(val e: QrError? = null) : ValidationError
         
     }

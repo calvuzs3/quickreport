@@ -9,6 +9,7 @@ import net.calvuz.qreport.app.app.domain.AppVersionInfo
 import net.calvuz.qreport.app.result.domain.QrResult
 import net.calvuz.qreport.checkup.items.domain.model.CheckItemStatus
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpHeader
+import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpIslandAssociation
 import net.calvuz.qreport.checkup.modules.domain.usecase.ObserveModuleTypesUseCase
 import net.calvuz.qreport.checkup.status.domain.usecase.ObserveActiveCheckUpStatusesUseCase
 import net.calvuz.qreport.photo.domain.model.Photo
@@ -27,6 +28,7 @@ import net.calvuz.qreport.checkup.checkup.presentation.model.AssociationDialogSt
 import net.calvuz.qreport.checkup.checkup.presentation.model.CheckUpDetailUiState
 import net.calvuz.qreport.client.client.domain.usecase.GetClientsUseCase
 import net.calvuz.qreport.client.facility.domain.usecase.GetFacilitiesByClientUseCase
+import net.calvuz.qreport.client.island.domain.usecase.GetIslandByIdUseCase
 import net.calvuz.qreport.client.island.domain.usecase.GetIslandsByFacilityUseCase
 import net.calvuz.qreport.client.island.domain.usecase.ObserveIslandTypesUseCase
 import net.calvuz.qreport.photo.domain.usecase.CapturePhotoUseCase
@@ -74,6 +76,7 @@ class CheckUpDetailViewModel @Inject constructor(
     private val getClientsUseCase: GetClientsUseCase,
     private val getFacilitiesByClientUseCase: GetFacilitiesByClientUseCase,
     private val getIslandsByFacilityUseCase: GetIslandsByFacilityUseCase,
+    private val getIslandByIdUseCase: GetIslandByIdUseCase,
     private val associateCheckUpToIslandUseCase: AssociateCheckUpToIslandUseCase,
     private val getAssociationsForCheckUpUseCase: GetAssociationsForCheckUpUseCase,
     private val removeCheckUpAssociationUseCase: RemoveCheckUpAssociationUseCase,
@@ -759,10 +762,33 @@ class CheckUpDetailViewModel @Inject constructor(
                     _associationState.value = _associationState.value.copy(
                         currentAssociations = associations
                     )
+
+                    loadAssociationIslandNames(associations)
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Load current associations failed")
             }
+        }
+    }
+
+    /**
+     * Resolve island display names (customName, fallback serialNumber) for the
+     * associated islands — shown instead of the raw island id in [CheckUpHeaderCard].
+     */
+    private fun loadAssociationIslandNames(associations: List<CheckUpIslandAssociation>) {
+        viewModelScope.launch {
+            val names = associations
+                .map { it.islandId }
+                .distinct()
+                .mapNotNull { islandId ->
+                    when (val result = getIslandByIdUseCase(islandId)) {
+                        is QrResult.Success -> islandId to (result.data.customName ?: result.data.serialNumber)
+                        is QrResult.Error -> null
+                    }
+                }
+                .toMap()
+
+            _uiState.value = _uiState.value.copy(associationIslandNames = names)
         }
     }
 
