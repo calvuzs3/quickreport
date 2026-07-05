@@ -6,6 +6,11 @@ opzione 3). Stessa struttura, stessa tipografia, stessa spaziatura, stessa
 codifica della severità per intensità di un unico accento — cambia solo la
 **regola d'inchiostro** tra arancio e graphite.
 
+**Stato: implementato nell'app**, non solo materiale di design — vedi
+"Implementazione nel codice" più sotto per la mappatura completa componente ↔
+file Kotlin e lo stato di avanzamento (17 fasi, tutte con build verde,
+verifica visiva su device reale dopo ogni fase da parte dell'utente).
+
 Anteprima: `design/mockup-orange-technical.html` · Token: `design/tokens-orange-technical.json`
 
 ## La regola d'inchiostro (unica differenza rispetto a QuickStore)
@@ -79,7 +84,7 @@ testo secondario `#ABABAB`.
 
 ## Tipografia, spaziatura, mire d'angolo, severità per intensità
 
-Invariati da QuickStore:
+Invariati da QuickStore, ed **effettivamente implementati**:
 
 - Display/headline su **font di sistema** (Roboto, solo pesi più alti),
   **IBM Plex Mono** su codici articolo/voce e timestamp. Big Shoulders
@@ -87,7 +92,7 @@ Invariati da QuickStore:
   QuickStore: per l'opzione arancio/technical è stato provato e scartato —
   troppo condensato per restare leggibile su titoli reali (codici,
   descrizioni voce) — e il titolo/display è tornato al font di sistema. Vedi
-  `Type.kt` di QuickStore per il commento che documenta questa scelta.
+  `Type.kt` per il commento che documenta questa scelta.
 - **Title/body/label su Inter** (non più IBM Plex Sans, cambiato dopo
   verifica su device): Plex Sans era bundlato come font variabile ma
   caricato senza istanziare l'asse "wght" per i pesi richiesti, quindi
@@ -98,31 +103,92 @@ Invariati da QuickStore:
   usavano peso Medium (500, non disponibile come faccia reale) sono passati
   esplicitamente a SemiBold, dando anche il tono leggermente più "bold"
   richiesto.
-- Scala di spaziatura `xs=4 · sm=8 · md=12 · lg=16 · xl=24 · xxl=32` —
-  componenti su xs/sm, titoli e ritmo tra sezioni su lg/xl/xxl. QReport non ha
-  ancora un file token dedicato analogo a `Spacing.kt` di QuickStore: questa è
-  una scala proposta, da introdurre se/quando si implementa la palette.
-- Mire d'angolo da 9×9px su card e stat, colore = colore semantico della riga.
-- Severità per intensità dell'unico accento (non per tinta): striscia neutra =
-  normale, striscia arancio piena = attenzione, badge arancio pieno (testo
-  grafite) = critico.
+- Scala di spaziatura `xs=4 · sm=8 · md=12 · lg=16 · xl=24 · xxl=32` in
+  `app/app/presentation/ui/theme/Spacing.kt` — componenti su xs/sm, titoli e
+  ritmo tra sezioni su lg/xl/xxl.
+- **Raggio angoli card: 9dp** (`QReportCard.kt`) — via di mezzo tra i 12dp
+  del mockup originale (troppo arrotondato) e i 7dp di un tentativo
+  intermedio (troppo squadrato), scelto dopo verifica su device.
+- Mire d'angolo da 9×9px su card e stat — **sempre presenti**, non solo sulle
+  righe con qualcosa da segnalare: colore neutro (`colorScheme.outline`,
+  grigio) sulle righe normali, arancio (`colorScheme.primary`) solo su
+  quelle con severità/attenzione. Prima versione (fase 9) le ometteva del
+  tutto sulle righe neutre — corretto in fase 13 dopo verifica su device.
+- Severità per intensità dell'unico accento (non per tinta): striscia neutra
+  o mira grigia = normale, striscia/mira arancio piena = attenzione, badge
+  arancio pieno (testo grafite) = critico. **Il criterio è sempre "questa
+  riga ha una criticità/attenzione reale?", mai un colore di stato letterale
+  o un altro dato secondario** — es. la striscia di un check-up recente in
+  Home riflette se ha voci critiche NOK non risolte, non il colore
+  configurato per il suo stato (Bozza/In corso/Completato), che sono concetti
+  indipendenti (fase 12).
 
-## Componenti — mappatura sul codice esistente
+## Implementazione nel codice
 
-| Componente design | File Kotlin corrispondente |
-|---|---|
-| Nameplate → riga check item / checkup | `checkup/checkup/presentation/components/CheckupCard.kt` |
-| Empty state | `app/app/presentation/components/EmptyState.kt` |
-| Error state | `app/app/presentation/components/ErrorState.kt` |
-| Stat readout (3-up) | `HomeScreen.kt`, sezioni Check-up/Isole |
-| Chip filtro stato | Filtro stato in `CheckUpListScreen` |
-| Sezione modulo collassabile (Sicurezza/Meccanico/…) | `CheckUpDetailScreen.kt` |
+### Componente condiviso principale: `QReportCard`
 
-Contenuti di esempio usati nel mockup (reali, non placeholder): moduli
+`app/app/presentation/components/QReportCard.kt` — wrapper unico per **tutte**
+le card piatte dell'app (list-item, stat readout, header, sezioni di dialog):
+bordo 1dp `colorScheme.outline`, elevazione 0dp (nessuna ombra Material), forma
+`RoundedCornerShape(9.dp)`, mira d'angolo opzionale via `tickColor`.
+
+Un dettaglio da NON ripetere se si tocca ancora questo file: `CardDefaults
+.cardColors()` **senza argomenti** non usa `colorScheme.surface` come sfondo —
+la Card "filled" di Material3 prende di default `surfaceContainerHighest` dal
+token `FilledCardTokens.ContainerColor`, che qui coincideva col colore del
+bordo (`outline`), rendendo il bordo invisibile e la card un blocco grigio
+pieno (fase 11). `containerColor` va sempre passato esplicito.
+
+Pattern "striscia laterale colorata" (righe lista con stato — check-up
+recenti, isole recenti, clienti recenti, check item): `Box(Modifier.width(3.dp)
+.fillMaxHeight())` dentro una `Row` **deve** avere `Modifier.height(IntrinsicSize.Min)`
+sulla Row, altrimenti la striscia collassa a un'altezza invisibile — non è
+vero che Compose fa un secondo passaggio di misura automatico per
+`fillMaxHeight()` da solo in un contenitore "wrap content" (fase 13).
+
+### Altri componenti condivisi
+
+| Componente | File Kotlin | Note |
+|---|---|---|
+| Card piatta con bordo/mira | `app/app/presentation/components/QReportCard.kt` | vedi sopra — usato ovunque |
+| Bottoni con inchiostro corretto | `app/app/presentation/components/QrButtons.kt` | `QrTextButton`/`QrOutlinedButton`, `contentColor` di default = `onSurface` invece del `primary` (arancio) di Material3 di default — agganciati ovunque via `import ... as TextButton/OutlinedButton`, zero modifiche ai call site |
+| Sezione con titolo+icona nei dialog form | `app/app/presentation/components/SectionCard.kt` | delega a `QReportCard` |
+| Campo form / dropdown | `app/app/presentation/components/QrFormField.kt` / `QrDropdownField.kt` | |
+| Riga Annulla/Salva nei dialog | `app/app/presentation/components/QrFormActionsRow.kt` | |
+| Stat readout (numero+etichetta, con o senza icona) | `app/app/presentation/components/QrListStatItem.kt` | orientamento verticale/orizzontale |
+| Nameplate → riga check item / checkup | `checkup/checkup/presentation/components/CheckupCard.kt`, `CheckItemCardWithPhotos` in `CheckUpDetailScreen.kt` | |
+| Empty state | `app/app/presentation/components/EmptyState.kt` | |
+| Error state | `app/app/presentation/components/ErrorState.kt` | |
+| Chip filtro stato | Filtro stato in `CheckUpListScreen` | |
+| Sezione modulo collassabile (Sicurezza/Meccanico/…) | `ModuleSectionWithPhotos` in `CheckUpDetailScreen.kt` | |
+
+### Home (`app/app/presentation/ui/home/`)
+
+Tutta la Home usa lo stesso linguaggio piatto: sezione = etichetta + stat
+card individuali bordate (pattern "stat readout 3-up", non più chip dentro un
+unico contenitore con header "Apri") + eventuale lista con striscia laterale.
+`DashboardSectionCard` (il vecchio contenitore con header cliccabile) è stato
+eliminato — non serve più.
+
+Le sezioni **Clienti** e **Isole** sono parametrizzabili da una nuova
+schermata **Preferenze Home** (`HomePreferencesScreen.kt`, raggiungibile da
+Impostazioni o dall'icona in alto nella barra titolo della Home): 4
+interruttori — statistiche clienti/isole, clienti/isole recenti — tutti
+**spenti di default**. Se entrambi gli interruttori di una sezione sono
+spenti, l'intera sezione (etichetta inclusa) non compare. La sezione
+Check-up non è parametrizzata, resta sempre visibile. Persistenza via
+`AppSettingsDataStore` (Preferences DataStore, non Room — nessuna migrazione
+DB richiesta).
+
+### Contenuti di esempio nel mockup HTML
+
+(solo `design/mockup-orange-technical.html`, non nell'app reale): moduli
 Sicurezza/Meccanico/Elettrico da `strings.xml`, voci `SAF_001` (barriere
 fotoelettriche, critico), `MEC_001`, `ELE_001`; isole tipo POLY Move/POLY
 Weld; stati checkup Bozza/In Corso/Completato; stati voce OK/NOK/In
-Attesa/N-A.
+Attesa/N-A. Nell'app reale i "codici" dei check item vengono dall'id
+(editabile) del template checklist che li ha generati, non da questi
+placeholder — vedi `checkup/items/presentation/ui/CheckItemTemplateFormDialog.kt`.
 
 ## Come portarlo in Figma
 
@@ -145,15 +211,29 @@ JSON — copiabili direttamente come base del CSS, incluse le tre variabili
 che codificano la regola d'inchiostro: `--accent-fill`, `--accent-on`,
 `--accent-ink`.
 
-## Deliberatamente fuori scope
+## Stato di implementazione / cosa resta aperto
 
-- Nessuna modifica al codice Android in questo giro — questo è materiale di
-  design (vedi `Color.kt`/`Theme.kt`/`Type.kt` attuali, che restano il tema
-  blu industriale in uso oggi; l'adozione di questa palette è una scelta
-  successiva, non presa qui).
-- Non tutte le schermate dell'app sono mockate, solo le tre più
-  rappresentative (Home, Check-up list, Check-up detail) — le altre seguono
-  lo stesso linguaggio.
-- Nessuna modifica alla direzione "opzione 2" (nameplate industriale non
-  ricolorata) di QuickStore: questo documento copre solo la variante
-  arancio/graphite richiesta per QReport.
+Implementato e verificato su device reale dall'utente dopo ogni fase (17
+fasi totali): tema chiaro/scuro (`Color.kt`/`Theme.kt`/`Type.kt`), Home,
+CheckUpDetailScreen, tutte le card lista dell'app (Client/Facility/Island/
+MechanicalUnit/Checkup/Contact/Document/Contract/TechnicalIntervention/
+BackupItem), form condivisi, regola d'inchiostro sui bottoni/icone dirette,
+schermata Preferenze Home.
+
+Candidati non ancora fatti (nessuna richiesta esplicita finora):
+- Unificare i bottoni Salva singoli di Contact/Contract/MechanicalUnit (form
+  con un solo pulsante invece del pattern `QrFormActionsRow` standard).
+- Estendere `QrFormField`/`QrDropdownField` alle eccezioni rimaste dalla
+  centralizzazione dei form.
+- Colore identificativo per modulo checklist (richiederebbe `colorHex` su
+  `ModuleTypeMaster` — feature nuova con migrazione DB, non solo restyling).
+- `CheckupItemStatusChip.kt` (chip di stato sui singoli check item, testo
+  bianco su riempimento colorato incl. un arancio `#FF9800` per lo stato
+  "In attesa") non è stato toccato: è un sistema di colori di stato
+  pre-esistente e indipendente dal brand arancio/grafite (stessa scelta
+  "ibrida" dell'inizio: i colori di stato OK/NOK/Pending restano fuori dalla
+  regola d'inchiostro del brand), non un residuo dimenticato.
+
+Nessuna modifica alla direzione "opzione 2" (nameplate industriale non
+ricolorata) di QuickStore: questo documento copre solo la variante
+arancio/graphite adottata per QReport.
