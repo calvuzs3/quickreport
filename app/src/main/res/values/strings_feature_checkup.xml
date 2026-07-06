@@ -1,0 +1,356 @@
+<resources>
+
+    <!-- ========================================== -->
+    <!-- AssociationManagementDialog.kt -->
+    <!-- ========================================== -->
+
+    <!-- Dialog Header -->
+    <string name="checkup_component_association_dialog_title">Gestione Associazione</string>
+    <string name="checkup_component_association_dialog_associated_to">Associato a: %1$s</string>
+    <string name="checkup_component_association_dialog_remove">Rimuovi</string>
+    <string name="checkup_component_association_dialog_close">Chiudi</string>
+
+    <!-- Loading State -->
+    <string name="checkup_component_association_dialog_loading">Caricamento clienti…</string>
+
+    <!-- Steps -->
+    <string name="checkup_component_association_dialog_step_client">Seleziona Cliente</string>
+    <string name="checkup_component_association_dialog_step_facility">Seleziona Stabilimento</string>
+    <string name="checkup_component_association_dialog_step_island">Seleziona Isola</string>
+
+    <!-- Empty States -->
+    <string name="checkup_component_association_dialog_empty_clients">Nessun cliente attivo trovato</string>
+    <string name="checkup_component_association_dialog_empty_facilities">Nessuno stabilimento trovato per questo cliente</string>
+    <string name="checkup_component_association_dialog_empty_islands">Nessuna isola trovata per questo stabilimento</string>
+
+    <!-- Selection States -->
+    <string name="checkup_component_association_dialog_selected">Selezionato</string>
+    <string name="checkup_component_association_dialog_not_selected">Non selezionato</string>
+
+    <!-- Item Info -->
+    <string name="checkup_component_association_dialog_model_prefix">Modello: %1$s</string>
+    <string name="checkup_component_association_dialog_model_not_specified">Modello non specificato</string>
+
+
+    <!-- ========================================== -->
+    <!-- ClientFacilityIslandSelectorDialog.kt -->
+    <!-- ========================================== -->
+
+    <string name="checkup_component_source_dialog_title">Seleziona Cliente/Isola</string>
+
+
+    <!-- ========================================== -->
+    <!-- CheckupCard.kt -->
+    <!-- ========================================== -->
+
+    <!-- Actions -->
+    <string name="checkup_component_card_action_edit">Modifica Check-up</string>
+    <string name="checkup_component_card_action_delete">Elimina Check-up</string>
+
+    <!-- Info Labels -->
+    <string name="checkup_component_card_island_prefix">Isola %1$s</string>
+    <string name="checkup_component_card_progress">Progresso</string>
+
+    <!-- Stats Labels -->
+    <string name="checkup_component_card_stat_ok">OK</string>
+    <string name="checkup_component_card_stat_nok">NOK</string>
+    <string name="checkup_component_card_stat_photos">Foto</string>
+    <string name="checkup_component_card_stat_pending">Pending</string>
+
+    <!-- Delete Dialog -->
+    <string name="checkup_component_card_delete_object_name">Check-up</string>
+
+
+    <!-- ========================================== -->
+    <!-- CheckUpHeaderCard.kt -->
+    <!-- ========================================== -->
+
+    <!-- Island Info -->
+    <string name="checkup_component_header_serial_number">S/N: %1$s</string>
+
+    <!-- Actions -->
+    <string name="checkup_component_header_action_manage_association">Gestisci associazione</string>
+    <string name="checkup_component_header_action_edit">Modifica informazioni</string>
+
+    <!-- Labels -->
+    <string name="checkup_component_header_label_contact">Contatto</string>
+    <string name="checkup_component_header_label_model">Modello</string>
+    <string name="checkup_component_header_label_operating_hours">Ore Lavoro</string>
+    <string name="checkup_component_header_label_operating_hours_value">%1$dh</string>
+    <string name="checkup_component_header_label_cycle_count">Cicli</string>
+    <string name="checkup_component_header_label_technician">Tecnico</string>
+
+    <!-- Progress -->
+    <string name="checkup_component_header_progress">Progresso</string>
+    <string name="checkup_component_header_progress_completed">%1$d/%2$d completati</string>
+
+    <!-- Notes -->
+    <string name="checkup_component_header_notes">Note</string>
+
+    <!-- Association Info -->
+    <string name="checkup_component_header_association_title">CheckUp Associato</string>
+    <string name="checkup_component_header_association_subtitle">Associazione tipo</string>
+    <string name="checkup_component_header_association_island">Isola: %1$s</string>
+
+
+    <!-- ========================================== -->
+    <!-- CheckUpListScreen.kt -->
+    <!-- ========================================== -->
+
+    <!-- Top Bar -->
+    <string name="checkup_screen_list_title">Check-up</string>
+    <string name="checkup_screen_list_action_sort">Ordinamento</string>
+    <string name="checkup_screen_list_action_filter">Filtri</string>
+    <string name="checkup_screen_list_action_settings">Impostazioni checkup</string>
+
+    <!-- Search -->
+    <string name="checkup_screen_list_search_placeholder">Ricerca Check-up</string>
+
+    <!-- Empty States -->
+    <string name="checkup_screen_list_empty_title">Nessun Check-Up</string>
+    <string name="checkup_screen_list_empty_message">Non ci sono ancora Check-Up</string>
+    <string name="checkup_screen_list_empty_no_results_title">Nessun risultato</string>
+    <string name="checkup_screen_list_empty_no_results_message">Non ci sono Check-Up che corrispondono al filtro \'%1$s\'</string>
+    <string name="checkup_screen_list_empty_error_title">Lista vuota</string>
+    <string name="checkup_screen_list_empty_error_message">Errore nel caricamento dati</string>
+    <string name="checkup_screen_list_empty_icon_content_desc">Check-Up</string>
+
+    <!-- FAB -->
+    <string name="checkup_screen_list_fab_new">Nuovo Check-up</string>
+    <string name="checkup_screen_list_action_new">Nuovo Check-Up</string>
+
+
+    <!-- ========================================== -->
+    <!-- NewCheckUpScreen.kt -->
+    <!-- ========================================== -->
+
+    <!-- Top Bar -->
+    <string name="checkup_screen_new_title">Nuovo Check-up</string>
+    <string name="checkup_screen_new_back">Indietro</string>
+
+    <!-- Source Selection -->
+    <string name="checkup_screen_new_section_source_title">Origine Dati</string>
+    <string name="checkup_screen_new_link_source_button">Collega a cliente esistente</string>
+    <string name="checkup_screen_new_linked_banner">Collegato a: %1$s · %2$s · %3$s</string>
+    <string name="checkup_screen_new_unlink_source">Rimuovi collegamento</string>
+
+    <!-- Client Info Section -->
+    <string name="checkup_screen_new_section_client_title">Informazioni Cliente</string>
+    <string name="checkup_screen_new_client_name_label">Nome Cliente *</string>
+    <string name="checkup_screen_new_contact_person_label">Persona di Contatto</string>
+    <string name="checkup_screen_new_site_label">Stabilimento/Sede</string>
+
+    <!-- Island Type Section -->
+    <string name="checkup_screen_new_section_island_type_title">Tipo Isola *</string>
+    <string name="checkup_screen_new_island_type_description">Seleziona il tipo di isola robotizzata da controllare</string>
+
+    <!-- Island Info Section -->
+    <string name="checkup_screen_new_section_island_info_title">Informazioni Isola</string>
+    <string name="checkup_screen_new_serial_number_label">Numero Seriale</string>
+    <string name="checkup_screen_new_model_label">Modello</string>
+
+    <!-- Actions -->
+    <string name="checkup_screen_new_action_cancel">Annulla</string>
+    <string name="checkup_screen_new_action_create">Crea Check-up</string>
+
+
+    <!-- ========================================== -->
+    <!-- NewCheckUpViewModel.kt -->
+    <!-- ========================================== -->
+
+    <!-- Errors -->
+    <string name="checkup_viewmodel_new_error_required_fields">Compilare tutti i campi obbligatori</string>
+    <string name="checkup_viewmodel_new_error_creation_failed">Errore creazione check-up: %1$s</string>
+    <string name="checkup_viewmodel_new_error_unexpected">Errore imprevisto: %1$s</string>
+
+    <!-- Notes -->
+    <string name="checkup_viewmodel_new_default_note">Check-up creato tramite wizard guidato</string>
+
+
+    <!-- ========================================== -->
+    <!-- SCREENS - CheckUpDetailScreen.kt -->
+    <!-- ========================================== -->
+
+    <!-- Top Bar -->
+    <string name="checkup_screen_detail_title_default">Check-up</string>
+    <string name="checkup_screen_detail_back">Indietro</string>
+    <string name="checkup_screen_detail_menu">Menu</string>
+    <string name="checkup_screen_detail_delete">Elimina</string>
+
+    <!-- Menu Actions -->
+    <string name="checkup_screen_detail_action_complete">Completa Check-up</string>
+    <string name="checkup_screen_detail_action_export">Esporta Report</string>
+    <string name="checkup_screen_detail_action_delete">Elimina Check-up</string>
+    <string name="checkup_screen_detail_action_delete_confirmation">Sei sicuro di voler eliminare %1$s? Questa azione non può essere annullata.</string>
+
+    <!-- Error State -->
+    <string name="checkup_screen_detail_error_retry">Riprova</string>
+
+    <!-- Progress Overview -->
+    <string name="checkup_screen_detail_progress_title">Panoramica Progresso</string>
+    <string name="checkup_screen_detail_progress_total_label">Totali</string>
+    <string name="checkup_screen_detail_progress_completed_label">Completati</string>
+    <string name="checkup_screen_detail_progress_nok_label">NOK</string>
+    <string name="checkup_screen_detail_progress_critical_label">Critici</string>
+
+    <!-- Module Section -->
+    <string name="checkup_screen_detail_module_collapse">Comprimi</string>
+    <string name="checkup_screen_detail_module_expand">Espandi</string>
+    <string name="checkup_screen_detail_module_summary">%1$d/%2$d OK</string>
+
+    <!-- Check Item Card -->
+    <string name="checkup_screen_detail_item_notes_button">Note</string>
+    <string name="checkup_screen_detail_item_critical">Critico</string>
+
+    <!-- Notes Dialog -->
+    <string name="checkup_screen_detail_dialog_notes_title">Modifica Note</string>
+    <string name="checkup_screen_detail_dialog_notes_label">Note</string>
+    <string name="checkup_screen_detail_dialog_notes_placeholder">Inserisci note per questo check item…</string>
+    <string name="checkup_screen_detail_dialog_notes_action_save">Salva</string>
+    <string name="checkup_screen_detail_dialog_notes_action_cancel">Annulla</string>
+
+    <!-- Photo Section -->
+    <string name="checkup_screen_detail_photo_empty">Nessuna foto</string>
+    <string name="checkup_screen_detail_photo_action_take">Scatta foto</string>
+    <string name="checkup_screen_detail_photo_action_view">Visualizza foto</string>
+    <string name="checkup_screen_detail_photo_caption_default">Foto check item</string>
+    <string name="checkup_screen_detail_photo_view_all">Vedi tutto</string>
+    <string name="checkup_screen_detail_photo_count_more">+%1$d</string>
+
+    <!-- ========================================== -->
+    <!-- DIALOGS - EditHeaderDialog.kt -->
+    <!-- ========================================== -->
+
+    <!-- Dialog Header -->
+    <string name="checkup_dialog_edit_header_title">Modifica Informazioni</string>
+    <string name="checkup_dialog_edit_header_close">Chiudi</string>
+
+    <!-- Auto Load Message -->
+    <string name="checkup_dialog_edit_header_autoload_message">Dati tecnico caricati automaticamente dal profilo</string>
+
+    <!-- Client Information Section -->
+    <string name="checkup_dialog_edit_header_section_client">Informazioni Cliente</string>
+    <string name="checkup_dialog_edit_header_client_company_label">Nome Azienda *</string>
+    <string name="checkup_dialog_edit_header_client_contact_label">Persona di Contatto</string>
+    <string name="checkup_dialog_edit_header_client_site_label">Stabilimento/Sede</string>
+    <string name="checkup_dialog_edit_header_client_address_label">Indirizzo</string>
+    <string name="checkup_dialog_edit_header_client_phone_label">Telefono</string>
+    <string name="checkup_dialog_edit_header_client_email_label">Email</string>
+
+    <!-- Island Information Section -->
+    <string name="checkup_dialog_edit_header_section_island">Informazioni Isola</string>
+    <string name="checkup_dialog_edit_header_island_serial_label">Numero Seriale *</string>
+    <string name="checkup_dialog_edit_header_island_model_label">Modello</string>
+    <string name="checkup_dialog_edit_header_island_installation_label">Data Installazione</string>
+    <string name="checkup_dialog_edit_header_island_installation_placeholder">dd/mm/yyyy</string>
+    <string name="checkup_dialog_edit_header_island_maintenance_label">Ultima Manutenzione</string>
+    <string name="checkup_dialog_edit_header_island_maintenance_placeholder">dd/mm/yyyy</string>
+    <string name="checkup_dialog_edit_header_island_hours_label">Ore di Lavoro</string>
+    <string name="checkup_dialog_edit_header_island_cycles_label">Contatore Cicli</string>
+
+    <!-- Technician Information Section -->
+    <string name="checkup_dialog_edit_header_section_technician">Informazioni Tecnico</string>
+    <string name="checkup_dialog_edit_header_technician_load_profile">Carica da Profilo Tecnico</string>
+    <string name="checkup_dialog_edit_header_technician_name_label">Nome Tecnico</string>
+    <string name="checkup_dialog_edit_header_technician_company_label">Azienda</string>
+    <string name="checkup_dialog_edit_header_technician_certification_label">Certificazione</string>
+    <string name="checkup_dialog_edit_header_technician_phone_label">Telefono</string>
+    <string name="checkup_dialog_edit_header_technician_email_label">Email</string>
+
+    <!-- Notes Section -->
+    <string name="checkup_dialog_edit_header_section_notes">Note Aggiuntive</string>
+    <string name="checkup_dialog_edit_header_notes_label">Note</string>
+    <string name="checkup_dialog_edit_header_notes_placeholder">Inserisci note aggiuntive…</string>
+
+    <!-- Actions -->
+    <string name="checkup_dialog_edit_header_action_cancel">Annulla</string>
+    <string name="checkup_dialog_edit_header_action_save">Salva</string>
+
+    <!-- ======================================================= -->
+    <!-- ModuleTypesManagementScreen + ModuleTypeFormDialog       -->
+    <!-- ======================================================= -->
+
+    <string name="module_types_screen_title">Moduli checklist</string>
+    <string name="module_type_dialog_title_create">Nuovo modulo</string>
+    <string name="module_type_dialog_title_edit">Modifica modulo</string>
+    <string name="module_type_field_code">Codice</string>
+    <string name="module_type_field_label">Nome</string>
+    <string name="module_type_field_description">Descrizione</string>
+    <string name="module_type_field_sort_order">Ordine</string>
+    <string name="module_type_dialog_error">Codice già in uso o dati non validi</string>
+
+    <!-- ============================================================= -->
+    <!-- CriticalityLevelsManagementScreen + CriticalityLevelFormDialog -->
+    <!-- ============================================================= -->
+
+    <string name="criticality_levels_screen_title">Livelli criticità</string>
+    <string name="criticality_level_dialog_title_create">Nuovo livello criticità</string>
+    <string name="criticality_level_dialog_title_edit">Modifica livello criticità</string>
+    <string name="criticality_level_field_code">Codice</string>
+    <string name="criticality_level_field_label">Nome</string>
+    <string name="criticality_level_field_priority">Priorità</string>
+    <string name="criticality_level_field_color_hex">Colore (hex)</string>
+    <string name="criticality_level_field_icon_emoji">Icona (emoji)</string>
+    <string name="criticality_level_field_sort_order">Ordine</string>
+    <string name="criticality_level_dialog_error">Codice già in uso o dati non validi</string>
+
+    <!-- ================================================================= -->
+    <!-- CheckItemTemplatesManagementScreen + CheckItemTemplateFormDialog   -->
+    <!-- ================================================================= -->
+
+    <string name="check_item_template_screen_title">Template checklist</string>
+    <string name="check_item_template_dialog_title_create">Nuovo template</string>
+    <string name="check_item_template_dialog_title_edit">Modifica template</string>
+    <string name="check_item_template_field_code">Codice</string>
+    <string name="check_item_template_field_category">Categoria</string>
+    <string name="check_item_template_field_description">Descrizione</string>
+    <string name="check_item_template_field_module_type">Modulo</string>
+    <string name="check_item_template_field_criticality">Criticità</string>
+    <string name="check_item_template_field_order_index">Ordine</string>
+    <string name="check_item_template_dialog_error">Dati non validi</string>
+
+    <!-- ================================================================= -->
+    <!-- CheckUpSettingsScreen.kt                                          -->
+    <!-- ================================================================= -->
+
+    <string name="checkup_settings_screen_title">Impostazioni checkup</string>
+    <string name="checkup_settings_module_island_association_title">Moduli per tipo isola</string>
+    <string name="checkup_settings_module_island_association_subtitle">Associa i moduli applicabili a ciascun tipo isola</string>
+    <string name="checkup_settings_statuses_title">Stati checkup</string>
+    <string name="checkup_settings_statuses_subtitle">Gestisci gli stati del workflow checkup</string>
+    <string name="checkup_settings_status_transitions_title">Transizioni di stato</string>
+    <string name="checkup_settings_status_transitions_subtitle">Definisci a quali stati può passare ciascuno stato</string>
+
+    <!-- ================================================================= -->
+    <!-- ModuleIslandAssociationScreen + ModuleIslandAssociationDialog      -->
+    <!-- ================================================================= -->
+
+    <string name="module_island_association_screen_title">Moduli per tipo isola</string>
+    <string name="module_island_association_dialog_title">Moduli per %1$s</string>
+    <string name="module_island_association_no_modules">Nessun modulo associato</string>
+
+    <!-- ================================================================= -->
+    <!-- CheckUpStatusesManagementScreen + CheckUpStatusFormDialog          -->
+    <!-- ================================================================= -->
+
+    <string name="checkup_status_screen_title">Stati checkup</string>
+    <string name="checkup_status_dialog_title_create">Nuovo stato checkup</string>
+    <string name="checkup_status_dialog_title_edit">Modifica stato checkup</string>
+    <string name="checkup_status_field_code">Codice</string>
+    <string name="checkup_status_field_label">Nome</string>
+    <string name="checkup_status_field_color_hex">Colore (hex)</string>
+    <string name="checkup_status_field_icon_emoji">Icona (emoji)</string>
+    <string name="checkup_status_field_sort_order">Ordine</string>
+    <string name="checkup_status_field_blocks_deletion">Impedisce la cancellazione del checkup</string>
+    <string name="checkup_status_field_marks_completion">Segna il checkup come completato</string>
+    <string name="checkup_status_dialog_error">Codice già in uso o dati non validi</string>
+
+    <!-- ================================================================= -->
+    <!-- CheckUpStatusTransitionsScreen + CheckUpStatusTransitionsDialog    -->
+    <!-- ================================================================= -->
+
+    <string name="checkup_status_transitions_screen_title">Transizioni di stato</string>
+    <string name="checkup_status_transitions_dialog_title">Transizioni da %1$s</string>
+    <string name="checkup_status_transitions_no_transitions">Nessuna transizione consentita (stato terminale)</string>
+
+</resources>

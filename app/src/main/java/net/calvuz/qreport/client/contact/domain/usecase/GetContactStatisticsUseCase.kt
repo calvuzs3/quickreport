@@ -1,0 +1,132 @@
+package net.calvuz.qreport.client.contact.domain.usecase
+
+import net.calvuz.qreport.app.error.domain.model.QrError
+import net.calvuz.qreport.app.result.domain.QrResult
+import net.calvuz.qreport.client.contact.domain.model.Contact
+import net.calvuz.qreport.client.contact.domain.model.ContactStatistics
+import net.calvuz.qreport.client.contact.domain.model.ContactMethod
+import net.calvuz.qreport.client.contact.presentation.model.getDisplayName
+import timber.log.Timber
+import javax.inject.Inject
+
+/**
+ * Use case per calcolare statistiche dettagliate sui contatti di un cliente
+ * Utilizzato dal ClientDetailScreen per la scheda ContactsError
+ *
+ * Usa GetContactsByClientUseCase per seguire i principi Clean Architecture
+ *
+ * Updated to use QrResult<ContactStatistics, QrError> pattern
+ */
+class GetContactStatisticsUseCase @Inject constructor(
+    private val getContactsByClientUseCase: GetContactsByClientUseCase
+) {
+
+    /**
+     * Calcola le statistiche dei contatti per un cliente
+     *
+     * @param clientId ID del cliente
+     * @return QrResult.Success con ContactStatistics, QrResult.Error per errori
+     */
+    @Suppress("HardCodedStringLiteral")
+    suspend operator fun invoke(clientId: String): QrResult<ContactStatistics, QrError> {
+        return try {
+            Timber.v("Calculating contact statistics for client: $clientId")
+
+            // Check input
+            if (clientId.isBlank()) {
+                Timber.w("ClientId is blank")
+                return QrResult.Error(QrError.ValidationError.EmptyField(clientId))
+            }
+
+            // Recupera tutti i contatti del cliente usando il use case specifico
+            when (val contactsResult = getContactsByClientUseCase(clientId)) {
+                is QrResult.Success -> {
+                    Timber.d("Successfully retrieved contacts for client $clientId: ${contactsResult.data.size}")
+                    QrResult.Success(calculateStatistics(contactsResult.data))
+                }
+
+                is QrResult.Error -> {
+                    Timber.e("Error getting contacts for client $clientId: ${contactsResult.error}")
+                    QrResult.Error(contactsResult.error)
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Exception calculating statistics for client: $clientId")
+            QrResult.Error(QrError.SystemError.UnknownError())
+        }
+    }
+
+    /**
+     * Calcola statistiche dettagliate sui contatti
+     */
+    private fun calculateStatistics(contacts: List<Contact>): ContactStatistics {
+        if (contacts.isEmpty()) return ContactStatistics.empty()
+
+        val activeContacts = contacts.filter { it.isActive }
+        val inactiveContacts = contacts.filter { !it.isActive }
+        val primaryContacts = contacts.filter { it.isPrimary }
+
+        // Metodi di contatto
+        val contactsWithPhone = contacts.count { !it.phone.isNullOrBlank() }
+        val contactsWithMobile = contacts.count { !it.mobilePhone.isNullOrBlank() }
+        val contactsWithEmail = contacts.count { !it.email.isNullOrBlank() }
+        val contactsWithoutContact = contacts.count {
+            it.phone.isNullOrBlank() &&
+                    it.mobilePhone.isNullOrBlank() &&
+                    it.email.isNullOrBlank()
+        }
+
+        // Distribuzione per dipartimento (escludendo vuoti/null)
+        val departmentDistribution = contacts
+            .mapNotNull { it.department?.takeIf { dept -> dept.isNotBlank() } }
+            .groupingBy { it }
+            .eachCount()
+
+        // Distribuzione per ruolo (escludendo vuoti/null)
+        val roleDistribution = contacts
+            .mapNotNull { it.role?.takeIf { role -> role.isNotBlank() } }
+            .groupingBy { it }
+            .eachCount()
+
+        // Distribuzione metodi preferiti
+        val preferredMethodDistribution = contacts
+            .mapNotNull { contact ->
+                when (contact.preferredContactMethod) {
+                    ContactMethod.PHONE -> ContactMethod.PHONE.getDisplayName()
+                    ContactMethod.MOBILE -> ContactMethod.MOBILE.getDisplayName()
+                    ContactMethod.EMAIL -> ContactMethod.EMAIL.getDisplayName()
+                    null -> null
+                }
+            }
+            .groupingBy { it }
+            .eachCount()
+
+        // Completezza profili
+        val completeProfiles = contacts.count { contact ->
+            contact.firstName.isNotBlank() &&
+                    !contact.lastName.isNullOrBlank() &&
+                    !contact.role.isNullOrBlank() &&
+                    ((!contact.phone.isNullOrBlank()) || (!contact.mobilePhone.isNullOrBlank()) || (!contact.email.isNullOrBlank()))
+        }
+
+        val incompleteProfiles = contacts.size - completeProfiles
+
+        Timber.d("Statistics calculated - Total: ${contacts.size}, Active: ${activeContacts.size}, Complete profiles: $completeProfiles")
+
+        return ContactStatistics(
+            totalContacts = contacts.size,
+            activeContacts = activeContacts.size,
+            inactiveContacts = inactiveContacts.size,
+            primaryContacts = primaryContacts.size,
+            contactsWithPhone = contactsWithPhone,
+            contactsWithMobile = contactsWithMobile,
+            contactsWithEmail = contactsWithEmail,
+            contactsWithoutContact = contactsWithoutContact,
+            departmentDistribution = departmentDistribution,
+            roleDistribution = roleDistribution,
+            preferredMethodDistribution = preferredMethodDistribution,
+            completeProfiles = completeProfiles,
+            incompleteProfiles = incompleteProfiles
+        )
+    }
+}

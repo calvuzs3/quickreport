@@ -1,0 +1,511 @@
+<title>QReport — Design System (Arancio e Technical Design)</title>
+<style>
+  :root {
+    --sp-xs: 4px; --sp-sm: 8px; --sp-md: 12px; --sp-lg: 16px; --sp-xl: 24px; --sp-xxl: 32px;
+    --radius-sm: 4px; --radius-md: 8px; --radius-lg: 14px;
+
+    --font-display: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', 'Courier New', monospace;
+
+    /* Solo due colori con hue: arancio + graphite. Il resto e' neutro/grigio. */
+    --color-orange: #E88706;
+    --color-graphite: #333333;
+
+    --bg: #F4F4F4;
+    --surface: #FFFFFF;
+    --surface-2: #ECECEC;
+    --border: #E3E3E3;
+    --text: #333333;
+    --text-secondary: #707070;
+
+    /* Regola d'inchiostro: l'arancio come TESTO/ICONA e' ammesso solo su sfondo grafite.
+       Il grafite come TESTO/ICONA e' ammesso su bianco o sopra un riempimento arancione.
+       I riempimenti (sfondi di pulsanti/chip/badge/strisce/mire) restano arancio pieno
+       sempre, anche su pagina chiara: la regola vincola l'inchiostro, non le forme piene. */
+    --accent-fill: var(--color-orange);   /* sfondo di pulsanti/chip/badge/strisce */
+    --accent-on: var(--color-graphite);   /* inchiostro SOPRA accent-fill (chip/badge/tile): grafite */
+    --accent-on-button: #FFFFFF;          /* ECCEZIONE dopo verifica su device: sul pulsante primario
+                                              il grafite appesantiva troppo in chiaro — qui bianco */
+    --accent-ink: var(--color-graphite);  /* inchiostro "libero" (non su fill): in chiaro e' grafite */
+
+    /* Severita' codificata per intensita' dell'unico accento, non per tinta */
+    --severity-neutral: var(--border);
+    --severity-attention: var(--color-orange);
+    --severity-critical-bg: var(--color-orange);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1B1B1B; --surface: #262626; --surface-2: #2F2F2F; --border: #3A3A3A;
+      --text: #F2F2F2; --text-secondary: #ABABAB;
+      --color-orange: #F0993A;
+      --accent-ink: var(--color-orange); /* qui ammesso: lo sfondo pagina e' grafite/scuro */
+      --accent-on-button: var(--color-graphite); /* in scuro il pulsante resta grafite: il bianco ci starebbe anche peggio */
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1B1B1B; --surface: #262626; --surface-2: #2F2F2F; --border: #3A3A3A;
+    --text: #F2F2F2; --text-secondary: #ABABAB;
+    --color-orange: #F0993A;
+    --accent-ink: var(--color-orange);
+    --accent-on-button: var(--color-graphite);
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F4F4; --surface: #FFFFFF; --surface-2: #ECECEC; --border: #E3E3E3;
+    --text: #333333; --text-secondary: #707070;
+    --color-orange: #E88706;
+    --accent-ink: var(--color-graphite);
+    --accent-on-button: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--color-orange); color: var(--accent-on); }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--sp-xl) 96px; }
+
+  .topnav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+  .topnav-inner { max-width: 1180px; margin: 0 auto; padding: var(--sp-md) var(--sp-xl); display: flex; align-items: center; gap: var(--sp-xl); }
+  .brand { display: flex; align-items: center; gap: var(--sp-sm); font-family: var(--font-display); font-weight: 800; font-stretch: condensed; font-size: 20px; letter-spacing: .02em; }
+  .navlinks { display: flex; gap: var(--sp-lg); font-size: 13px; }
+  .navlinks a { color: var(--text-secondary); text-decoration: none; padding: 6px 0; border-bottom: 2px solid transparent; }
+  .navlinks a:hover, .navlinks a:focus-visible { color: var(--text); border-color: var(--color-orange); }
+
+  /* ---------- Titoli: spacing invariato rispetto ai titoli di sezione ---------- */
+  .hero { padding: var(--sp-xxl) 0 var(--sp-xl); display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--sp-xxl); align-items: end; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-ink); display: flex; align-items: center; gap: var(--sp-sm); margin-bottom: var(--sp-md); }
+  .eyebrow .dash { width: 20px; height: 1px; background: var(--color-orange); }
+  h1.title { font-family: var(--font-display); font-weight: 800; font-stretch: condensed; font-size: clamp(36px, 5vw, 56px); line-height: .98; margin: 0 0 var(--sp-lg); letter-spacing: .01em; text-wrap: balance; }
+  .lede { color: var(--text-secondary); font-size: 16px; max-width: 54ch; margin: 0; }
+  .hero-meta { display: flex; flex-direction: column; gap: var(--sp-md); font-size: 13px; color: var(--text-secondary); border-left: 2px solid var(--border); padding-left: var(--sp-lg); }
+  .hero-meta b { color: var(--text); font-weight: 600; }
+
+  section { padding-top: var(--sp-xxl); }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-lg); margin-bottom: var(--sp-xl); border-bottom: 1px solid var(--border); padding-bottom: var(--sp-md); }
+  .section-head h2 { font-family: var(--font-display); font-weight: 800; font-stretch: condensed; font-size: 26px; margin: 0; letter-spacing: .01em; }
+  .section-head p { margin: 0; color: var(--text-secondary); font-size: 13px; max-width: 40ch; text-align: right; }
+
+  /* ---------- Registration-mark plate (forma piena/bordo decorativo, non inchiostro: invariato) ---------- */
+  .plate { position: relative; }
+  .plate::before, .plate::after { content: ""; position: absolute; width: 9px; height: 9px; opacity: .5; pointer-events: none; border-style: solid; border-color: var(--accent-tick, var(--color-orange)); }
+  .plate::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .plate::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+  /* ---------- Componenti: spacing ridotto (xs/sm) ---------- */
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--sp-sm); }
+  .swatch { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+  .swatch-color { height: 84px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; }
+  .swatch-body { padding: var(--sp-sm) var(--sp-md); }
+  .swatch-name { font-weight: 600; font-size: 13px; }
+  .swatch-role { color: var(--text-secondary); font-size: 12px; margin-top: 2px; }
+  .swatch-hex { font-family: var(--font-mono); font-size: 12px; margin-top: var(--sp-xs); color: var(--text-secondary); }
+
+  .type-row { display: flex; align-items: baseline; gap: var(--sp-lg); padding: var(--sp-sm) 0; border-bottom: 1px dashed var(--border); }
+  .type-row:last-child { border-bottom: none; }
+  .type-tag { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); width: 130px; flex: none; text-transform: uppercase; letter-spacing: .06em; }
+  .type-sample-display { font-family: var(--font-display); font-weight: 800; font-stretch: condensed; font-size: 32px; }
+  .type-sample-title { font-family: var(--font-body); font-weight: 600; font-size: 18px; }
+  .type-sample-body { font-family: var(--font-body); font-size: 15px; color: var(--text-secondary); max-width: 60ch; }
+  .type-sample-mono { font-family: var(--font-mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+
+  .space-scale { display: flex; flex-direction: column; gap: var(--sp-xs); }
+  .space-row { display: flex; align-items: center; gap: var(--sp-md); }
+  .space-label { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); width: 90px; flex: none; }
+  .space-bar { background: var(--color-orange); height: 8px; border-radius: 2px; }
+
+  .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-md); align-items: start; }
+  .comp-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-md); }
+  .comp-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: var(--sp-sm); }
+
+  .btn { font-family: var(--font-body); font-weight: 600; font-size: 13px; border-radius: var(--radius-sm); padding: 6px 12px; border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary { background: var(--accent-fill); color: var(--accent-on-button); }
+  .btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-text { background: transparent; color: var(--accent-ink); padding-left: 2px; padding-right: 2px; }
+  .btn:focus-visible { outline: 2px solid var(--color-orange); outline-offset: 2px; }
+  .btn-row { display: flex; gap: var(--sp-sm); flex-wrap: wrap; }
+
+  .chip { font-family: var(--font-body); font-size: 12.5px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+  .chip.is-active { background: var(--accent-fill); color: var(--accent-on); border-color: var(--accent-fill); font-weight: 600; }
+  .chip-row { display: flex; gap: var(--sp-xs); flex-wrap: wrap; }
+
+  /* Nameplate: riga check-item / checkup, padding dimezzato, icona piu' piccola */
+  .nameplate { display: flex; align-items: center; gap: var(--sp-sm); background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--stripe, var(--severity-neutral)); border-radius: var(--radius-md); padding: var(--sp-sm); }
+  .nameplate-icon { width: 32px; height: 32px; flex: none; border-radius: var(--radius-sm); background: var(--surface-2); display: flex; align-items: center; justify-content: center; color: var(--stripe-icon, var(--text-secondary)); }
+  .nameplate-body { flex: 1; min-width: 0; }
+  .nameplate-title { font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nameplate-code { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+  .nameplate-qty { font-family: var(--font-mono); font-size: 15px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; flex: none; color: var(--qty-color, var(--text)); }
+  .nameplate-unit { font-size: 10.5px; color: var(--text-secondary); display: block; text-align: right; }
+  .nameplate-badge { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; background: var(--severity-critical-bg); color: var(--accent-on); padding: 2px 7px; border-radius: 999px; }
+  .stack { display: flex; flex-direction: column; gap: var(--sp-xs); }
+
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-sm); }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-sm); text-align: center; position: relative; }
+  .stat-value { font-family: var(--font-display); font-weight: 800; font-stretch: condensed; font-size: 30px; font-variant-numeric: tabular-nums; color: var(--stat-color, var(--text)); line-height: 1; }
+  .stat-label { font-size: 10.5px; color: var(--text-secondary); margin-top: var(--sp-xs); text-transform: uppercase; letter-spacing: .05em; }
+
+  .state-block { text-align: center; padding: var(--sp-xl) var(--sp-md); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+  .state-icon { width: 40px; height: 40px; margin: 0 auto var(--sp-sm); color: var(--text-secondary); }
+  .state-icon.is-error { color: var(--accent-ink); }
+  .state-title { font-weight: 600; font-size: 15px; }
+  .state-sub { color: var(--text-secondary); font-size: 12.5px; margin-top: 4px; }
+
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11.5px; color: var(--text-secondary); }
+  .field .control { font-family: var(--font-body); font-size: 14px; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); }
+  .field .control.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  .screens-row { display: flex; gap: var(--sp-xl); flex-wrap: wrap; justify-content: center; }
+  .phone { width: 300px; flex: none; border: 1px solid var(--border); border-radius: 28px; background: var(--bg); padding: 10px; box-shadow: 0 20px 50px -20px rgba(0,0,0,.35); }
+  .phone-screen { background: var(--bg); border-radius: 20px; overflow: hidden; min-height: 540px; display: flex; flex-direction: column; }
+  .phone-caption { text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); margin-top: var(--sp-md); text-transform: uppercase; letter-spacing: .06em; }
+  .app-bar { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-md) var(--sp-lg); }
+  .app-bar h3 { font-family: var(--font-display); font-weight: 800; font-stretch: condensed; font-size: 20px; margin: 0; }
+  .app-bar .icons { display: flex; gap: var(--sp-sm); color: var(--text-secondary); }
+  .screen-body { padding: 0 var(--sp-md) var(--sp-md); display: flex; flex-direction: column; gap: var(--sp-sm); flex: 1; }
+  .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-xs); }
+  .quick-action { border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-sm) 2px; text-align: center; background: var(--surface); }
+  .quick-action .ic-tile { width: 26px; height: 26px; margin: 0 auto 2px; border-radius: var(--radius-sm); background: var(--accent-fill); color: var(--accent-on); display: flex; align-items: center; justify-content: center; }
+  .quick-action span { font-size: 10.5px; color: var(--text-secondary); }
+  .block-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
+  .module-head { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-xs) 0; }
+  .module-head .name { font-weight: 600; font-size: 12.5px; }
+  .module-head .count { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+  .segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+  .segmented > div { flex: 1; text-align: center; padding: 6px 4px; font-size: 11.5px; color: var(--text-secondary); border-right: 1px solid var(--border); }
+  .segmented > div:last-child { border-right: none; }
+  .segmented > div.active { background: var(--accent-fill); color: var(--accent-on); font-weight: 600; }
+  .result-line { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-secondary); text-align: center; font-variant-numeric: tabular-nums; }
+  .progress-bar { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+  .progress-bar > div { height: 100%; background: var(--accent-fill); }
+
+  pre.tokens { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-md); overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; max-height: 420px; }
+  .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-lg); align-items: start; }
+  .note-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--sp-lg); }
+  .note-card h3 { margin: 0 0 var(--sp-xs); font-size: 15px; }
+  .note-card p { margin: 0 0 var(--sp-sm); color: var(--text-secondary); font-size: 13px; }
+  .note-card ol, .note-card ul { margin: 0; padding-left: 1.2em; color: var(--text-secondary); font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+  .copy-btn { margin-top: var(--sp-sm); }
+
+  .legend-row { display: flex; gap: var(--sp-lg); flex-wrap: wrap; margin-bottom: var(--sp-md); }
+  .legend-item { display: flex; align-items: center; gap: var(--sp-sm); font-size: 13px; color: var(--text-secondary); }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex: none; }
+
+  footer { margin-top: var(--sp-xxl); padding-top: var(--sp-xl); border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 12px; display: flex; justify-content: space-between; }
+
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-meta { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: var(--sp-lg); }
+    .export-grid { grid-template-columns: 1fr; }
+    .navlinks { display: none; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-in { animation: fadeIn .5s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v3h6V3M8 11l2.5 2.5L16 8"/></svg>QReport</div>
+    <div class="navlinks">
+      <a href="#fondamenta">Fondamenta</a>
+      <a href="#componenti">Componenti</a>
+      <a href="#schermate">Schermate</a>
+      <a href="#export">Export</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section class="hero fade-in">
+    <div>
+      <div class="eyebrow"><span class="dash"></span>Design system · Arancio e Technical Design</div>
+      <h1 class="title">Due colori, una regola<br>d'inchiostro.</h1>
+      <p class="lede">Stessa targhetta tecnica di QuickStore (mire d'angolo, monospazio per i codici, severità per intensità), stessi due colori — arancio <code style="font-family:var(--font-mono)">#E88706</code> e graphite <code style="font-family:var(--font-mono)">#333333</code> — ma con una regola d'inchiostro invertita: qui l'arancio è testo/icona solo su sfondo grafite, il grafite è testo/icona su bianco o sopra un riempimento arancione. I riempimenti pieni (pulsanti, chip, badge, strisce, mire) restano identici a QuickStore.</p>
+    </div>
+    <div class="hero-meta">
+      <div><b>Uguale a QuickStore</b> — tipografia, spaziatura ridotta nei componenti, mire d'angolo, severità per intensità</div>
+      <div><b>Diverso qui</b> — l'arancio non è mai inchiostro su pagina chiara; il testo sopra un riempimento arancione è grafite, non bianco</div>
+      <div><b>Perché</b> — bianco su arancio contrasta 2.66:1 (sotto soglia AA); grafite su arancio contrasta 4.76:1 (chiaro) / 5.9:1 (scuro)</div>
+    </div>
+  </section>
+
+  <section id="fondamenta">
+    <div class="section-head">
+      <h2>Colore</h2>
+      <p>Due hue in tutto: arancio e graphite. Il resto è scala di grigi neutra.</p>
+    </div>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch-color" style="background:var(--color-orange)"></div><div class="swatch-body"><div class="swatch-name">Orange</div><div class="swatch-role">Riempimento sempre; inchiostro solo su grafite</div><div class="swatch-hex">#E88706</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:var(--color-graphite)"></div><div class="swatch-body"><div class="swatch-name">Graphite</div><div class="swatch-role">Inchiostro su bianco o su riempimento arancio</div><div class="swatch-hex">#333333</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:var(--bg)"></div><div class="swatch-body"><div class="swatch-name">Paper</div><div class="swatch-role">Sfondo (neutro)</div><div class="swatch-hex">#F4F4F4</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:var(--border)"></div><div class="swatch-body"><div class="swatch-name">Border</div><div class="swatch-role">Bordi (neutro)</div><div class="swatch-hex">#E3E3E3</div></div></div>
+    </div>
+
+    <div class="legend-row" style="margin-top:var(--sp-lg)">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--severity-neutral)"></span>Normale — nessun accento</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-orange); opacity:.55"></span>Attenzione — arancio a tinta piena sulla striscia</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--color-orange)"></span>Critico — badge arancio pieno, testo grafite</div>
+    </div>
+
+    <div class="note-card" style="margin-top:var(--sp-lg)">
+      <h3>Regola d'inchiostro (differenza rispetto a QuickStore)</h3>
+      <p>L'unica differenza di sostanza rispetto all'opzione Arancio/Technical di QuickStore riguarda dove può comparire ciascun colore come <b>inchiostro</b> (testo o icona), non come riempimento:</p>
+      <ul>
+        <li><b>Arancio come inchiostro</b> → solo su sfondo grafite (tema scuro). Su pagina chiara i testi/icone che in QuickStore erano arancio (eyebrow, pulsante testuale, icone di scorciatoia, icona di errore, valori numerici in evidenza) qui diventano grafite: su carta bianca l'arancio in inchiostro contrasta solo 2.66:1, sotto la soglia AA (4.5:1).</li>
+        <li><b>Grafite come inchiostro</b> → su sfondo bianco (il default) oppure sopra un riempimento arancione pieno. Pulsante primario, chip attivo, badge critico e segmented attivo hanno quindi testo grafite, non più bianco: 4.76:1 in chiaro e 5.9:1 in scuro, contro il 2.66:1 del bianco su arancio.</li>
+        <li><b>Le forme piene restano invariate</b> — pulsanti, chip, badge, strisce di stato e mire d'angolo continuano a usare l'arancio come riempimento anche su pagina chiara, esattamente come in QuickStore. La regola vincola solo l'inchiostro sopra quelle forme, non le forme stesse.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Tipografia</h2>
+      <p>Invariata da QuickStore — solo la regola d'inchiostro cambia, non il carattere.</p>
+    </div>
+    <div class="type-row"><div class="type-tag">Display<br>Big Shoulders</div><div class="type-sample-display">12 CHECK-UP APERTI</div></div>
+    <div class="type-row"><div class="type-tag">Title<br>Inter 600</div><div class="type-sample-title">Check-up POLY Move — Isola IS-0042</div></div>
+    <div class="type-row"><div class="type-tag">Body<br>Inter 400</div><div class="type-sample-body">Impossibile completare il check-up: 2 voci critiche risultano ancora "NOK". Risolvi le anomalie prima dell'esportazione.</div></div>
+    <div class="type-row"><div class="type-tag">Mono / dati<br>IBM Plex Mono</div><div class="type-sample-mono">SAF_001 · 3HAC025396-001 · 07:44</div></div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2>Spaziatura</h2><p>Scala proposta xs→xxl; i componenti usano i gradini più bassi (xs/sm), titoli e ritmo tra sezioni restano su lg/xl/xxl.</p></div>
+    <div class="space-scale">
+      <div class="space-row"><div class="space-label">xs · 4</div><div class="space-bar" style="width:4px"></div></div>
+      <div class="space-row"><div class="space-label">sm · 8</div><div class="space-bar" style="width:8px"></div></div>
+      <div class="space-row"><div class="space-label">md · 12</div><div class="space-bar" style="width:12px"></div></div>
+      <div class="space-row"><div class="space-label">lg · 16</div><div class="space-bar" style="width:16px"></div></div>
+      <div class="space-row"><div class="space-label">xl · 24 <span style="opacity:.6">(titoli)</span></div><div class="space-bar" style="width:24px"></div></div>
+      <div class="space-row"><div class="space-label">xxl · 32 <span style="opacity:.6">(titoli)</span></div><div class="space-bar" style="width:32px"></div></div>
+    </div>
+  </section>
+
+  <section id="componenti">
+    <div class="section-head">
+      <h2>Componenti</h2>
+      <p>Mapping su CheckupCard.kt/CheckUpDetailScreen.kt/EmptyState.kt/ErrorState.kt — compatti come in QuickStore.</p>
+    </div>
+    <div class="comp-grid">
+
+      <div class="comp-card">
+        <div class="comp-label">Pulsanti</div>
+        <div class="btn-row">
+          <button class="btn btn-primary">Completa Check-up</button>
+          <button class="btn btn-secondary">Annulla</button>
+          <button class="btn btn-text">Riprova</button>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-label">Filtro stato check-up</div>
+        <div class="chip-row">
+          <span class="chip is-active">Tutti</span>
+          <span class="chip">Bozza</span>
+          <span class="chip">In Corso</span>
+          <span class="chip">Completato</span>
+        </div>
+      </div>
+
+      <div class="comp-card" style="grid-column: span 2;">
+        <div class="comp-label">Check item — 3 livelli di severità, un solo hue</div>
+        <div class="stack">
+          <div class="nameplate plate" style="--accent-tick:var(--severity-neutral); --stripe:var(--severity-neutral);">
+            <div class="nameplate-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+            <div class="nameplate-body"><div class="nameplate-title">MEC_001 — Controllo giochi meccanici assi</div><div class="nameplate-code">Meccanico · OK</div></div>
+            <div class="nameplate-qty">OK</div>
+          </div>
+          <div class="nameplate plate" style="--accent-tick:var(--severity-attention); --stripe:var(--severity-attention); --stripe-icon:var(--color-orange);">
+            <div class="nameplate-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v5M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg></div>
+            <div class="nameplate-body"><div class="nameplate-title">ELE_001 — Verifica tensioni alimentazione</div><div class="nameplate-code">Elettrico · In attesa di verifica</div></div>
+            <div class="nameplate-qty">ATT.</div>
+          </div>
+          <div class="nameplate plate" style="--accent-tick:var(--color-orange); --stripe:var(--color-orange); --stripe-icon:var(--color-orange);">
+            <div class="nameplate-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+            <div class="nameplate-body"><div class="nameplate-title">SAF_001 — Integrità barriere fotoelettriche</div><div class="nameplate-code">Sicurezza · Critico</div></div>
+            <div class="nameplate-badge">NOK</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card" style="grid-column: span 2;">
+        <div class="comp-label">Progresso check-up</div>
+        <div class="stat-row">
+          <div class="stat plate" style="--accent-tick:var(--severity-neutral)"><div class="stat-value">18</div><div class="stat-label">Voci totali</div></div>
+          <div class="stat plate" style="--accent-tick:var(--severity-neutral)"><div class="stat-value">15</div><div class="stat-label">Completate</div></div>
+          <div class="stat plate" style="--accent-tick:var(--color-orange)"><div class="stat-value" style="--stat-color:var(--accent-ink)">2</div><div class="stat-label">Critiche NOK</div></div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-label">Empty state</div>
+        <div class="state-block">
+          <svg class="state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 3v3h6V3"/></svg>
+          <div class="state-title">Nessun check-up per "Isola IS-0042"</div>
+          <div class="state-sub">Crea un nuovo check-up per questa isola</div>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <div class="comp-label">Error state</div>
+        <div class="state-block">
+          <svg class="state-icon is-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+          <div class="state-title">Errore nel caricamento</div>
+          <div class="state-sub">Verifica la connessione e riprova</div>
+        </div>
+      </div>
+
+      <div class="comp-card" style="grid-column: span 2;">
+        <div class="comp-label">Modulo — intestazione collassabile</div>
+        <div class="module-head">
+          <span class="name">Sicurezza</span>
+          <span class="count">3 / 4 OK · 1 NOK</span>
+        </div>
+        <div class="progress-bar"><div style="width:75%"></div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="schermate">
+    <div class="section-head">
+      <h2>Schermate</h2>
+      <p>Home, Check-up list, Check-up detail — stessi contenuti reali, componenti compatti.</p>
+    </div>
+    <div class="screens-row">
+
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="app-bar"><h3>QReport</h3><div class="icons"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></div></div>
+          <div class="screen-body">
+            <div class="block-title">Azioni rapide</div>
+            <div class="quick-actions">
+              <div class="quick-action"><div class="ic-tile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 11l2.5 2.5L16 8"/></svg></div><span>Check-up</span></div>
+              <div class="quick-action"><div class="ic-tile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></div><span>Clienti</span></div>
+              <div class="quick-action"><div class="ic-tile"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-6 9 6-9 6-9-6z"/><path d="M3 9v6l9 6 9-6V9"/></svg></div><span>Isole</span></div>
+            </div>
+            <div class="block-title">Check-up</div>
+            <div class="stat-row">
+              <div class="stat plate" style="--accent-tick:var(--severity-neutral); padding:var(--sp-xs) 2px;"><div class="stat-value" style="font-size:21px">12</div><div class="stat-label">Totali</div></div>
+              <div class="stat plate" style="--accent-tick:var(--severity-neutral); padding:var(--sp-xs) 2px;"><div class="stat-value" style="font-size:21px">4</div><div class="stat-label">Attivi</div></div>
+              <div class="stat plate" style="--accent-tick:var(--color-orange); padding:var(--sp-xs) 2px;"><div class="stat-value" style="font-size:21px;--stat-color:var(--accent-ink)">2</div><div class="stat-label">Critici</div></div>
+            </div>
+            <div class="block-title">Check-up recenti</div>
+            <div class="stack">
+              <div class="nameplate" style="--stripe:var(--severity-neutral); padding:var(--sp-xs) var(--sp-sm);">
+                <div class="nameplate-body"><div class="nameplate-title" style="font-size:12.5px">ABB Robotics S.p.A.</div><div class="nameplate-code">02/07 · Completato</div></div>
+              </div>
+              <div class="nameplate" style="--stripe:var(--color-orange); padding:var(--sp-xs) var(--sp-sm);">
+                <div class="nameplate-body"><div class="nameplate-title" style="font-size:12.5px">Comau Impianti Srl</div><div class="nameplate-code">03/07 · In corso — 2 critiche</div></div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        <div class="phone-caption">Home</div>
+      </div>
+
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="app-bar"><h3 style="font-size:17px">Check-up</h3><div class="icons"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div></div>
+          <div class="screen-body">
+            <div class="control" style="color:var(--text-secondary); font-size:12.5px;">Cerca cliente, isola…</div>
+            <div class="chip-row">
+              <span class="chip is-active">Tutti</span>
+              <span class="chip">In Corso</span>
+              <span class="chip">Completato</span>
+            </div>
+            <div class="stack">
+              <div class="nameplate plate" style="--accent-tick:var(--severity-neutral); --stripe:var(--severity-neutral);">
+                <div class="nameplate-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                <div class="nameplate-body"><div class="nameplate-title" style="font-size:12.5px">ABB Robotics — IS-0042</div><div class="nameplate-code">15/15 OK · Completato</div></div>
+              </div>
+              <div class="nameplate plate" style="--accent-tick:var(--color-orange); --stripe:var(--color-orange); --stripe-icon:var(--color-orange);">
+                <div class="nameplate-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                <div class="nameplate-body"><div class="nameplate-title" style="font-size:12.5px">Comau Impianti — IS-0107</div><div class="nameplate-code">12/18 OK · 2 NOK critiche</div></div>
+              </div>
+              <div class="nameplate plate" style="--accent-tick:var(--severity-neutral); --stripe:var(--severity-neutral);">
+                <div class="nameplate-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                <div class="nameplate-body"><div class="nameplate-title" style="font-size:12.5px">Fanuc Italia — IS-0063</div><div class="nameplate-code">Bozza · non iniziato</div></div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        <div class="phone-caption">Check-up · filtro stato</div>
+      </div>
+
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="app-bar"><h3 style="font-size:17px">IS-0107 · Check-up</h3><div></div></div>
+          <div class="screen-body">
+            <div class="nameplate plate" style="--accent-tick:var(--severity-neutral); --stripe:var(--severity-neutral); flex-direction:column; align-items:flex-start; gap:2px;">
+              <div class="nameplate-title">Comau Impianti Srl — POLY Weld</div>
+              <div class="nameplate-code">12/18 OK · 2 NOK critiche</div>
+            </div>
+            <div class="progress-bar"><div style="width:66%"></div></div>
+            <div class="module-head" style="margin-top:2px;"><span class="name">Sicurezza</span><span class="count">3/4 OK</span></div>
+            <div class="stack">
+              <div class="nameplate" style="--stripe:var(--color-orange); padding:var(--sp-xs) var(--sp-sm);">
+                <div class="nameplate-body"><div class="nameplate-title" style="font-size:12.5px">SAF_001 — Barriere fotoelettriche</div><div class="nameplate-code">Critico · nota presente</div></div>
+                <div class="nameplate-badge">NOK</div>
+              </div>
+              <div class="nameplate" style="--stripe:var(--severity-neutral); padding:var(--sp-xs) var(--sp-sm);">
+                <div class="nameplate-body"><div class="nameplate-title" style="font-size:12.5px">SAF_002 — Arresto di emergenza</div><div class="nameplate-code">Routine</div></div>
+                <div class="nameplate-qty" style="font-size:13px">OK</div>
+              </div>
+            </div>
+            <div class="module-head"><span class="name">Elettrico</span><span class="count">2/3 OK</span></div>
+            <div class="result-line">1 voce in attesa di verifica</div>
+          </div>
+        </div></div>
+        <div class="phone-caption">Check-up detail · modulo Sicurezza</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="export">
+    <div class="section-head">
+      <h2>Export</h2>
+      <p>Token pronti per Figma (Tokens Studio) e per il CSS della futura web app.</p>
+    </div>
+    <div class="export-grid">
+      <div>
+        <pre class="tokens" id="tokens-json">{
+  "global": {
+    "color": {
+      "orange":   { "value": "#E88706" },
+      "graphite": { "value": "#333333" }
+    },
+    "spacing": { "xs": 4, "sm": 8, "md": 12, "lg": 16, "xl": 24, "xxl": 32 }
+  },
+  "light": { "accentFill": "orange", "accentOn": "graphite", "accentInk": "graphite" },
+  "dark":  { "accentFill": "orange", "accentOn": "graphite", "accentInk": "orange" }
+}</pre>
+        <button class="btn btn-secondary copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('tokens-json').textContent)">Copia JSON (vedi design/tokens-orange-technical.json)</button>
+      </div>
+      <div class="note-card">
+        <h3>Come portarlo in Figma</h3>
+        <ol>
+          <li>Plugin gratuito <b>Tokens Studio for Figma</b></li>
+          <li>Import → incolla <code style="font-family:var(--font-mono)">design/tokens-orange-technical.json</code></li>
+          <li>"Create Styles/Variables"</li>
+          <li>Font: "Inter", "IBM Plex Mono" — già su Google Fonts</li>
+        </ol>
+        <h3 style="margin-top:var(--sp-md)">Riuso per la web app</h3>
+        <p>Le variabili CSS in cima a questo file sono la stessa fonte del token JSON — copiabili come base del foglio di stile.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>QReport Design System · Arancio e Technical Design</span>
+    <span>Base: QuickStore opzione 3 · Differenza: regola d'inchiostro arancio/grafite</span>
+  </footer>
+
+</div>

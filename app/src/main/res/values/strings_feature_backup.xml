@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Backup Mode -->
+    <string name="backup_backup_mode_local_name">Locale</string>
+    <string name="backup_backup_mode_local_desc">Salva solo su dispositivo</string>
+
+    <!-- Restore strategy -->
+    <string name="backup_restore_strategy_replace_all_name">Sostituisci tutto</string>
+    <string name="backup_restore_strategy_replace_all_desc">Elimina tutti i dati esistenti e ripristina dal backup</string>
+    <string name="backup_restore_strategy_merge_name">Unisci dati</string>
+    <string name="backup_restore_strategy_merge_desc">Mantiene dati esistenti e aggiunge quelli dal backup</string>
+    <string name="backup_restore_strategy_selective_name">"Ripristino selezionativo"</string>
+    <string name="backup_restore_strategy_selective_desc">Permette di scegliere specifiche tabelle da ripristinare</string>
+
+    <!-- RestoreBackupConfirmationDialog -->
+    <string name="backup_restore_confirm_title">Ripristina Backup</string>
+    <string name="backup_restore_confirm_info_label">Backup da ripristinare:</string>
+    <string name="backup_restore_confirm_date_format">📅 %1$s</string>
+    <string name="backup_restore_confirm_size_format">📦 %1$s</string>
+    <string name="backup_restore_confirm_includes_photos">Include foto (%1$s)</string>
+    <string name="backup_restore_confirm_photo_count_na">N/A</string>
+    <string name="backup_restore_confirm_strategy_label">Strategia di ripristino:</string>
+    <string name="backup_restore_confirm_warning_title">⚠️ Attenzione</string>
+    <string name="backup_restore_confirm_warning_replace_all">Tutti i dati esistenti verranno sostituiti. Questa operazione non è reversibile.</string>
+    <string name="backup_restore_confirm_warning_merge">I dati esistenti verranno uniti con quelli del backup. Verificare compatibilità.</string>
+    <string name="backup_restore_confirm_action">Ripristina</string>
+
+    <!-- RestoreBackupProgressDialog -->
+    <string name="backup_restore_progress_in_progress">Ripristino in corso...</string>
+    <string name="backup_restore_progress_table_label">Tabella</string>
+    <string name="backup_restore_progress_record_label">Record</string>
+    <string name="backup_restore_progress_completed_title">Ripristino Completato</string>
+    <string name="backup_restore_progress_summary_label">Riepilogo azioni</string>
+    <string name="backup_restore_progress_records_restored_label">Records ripristinati</string>
+    <string name="backup_restore_progress_error_title">Errore Ripristino</string>
+    <string name="backup_restore_progress_idle">Nessuna operazione in corso</string>
+
+    <!-- RestoreBackupProgressDialog - restoreFromBackup steps -->
+    <string name="backup_restore_progress_step_starting">Avvio ripristino...</string>
+    <string name="backup_restore_progress_step_loading">Caricamento backup</string>
+    <string name="backup_restore_progress_step_validating">Validazione backup</string>
+    <string name="backup_restore_progress_step_db_restoring">Ripristino database</string>
+    <string name="backup_restore_progress_step_db_restored">Database ripristinato</string>
+    <string name="backup_restore_progress_step_photos_restoring">Ripristino foto</string>
+    <string name="backup_restore_progress_step_photos_progress">Ripristino foto: %1$d/%2$d</string>
+    <string name="backup_restore_progress_step_signatures_restoring">Ripristino firme...</string>
+    <string name="backup_restore_progress_step_signatures_progress">Ripristino firme: %1$d/%2$d</string>
+    <string name="backup_restore_progress_step_documents_restoring">Ripristino documenti...</string>
+    <string name="backup_restore_progress_step_documents_progress">Ripristino documenti: %1$d/%2$d</string>
+    <string name="backup_restore_progress_step_settings_restoring">Ripristino impostazioni</string>
+
+    <!-- RestoreBackupProgressDialog - restoreFromBackup errors -->
+    <string name="backup_restore_progress_error_load_failed">Caricamento backup non riuscito</string>
+    <string name="backup_restore_progress_error_invalid">Backup non valido: %1$s</string>
+    <string name="backup_restore_progress_error_checksum_invalid">Checksum non valido - possibile corruzione</string>
+    <string name="backup_restore_progress_error_photos_dir_failed">Impossibile ottenere la cartella foto</string>
+    <string name="backup_restore_progress_error_photos_failed">Ripristino foto non riuscito: %1$s</string>
+    <string name="backup_restore_progress_error_db_failed">Ripristino database non riuscito: %1$s</string>
+    <string name="backup_restore_progress_error_generic">Ripristino backup non riuscito: %1$s</string>
+
+    <!-- BackupItemCard -->
+    <string name="backup_item_card_with_photos">Con foto</string>
+    <string name="backup_item_card_record_count">%1$d record</string>
+    <string name="backup_item_card_photo_count">%1$d foto</string>
+    <string name="backup_item_card_cd_download">Scarica backup</string>
+    <string name="backup_item_card_cd_share">Condividi backup</string>
+    <string name="backup_item_card_cd_delete">Elimina backup</string>
+
+    <!-- BackupProgressDialog -->
+    <string name="backup_progress_in_progress">Backup in corso...</string>
+    <string name="backup_progress_completed_title">Backup Completato</string>
+    <string name="backup_progress_tables_saved_label">Tabelle salvate</string>
+    <string name="backup_progress_data_saved_label">Dati salvati</string>
+    <string name="backup_progress_time_elapsed_label">Tempo impiegato</string>
+    <string name="backup_progress_error_title">Errore Backup</string>
+
+    <!-- BackupProgressDialog - current table names (shared backup/restore) -->
+    <string name="backup_table_all">Tutte</string>
+    <string name="backup_table_photos">Foto</string>
+    <string name="backup_table_signatures">Firme</string>
+    <string name="backup_table_documents">Documenti</string>
+
+    <!-- BackupProgressDialog - createFullBackup steps -->
+    <string name="backup_progress_step_initializing">Inizializzazione backup...</string>
+    <string name="backup_progress_step_start">Avvio backup completo</string>
+    <string name="backup_progress_step_db_validation">1. Validazione database</string>
+    <string name="backup_progress_step_db_valid">- Database valido</string>
+    <string name="backup_progress_step_export_db">2. Esportazione database</string>
+    <string name="backup_progress_step_db_exported">- Database esportato</string>
+    <string name="backup_progress_step_export_settings">3. Esportazione impostazioni</string>
+    <string name="backup_progress_step_settings_exported">- Impostazioni esportate</string>
+    <string name="backup_progress_step_export_photos">4. Esportazione foto</string>
+    <string name="backup_progress_step_photos_progress">- Backup foto: %1$d/%2$d</string>
+    <string name="backup_progress_step_photos_exported">- Foto esportate</string>
+    <string name="backup_progress_step_metadata_creation">5. Creazione metadati</string>
+    <string name="backup_progress_step_export_signatures">4b. Esportazione firme</string>
+    <string name="backup_progress_step_signatures_progress">- Backup firme: %1$d/%2$d</string>
+    <string name="backup_progress_step_export_documents">4c. Esportazione documenti</string>
+    <string name="backup_progress_step_documents_progress">- Backup documenti: %1$d/%2$d</string>
+    <string name="backup_progress_step_finalizing">Finalizzazione backup</string>
+    <string name="backup_progress_step_checking_checksum">Verifica checksum</string>
+    <string name="backup_progress_step_saving">Salvataggio backup</string>
+
+    <!-- BackupProgressDialog - createFullBackup errors -->
+    <string name="backup_progress_error_thumbnails_without_photos">Impossibile includere le miniature senza le foto</string>
+    <string name="backup_progress_error_path_generation">Impossibile generare il percorso di backup</string>
+    <string name="backup_progress_error_db_invalid">Database non valido: %1$s</string>
+    <string name="backup_progress_error_export_photos">Esportazione foto non riuscita: %1$s</string>
+    <string name="backup_progress_error_checksum_failed">Verifica checksum non riuscita</string>
+    <string name="backup_progress_error_save_failed">Salvataggio backup non riuscito</string>
+    <string name="backup_progress_error_generic">Backup non riuscito: %1$s</string>
+
+    <!-- BackupConfirmationDialog -->
+    <string name="backup_confirmation_title">Conferma Backup</string>
+    <string name="backup_confirmation_summary_label">Riepilogo Opzioni</string>
+    <string name="backup_confirmation_photos_label">Foto</string>
+    <string name="backup_confirmation_thumbnails_label">Miniature</string>
+    <string name="backup_confirmation_mode_label">Modalità</string>
+    <string name="backup_confirmation_size_label">Stima Dimensione</string>
+    <string name="backup_confirmation_description_label">Descrizione</string>
+    <string name="backup_confirmation_included">Incluse</string>
+    <string name="backup_confirmation_excluded">Escluse</string>
+    <string name="backup_confirmation_action">Backup</string>
+
+    <!-- BackupHeaderCard -->
+    <string name="backup_header_card_title">Sistema Backup</string>
+    <string name="backup_header_card_subtitle">Database e foto QReport</string>
+    <string name="backup_header_card_backups_label">Backup</string>
+    <string name="backup_header_card_last_label">Ultimo</string>
+    <string name="backup_header_card_never">Mai</string>
+    <string name="backup_header_card_size_label">Dimensione</string>
+
+    <!-- BackupOptionsCard -->
+    <string name="backup_options_card_title">Opzioni Backup</string>
+    <string name="backup_options_include_photos_title">Includi foto</string>
+    <string name="backup_options_include_photos_desc">Backup di tutte le foto dei check-up</string>
+    <string name="backup_options_mode_title">Modalità Backup</string>
+    <string name="backup_options_estimated_size_label">Dimensione stimata:</string>
+
+    <!-- BackupActionCard -->
+    <string name="backup_action_table_progress">Tabella: %1$s (%2$d/%3$d)</string>
+    <string name="backup_action_preparing">Preparazione backup...</string>
+    <string name="backup_action_completed">Backup completato</string>
+    <string name="backup_action_saved_to">File salvato in: %1$s</string>
+    <string name="backup_action_error">Errore backup</string>
+    <string name="backup_action_create_new">Crea Nuovo Backup</string>
+    <string name="backup_action_create">Crea Backup</string>
+
+    <!-- DeleteBackupDialog -->
+    <string name="backup_delete_dialog_title">Elimina Backup</string>
+    <string name="backup_delete_dialog_confirm_message">Sei sicuro di voler eliminare questo backup?</string>
+    <string name="backup_delete_dialog_date">📅 Data: %1$s</string>
+    <string name="backup_delete_dialog_size">📦 Dimensione: %1$s</string>
+    <string name="backup_delete_dialog_description">📝 Descrizione: %1$s</string>
+    <string name="backup_delete_dialog_photos">📸 Include %1$s foto</string>
+    <string name="backup_delete_dialog_version">📱 Versione: %1$s</string>
+    <string name="backup_delete_dialog_irreversible_title">⚠️ Operazione Irreversibile</string>
+    <string name="backup_delete_dialog_irreversible_message">Una volta eliminato, questo backup non potrà più essere recuperato. Assicurati di avere altri backup disponibili se necessario.</string>
+
+    <!-- BackupScreen -->
+    <string name="backup_screen_list_title">Backup Disponibili</string>
+    <string name="backup_screen_list_count">%1$d backup</string>
+    <string name="backup_screen_empty_title">Nessun backup trovato</string>
+    <string name="backup_screen_empty_message">Crea un nuovo backup per iniziare</string>
+    <string name="backup_screen_empty_cd">Nessun Backup Trovato</string>
+    <string name="backup_screen_export_in_progress">Esportazione in corso</string>
+    <string name="backup_screen_import_in_progress">Importazione in corso</string>
+    <string name="backup_screen_cd_import">Importa backup</string>
+    <string name="backup_screen_cd_refresh">Aggiorna</string>
+
+    <!-- BackupViewModel - UI messages -->
+    <string name="backup_vm_err_not_found">Backup non trovato</string>
+    <string name="backup_vm_success_created">Backup creato con successo</string>
+    <string name="backup_vm_err_during_backup">Errore durante backup: %1$s</string>
+    <string name="backup_vm_err_unexpected_backup">Errore imprevisto durante backup</string>
+    <string name="backup_vm_info_backup_cancelled">Backup annullato</string>
+    <string name="backup_vm_err_invalid">Backup non valido: %1$s</string>
+    <string name="backup_vm_success_restored">Ripristino completato con successo</string>
+    <string name="backup_vm_err_during_restore">Errore durante ripristino: %1$s</string>
+    <string name="backup_vm_err_unexpected_restore">Errore imprevisto durante ripristino</string>
+    <string name="backup_vm_info_restore_cancelled">Ripristino annullato</string>
+    <string name="backup_vm_success_deleted">Backup eliminato</string>
+    <string name="backup_vm_err_delete_failed">Impossibile eliminare backup: %1$s</string>
+    <string name="backup_vm_err_delete_unexpected">Errore durante eliminazione backup</string>
+    <string name="backup_vm_err_load">Errore caricamento backup</string>
+    <string name="backup_vm_success_exported">Backup esportato con successo</string>
+    <string name="backup_vm_err_export">Errore durante l\'export</string>
+    <string name="backup_vm_success_imported">Backup importato con successo (%1$d file)</string>
+    <string name="backup_vm_err_import">Errore durante l\'import</string>
+
+
+
+
+
+</resources>

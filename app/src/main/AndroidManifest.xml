@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions for opening map applications -->
+    <queries>
+        <!-- Solo Google Maps -->
+        <package android:name="com.google.android.apps.maps" />
+
+        <!-- Intent geo generico per QUALSIASI app mappe -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+
+        <!-- Browser fallback -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" android:host="maps.google.com" />
+        </intent>
+
+        <!-- QuickStore: picker ricambi e ContentProvider articoli -->
+        <package android:name="net.calvuz.quickstore" />
+        <intent>
+            <action android:name="net.calvuz.qstore.action.PICK_ARTICLES" />
+        </intent>
+        <provider android:authorities="net.calvuz.qstore.provider" />
+    </queries>
+
+    <!-- Camera permissions -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+    <!-- Storage permissions (per scoped storage Android 10+) -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!-- Permessi per Android 13+ (Tiramisu) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Nuovo permesso per Android 14+ (Upside Down Cake) -->
+    <!-- Permette l'accesso granulare alle foto selezionate -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+
+    <!--Photo Picker feature (opzionale, per ottimizzazione) -->
+    <uses-feature
+        android:name="android.software.activities_on_secondary_displays"
+        android:required="false" />
+
+    <!-- Network permission per future sync features -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- QStore ContentProvider — lettura catalogo articoli -->
+    <uses-permission android:name="net.calvuz.qstore.permission.READ_ARTICLES" />
+
+    <application
+        android:name=".app.app.QReportApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_qreport_launcher"
+        android:label="@string/app_name"
+        android:preserveLegacyExternalStorage="true"
+        android:requestLegacyExternalStorage="true"
+        android:roundIcon="@mipmap/ic_qreport_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.QReport"
+        android:enableOnBackInvokedCallback="true" >
+        <!--        android:label="${appName}"-->
+
+        <activity
+            android:name=".app.app.presentation.ui.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.QReport"
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="DiscouragedApi">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- File provider per condivisione documenti -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+</manifest>

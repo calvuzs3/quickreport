@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name" translatable="false">Quick Report</string>
+    <string name="app_version" translatable="false">1.0.0</string>
+    <string name="app_version_code" translatable="false">1</string>
+    <string name="app_database_name" translatable="false">qreport_database</string>
+    <string name="app_description">Sistema digitalizzato per check-up isole robotizzate industriali</string>
+
+    <!-- Routes -->
+    <string name="route_home">home</string>
+    <string name="route_home_title">Home</string>
+    <string name="route_home_subtitle">Gestione isole robotizzate</string>
+    <string name="route_clients">clients</string>
+    <string name="route_clients_title">Clienti</string>
+    <string name="route_checkups">checkup</string>
+    <string name="route_checkups_title">Check-up</string>
+    <string name="route_checkups_subtitle">Check-up isole robotizzate</string>
+    <string name="route_settings">settings</string>
+    <string name="route_settings_title">Impostazioni</string>
+    <string name="route_settings_subtitle">Impostazioni applicazione</string>
+
+    <string name="route_photos">Foto</string>
+    <string name="route_export">Export</string>
+    <string name="route_backup">Backup</string>
+    <string name="route_client_detail">Dettagli Cliente</string>
+    <string name="route_client_create">Crea Cliente</string>
+    <string name="route_client_edit">Modifica Cliente</string>
+    <string name="route_contacts">Contatti</string>
+    <string name="route_contact_detail">Dettagli Contatto</string>
+    <string name="route_contact_create">Crea Contatto</string>
+    <string name="route_contact_edit">Modifica Contatto</string>
+    <string name="route_facilities">Facilities</string>
+    <string name="route_facility_detail">Dettagli Facility</string>
+    <string name="route_facility_create">Crea Facility</string>
+    <string name="route_facility_edit">Modifica Facility</string>
+    <string name="route_islands">Isle</string>
+    <string name="route_island_detail">Dettagli Isola</string>
+
+
+    <!-- CORE COMPONENTS -->
+
+    <string name="core_component_loading_in_progress">Caricamento..</string>
+    <!-- ===== Core actions (add if not already present) ===== -->
+    <string name="core_action_next">Avanti</string>
+    <string name="core_action_confirm">Conferma</string>
+    <string name="core_action_cancel">Annulla</string>
+
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_checkups">Check-up</string>
+    <string name="nav_photos">Foto</string>
+    <string name="nav_export">Export</string>
+    <string name="nav_settings">Impostazioni</string>
+
+    <!-- status -->
+    <string name="status_draft">Bozza</string>
+    <string name="status_in_progress">In Corso</string>
+    <string name="status_completed">Completato</string>
+    <string name="status_exported">Esportato</string>
+    <string name="status_pending_review">In Revisione</string>
+    <string name="status_archived">Archiviato</string>
+
+
+    <!-- Check item status -->
+    <string name="check_status_ok">OK</string>
+    <string name="check_status_nok">NOK</string>
+    <string name="check_status_pending">In Attesa</string>
+    <string name="check_status_na">N/A</string>
+
+    <!-- Island types -->
+    <string name="island_welding">Isola Saldatura</string>
+    <string name="island_assembly">Isola Assemblaggio</string>
+    <string name="island_painting">Isola Verniciatura</string>
+    <string name="island_handling">Isola Movimentazione</string>
+    <string name="island_quality_control">Controllo Qualità</string>
+    <string name="island_packaging">Confezionamento</string>
+
+    <!-- Criticality levels -->
+    <string name="criticality_critical">Critico</string>
+    <string name="criticality_important">Importante</string>
+    <string name="criticality_routine">Routine</string>
+    <string name="criticality_na">N/A</string>
+
+    <!-- Modules -->
+    <string name="module_safety">Sicurezza</string>
+    <string name="module_mechanical">Meccanico</string>
+    <string name="module_electrical">Elettrico</string>
+    <string name="module_software">Software</string>
+    <string name="module_welding">Saldatura</string>
+    <string name="module_assembly">Assemblaggio</string>
+    <string name="module_painting">Verniciatura</string>
+    <string name="module_handling">Movimentazione</string>
+    <string name="module_quality">Controllo Qualità</string>
+    <string name="module_packaging">Confezionamento</string>
+
+    <!-- Actions -->
+    <string name="action_ok">OK</string>
+    <string name="action_more_vert">Altre azioni</string>
+    <string name="action_new">Nuovo</string>
+    <string name="action_create">Crea</string>
+    <string name="action_open">Apri</string>
+    <string name="action_close">Chiudi</string>
+    <string name="action_dismiss">Chiudi</string>
+    <string name="action_exit_selection">Chiudi selezione</string>
+    <string name="action_select_all">Seleziona tutto</string>
+    <string name="action_set_active">Attiva</string>
+    <string name="action_set_not_active">Disattiva</string>
+    <string name="action_edit">Modifica</string>
+    <string name="action_delete">Elimina</string>
+    <string name="action_restore">Ripristina</string>
+    <string name="action_save">Salva</string>
+    <string name="action_update">Aggiorna</string>
+    <string name="action_cancel">Annulla</string>
+    <string name="action_confirm">Conferma</string>
+    <string name="action_export">Esporta</string>
+    <string name="action_archive">Archivia</string>
+    <string name="action_renew">Rinnova</string>
+    <string name="action_share">Condividi</string>
+    <string name="action_mark_completed">Setta completato</string>
+    <string name="action_take_photo">Scatta Foto</string>
+    <string name="action_add_note">Aggiungi Nota</string>
+    <string name="action_view_details">Visualizza Dettagli</string>
+    <string name="action_collapse">Comprimi</string>
+    <string name="action_expand">Espandi</string>
+    <string name="action_view_all">Vedi tutto</string>
+    <string name="action_retry">Riprova</string>
+    <string name="action_back">Indietro</string>
+    <string name="action_sort">Ordina</string>
+    <string name="action_filter">Filtra</string>
+    <string name="action_set_as_primary">Setta come primario</string>
+    <string name="action_call">Chiama</string>
+    <string name="action_send_email">Invia Email</string>
+    <string name="action_contact">Contatta</string>
+    <string name="action_login">Accedi</string>
+    <string name="action_logout">Disconnetti</string>
+
+
+    <!-- DO NOT TRANSLATE THESE -->
+    <string translatable="false" name="intent_action_mailto">mailto:%1$s</string>
+    <string translatable="false" name="intent_action_dial">tel:%1$s</string>
+
+
+
+    <!-- Labels -->
+    <string name="label_saving">Salvataggio</string>
+    <string name="label_updating">Aggiornamento</string>
+    <string name="label_deleting">Eliminazione</string>
+    <string name="label_exporting">Esportazione</string>
+    <string name="label_importing">Importazione</string>
+    <string name="label_creating">C1reazione</string>
+    <string name="label_ordering">Ordinamento</string>
+    <string name="label_filtering">Filtraggio</string>
+    <string name="label_assist_chip_not_active">INATTIVO</string>
+    <string name="label_maintenance">Manutenzione</string>
+    <string name="label_assistance">Assistenza</string>
+    <string name="label_priority">Priorità</string>
+    <string name="label_active">Attivo</string>
+    <string name="label_actives">Attivi</string>
+    <string name="label_not_active">Non attivo</string>
+    <string name="label_not_actives">Non attivi</string>
+    <string name="label_valid">Valido</string>
+    <string name="label_invalid">Non Valido</string>
+    <string name="label_preferred">Preferito</string>
+    <string name="label_unavailable">—</string>
+
+
+
+
+    <!-- Forms -->
+    <string name="field_title">Titolo</string>
+    <string name="field_description">Descrizione</string>
+    <string name="field_notes">Note</string>
+    <string name="field_company_name">Nome Azienda</string>
+    <string name="field_contact_person">Persona di Contatto</string>
+    <string name="field_email">Email</string>
+    <string name="field_phone">Telefono</string>
+    <string name="field_address">Indirizzo</string>
+    <string name="field_technician_name">Nome Tecnico</string>
+    <string name="field_employee_id">ID Dipendente</string>
+    <string name="field_island_id">ID Isola</string>
+    <string name="field_location">Ubicazione</string>
+    <string name="field_installation_date">Data Installazione</string>
+    <string name="field_last_maintenance">Ultima Manutenzione</string>
+    <string name="field_warranty_status">Stato Garanzia</string>
+    <string name="field_maintenance_type">Tipo Manutenzione</string>
+    <string name="field_scheduled_date">Data Programmata</string>
+    <string name="field_duration">Durata</string>
+    <string name="field_username">Username</string>
+    <string name="field_password">Password</string>
+
+    <!-- Messages -->
+    <string name="msg_checkup_created">Check-up creato con successo</string>
+    <string name="msg_checkup_updated">Check-up aggiornato</string>
+    <string name="msg_checkup_deleted">Check-up eliminato</string>
+    <string name="msg_photo_added">Foto aggiunta</string>
+    <string name="msg_photo_deleted">Foto eliminata</string>
+    <string name="msg_export_success">Export completato con successo</string>
+    <string name="msg_export_error">Errore durante l\'export</string>
+    <string name="msg_saving">Salvataggio in corso…</string>
+    <string name="msg_loading">Caricamento…</string>
+    <string name="msg_delete_multi_confirmation">Cancellare %1$d elementi?</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Si è verificato un errore</string>
+    <string name="error_network">Errore di connessione</string>
+    <string name="error_permission_camera">Permesso camera necessario</string>
+    <string name="error_permission_storage">Permesso storage necessario</string>
+    <string name="error_file_not_found">File non trovato</string>
+    <string name="error_invalid_data">Dati non validi</string>
+    <string name="error_export_failed">Export fallito</string>
+    <string name="error_server">Errore server</string>
+    <string name="error_no_connection">Nessuna connessione di rete</string>
+
+    <!-- Empty states -->
+    <string name="empty_checkups">Nessun check-up disponibile</string>
+    <string name="empty_photos">Nessuna foto</string>
+    <string name="empty_notes">Nessuna nota</string>
+
+    <!-- Progress -->
+    <string name="progress_completion">Completamento: %1$d%%</string>
+    <string name="progress_items_completed">%1$d di %2$d completati</string>
+
+    <!-- Export -->
+    <string name="export_title">Esporta Report</string>
+    <string name="export_format_word">Documento Word</string>
+    <string name="export_format_pdf">Documento PDF</string>
+    <string name="export_include_photos">Includi foto nel documento</string>
+    <string name="export_filename">Nome file</string>
+
+    <!-- Photo captions -->
+    <string name="photo_caption_hint">Aggiungi didascalia…</string>
+    <string name="photo_timestamp">Scattata il %1$s</string>
+    <string name="photo_filesize">Dimensione: %1$s</string>
+
+    <!-- Accessibility -->
+    <string name="cd_photo">Foto del check item</string>
+    <string name="cd_status_icon">Icona stato</string>
+    <string name="cd_criticality_icon">Icona criticità</string>
+    <string name="cd_module_icon">Icona modulo</string>
+    <string name="cd_delete_photo">Elimina foto</string>
+    <string name="cd_edit_photo">Modifica foto</string>
+    <string name="cd_take_photo">Scatta foto</string>
+    <string name="cd_show_password">Mostra password</string>
+    <string name="cd_hide_password">Nascondi password</string>
+
+    <!-- Content descriptions for screen readers -->
+    <string name="cd_navigation_home">Naviga alla home</string>
+    <string name="cd_navigation_checkups">Naviga alla lista di check-up</string>
+    <string name="cd_create_checkup">Crea nuovo check-up</string>
+    <string name="cd_checkup_progress">Progresso check-up</string>
+
+
+
+
+
+
+    <!-- ======================================================= -->
+    <!-- QReportErrorState                                        -->
+    <!-- ======================================================= -->
+
+    <string name="error_state_title">Errore</string>
+    <string name="error_state_action_dismiss">Chiudi</string>
+    <string name="error_state_action_retry">Riprova</string>
+
+    <!-- ======================================================= -->
+    <!-- QReportFilterChipRow                                        -->
+    <!-- ======================================================= -->
+
+    <string name="filter_chip_row_remove_filter">Rimuovi filtro</string>
+    <string name="filter_chip_row_remove_sort">Rimuovi ordinamento</string>
+    <string name="filter_chip_row_filter_label">Filtro: %1$s</string>
+    <string name="filter_chip_row_sort_label">Ordine: %1$s</string>
+
+    <!-- ======================================================= -->
+    <!-- QReportSearchBar                                         -->
+    <!-- ======================================================= -->
+
+    <string name="search_bar_placeholder">Cerca…</string>
+    <string name="search_bar_cd_search">Cerca</string>
+    <string name="search_bar_cd_clear_search">Cancella ricerca</string>
+    <string name="search_bar_cd_clear">Cancella</string>
+    <string name="search_bar_cd_filters">Filtri</string>
+
+    <!-- ======================================================= -->
+    <!-- QrDatePickerField / QrDatePickerDialog                   -->
+    <!-- ======================================================= -->
+
+    <string name="date_picker_placeholder">Seleziona data</string>
+
+    <!-- ======================================================= -->
+    <!-- PrimaryBadge                                             -->
+    <!-- ======================================================= -->
+
+    <string name="primary_badge_label">Primario</string>
+
+    <!-- ======================================================= -->
+    <!-- QReportConfirmDeleteDialog                               -->
+    <!-- ======================================================= -->
+
+    <string name="confirm_delete_dialog_title">Elimina %1$s</string>
+    <string name="confirm_delete_dialog_message">Sei sicuro di voler eliminare %1$s: %2$s?\nL\'operazione non può essere annullata.</string>
+
+</resources>

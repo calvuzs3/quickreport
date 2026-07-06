@@ -1,0 +1,1557 @@
+
+package net.calvuz.qreport.app.navigation
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavHostController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
+import net.calvuz.qreport.backup.presentation.ui.BackupScreen
+import net.calvuz.qreport.app.app.presentation.ui.home.HomeScreen
+import net.calvuz.qreport.app.app.presentation.ui.home.HomePreferencesScreen
+import net.calvuz.qreport.checkup.checkup.presentation.CheckUpListScreen
+import net.calvuz.qreport.checkup.checkup.presentation.NewCheckUpScreen
+import net.calvuz.qreport.checkup.checkup.presentation.CheckUpDetailScreen
+import net.calvuz.qreport.photo.presentation.ui.CameraScreen
+import net.calvuz.qreport.client.client.presentation.ui.ClientDetailScreen
+import net.calvuz.qreport.photo.presentation.ui.PhotoGalleryScreen
+import net.calvuz.qreport.settings.presentation.ui.SettingsScreen
+import net.calvuz.qreport.export.presentation.ui.ExportOptionsScreen
+import net.calvuz.qreport.client.client.presentation.ui.ClientListScreen
+import net.calvuz.qreport.client.client.presentation.ui.ClientFormScreen
+import net.calvuz.qreport.client.contact.presentation.ui.ContactFormScreen
+import net.calvuz.qreport.client.contact.presentation.ui.ContactListScreen
+import net.calvuz.qreport.client.facility.presentation.ui.FacilityDetailScreen
+import net.calvuz.qreport.client.facility.presentation.ui.FacilityFormScreen
+import net.calvuz.qreport.client.facility.presentation.ui.FacilityListScreen
+import net.calvuz.qreport.client.island.presentation.ui.IslandFormScreen
+import net.calvuz.qreport.client.island.presentation.ui.IslandDetailScreen
+import net.calvuz.qreport.client.island.presentation.ui.IslandListScreen
+import net.calvuz.qreport.client.island.presentation.ui.IslandTypesManagementScreen
+import net.calvuz.qreport.checkup.modules.presentation.ui.ModuleTypesManagementScreen
+import net.calvuz.qreport.checkup.modules.presentation.ui.ModuleIslandAssociationScreen
+import net.calvuz.qreport.checkup.checkup.presentation.ui.CheckUpSettingsScreen
+import net.calvuz.qreport.checkup.criticality.presentation.ui.CriticalityLevelsManagementScreen
+import net.calvuz.qreport.checkup.status.presentation.ui.CheckUpStatusesManagementScreen
+import net.calvuz.qreport.checkup.status.presentation.ui.CheckUpStatusTransitionsScreen
+import net.calvuz.qreport.checkup.items.presentation.ui.CheckItemTemplatesManagementScreen
+import net.calvuz.qreport.photo.presentation.ui.PhotoImportPreviewScreen
+import net.calvuz.qreport.settings.presentation.ui.TechnicianSettingsScreen
+import timber.log.Timber
+import java.net.URLDecoder
+import java.net.URLEncoder
+import androidx.core.net.toUri
+import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.ui.home.model.HomePkg
+import net.calvuz.qreport.app.error.presentation.UiText
+import net.calvuz.qreport.checkup.checkup.presentation.model.CheckupPkg
+import net.calvuz.qreport.client.client.presentation.model.ClientPkg
+import net.calvuz.qreport.client.contract.presentation.ui.ContractFormScreen
+import net.calvuz.qreport.client.contract.presentation.ui.ContractListScreen
+import net.calvuz.qreport.client.island.maintenance.presentation.ui.IslandHealthScreen
+import net.calvuz.qreport.client.island.maintenance.presentation.ui.MaintenanceLogFormScreen
+import net.calvuz.qreport.client.unit.presentation.ui.MechanicalUnitFormScreen
+import net.calvuz.qreport.client.unit.presentation.ui.MechanicalUnitListScreen
+import net.calvuz.qreport.settings.presentation.model.SettingsPkg
+import net.calvuz.qreport.sync.presentation.ui.SyncLoginScreen
+import net.calvuz.qreport.sync.presentation.ui.SyncSettingsScreen
+import net.calvuz.qreport.ti.presentation.ui.EditInterventionScreen
+import net.calvuz.qreport.ti.presentation.ui.TechnicalInterventionFormScreen
+import net.calvuz.qreport.ti.presentation.ui.TechnicalInterventionListScreen
+
+/**
+ * QReport Navigation System
+ *
+ * Manages the app's main navigation:
+ * - Bottom navigation bar with 4 primary destinations
+ * - Navigation Component for Compose
+ * - State management for the active destination
+ * - Full check-up creation and detail flow
+ */
+sealed class QReportDestination(
+    val route: String,
+    val title: UiText,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
+) {
+    object Home : QReportDestination(
+        route = QReportRoutes.HOME,
+        title = UiText.StringResource(R.string.route_home_title),
+        selectedIcon = HomePkg.icon,
+        unselectedIcon = HomePkg.icon_unselected
+    )
+
+    object Clients : QReportDestination(
+        route = QReportRoutes.CLIENTS,
+        title = UiText.StringResource(R.string.route_clients_title),
+        selectedIcon = ClientPkg.icon,
+        unselectedIcon = ClientPkg.iconUnselected
+    )
+
+    object CheckUps : QReportDestination(
+        route = QReportRoutes.CHECKUPS,
+        title = UiText.StringResource(R.string.route_checkups_title),
+        selectedIcon = CheckupPkg.icon,
+        unselectedIcon = CheckupPkg.icon_unselected
+    )
+
+    object Settings : QReportDestination(
+        route = QReportRoutes.SETTINGS,
+        title = UiText.StringResource(R.string.route_settings_title),
+        selectedIcon = SettingsPkg.icon,
+        unselectedIcon = SettingsPkg.icon_unselected
+    )
+}
+
+/**
+ * Routes for secondary navigation
+ */
+object QReportRoutes {
+    const val HOME = "home"
+    const val CLIENTS = "clients"
+    const val CHECKUPS = "checkups"
+    const val SETTINGS = "settings"
+    const val TI = "tis"
+
+    // Intervention routes
+    const val TI_CREATE = "ti_form?islandId={islandId}"
+    const val TI_EDIT = "ti_edit_form/{interventionId}"
+
+    // Settings routes
+    const val HOME_PREFERENCES = "home_preferences"
+    const val TECHNICIAN_SETTINGS = "technician_settings"
+    const val ISLAND_TYPES_MANAGEMENT = "island_types_management"
+    const val MODULE_TYPES_MANAGEMENT = "module_types_management"
+    const val CRITICALITY_LEVELS_MANAGEMENT = "criticality_levels_management"
+    const val CHECK_ITEM_TEMPLATES_MANAGEMENT = "check_item_templates_management"
+    const val MODULE_ISLAND_ASSOCIATION_MANAGEMENT = "module_island_association_management"
+    const val CHECKUP_STATUSES_MANAGEMENT = "checkup_statuses_management"
+    const val CHECKUP_STATUS_TRANSITIONS_MANAGEMENT = "checkup_status_transitions_management"
+
+    // Checkup settings routes
+    const val CHECKUP_SETTINGS = "checkup_settings"
+
+    // Sync routes
+    const val SYNC_SETTINGS = "sync_settings"
+    const val SYNC_LOGIN = "sync_login"
+
+    // Check-up management routes
+    const val CHECKUP_CREATE = "checkup_create?islandId={islandId}"
+    const val CHECKUP_DETAIL = "checkup_detail/{checkUpId}"
+    const val CAMERA = "camera/{checkItemId}"
+    const val PHOTO_GALLERY = "photo_gallery/{checkItemId}"
+    const val PHOTO_IMPORT_PREVIEW = "photo_import_preview/{checkItemId}?photoUri={photoUri}"
+    const val EXPORT_OPTIONS = "export_options/{checkUpId}"
+
+    // Client management routes
+    const val CLIENT_DETAIL = "client_detail/{clientId}/{clientName}"
+    const val CLIENT_CREATE = "client_create"
+    const val CLIENT_EDIT = "client_edit/{clientId}"
+
+    // Contact routes
+    const val CONTACT_LIST = "contacts/{clientId}/{clientName}"
+    const val CONTACT_CREATE = "contact_form/{clientId}/{clientName}"
+    const val CONTACT_EDIT = "contact_form/{clientId}/{clientName}/{contactId}"
+
+    // Contract routes
+    const val CONTRACT_LIST = "contracts/{clientId}/{clientName}"
+    const val CONTRACT_CREATE = "contract_form/{clientId}/{clientName}"
+    const val CONTRACT_EDIT = "contract_form/{clientId}/{clientName}/{contractId}"
+
+    // Facility routes
+    const val FACILITY_LIST = "facilities/{clientId}"
+    const val FACILITY_DETAIL = "facility_detail/{clientId}/{facilityId}"
+    const val FACILITY_CREATE = "facility_form/{clientId}"
+    const val FACILITY_EDIT = "facility_form/{clientId}/{facilityId}"
+
+    // Island routes
+    const val ISLAND_LIST = "islands/{facilityId}"
+    const val ISLAND_LIST_ALL = "islands_all" // No facility filter — shows all islands
+    const val ISLAND_DETAIL = "island_detail/{facilityId}/{islandId}"
+    const val ISLAND_CREATE = "island_form/{facilityId}"
+    const val ISLAND_EDIT = "island_form/{facilityId}/{islandId}"
+
+    // Unit routes
+    const val UNIT_LIST = "units/{islandId}"
+    const val UNIT_CREATE = "unit_form/{islandId}"
+    const val UNIT_EDIT = "unit_form/{islandId}/{unitId}"
+
+    // Maintenance log routes
+    const val MAINTENANCE_LOG_CREATE = "maintenance_log_form/{islandId}"
+    const val ISLAND_HEALTH = "island_health/{islandId}"
+
+    // Backup routes
+    const val BACKUP = "backup"
+
+    // ------------------------------------------------------------
+    // Helper functions
+    // ------------------------------------------------------------
+
+    private fun String.encodeUrl(): String = URLEncoder.encode(this, "UTF-8")
+
+    // Intervention
+    fun ti() = "tis"
+    fun tiCreateRoute(islandId: String? = null) =
+        if (islandId != null) "ti_form?islandId=$islandId" else "ti_form"
+    fun tiEditRoute(interventionId: String) = "ti_edit_form/$interventionId"
+
+    // Client
+    fun clientDetail(clientId: String, clientName: String) =
+        "client_detail/$clientId/$clientName"
+
+    fun clientEdit(clientId: String) =
+        "client_edit/$clientId"
+
+    // Contact
+    fun contactCreateRoute(clientId: String, clientName: String) =
+        "contact_form/$clientId/${clientName.encodeUrl()}"
+
+    fun contactEditRoute(clientId: String, clientName: String, contactId: String?) =
+        "contact_form/$clientId/${clientName.encodeUrl()}/$contactId"
+
+    fun contactListRoute(clientId: String, clientName: String) =
+        "contacts/$clientId/${clientName.encodeUrl()}"
+
+    // Contract
+    fun contractListRoute(clientId: String, clientName: String) =
+        "contracts/$clientId/${clientName.encodeUrl()}"
+
+    fun contractCreateRoute(clientId: String, clientName: String) =
+        "contract_form/$clientId/${clientName.encodeUrl()}"
+
+    fun contractEditRoute(clientId: String, clientName: String, contractId: String?) =
+        "contract_form/$clientId/${clientName.encodeUrl()}/$contractId"
+
+    // Facility
+    fun facilityListRoute(clientId: String) =
+        "facilities/$clientId"
+
+    fun facilityEditRoute(clientId: String, facilityId: String) =
+        "facility_form/$clientId/$facilityId"
+
+    fun facilityDetailRoute(clientId: String, savedFacilityId: String) =
+        "facility_detail/$clientId/$savedFacilityId"
+
+    fun facilityCreateRoute(clientId: String) =
+        "facility_form/$clientId"
+
+    // Island
+    fun islandListRoute(facilityId: String) = "islands/$facilityId"
+
+    fun islandDetailRoute(facilityId: String, islandId: String) =
+        "island_detail/$facilityId/$islandId"
+
+    fun islandCreateRoute(facilityId: String) = "island_form/$facilityId"
+
+    fun islandEditRoute(facilityId: String, islandId: String) =
+        "island_form/$facilityId/$islandId"
+
+    // Unit
+    fun unitList(islandId: String) = "units/$islandId"
+    fun unitAdd(islandId: String) = "unit_form/$islandId"
+    fun unitEdit(islandId: String, unitId: String) = "unit_form/$islandId/$unitId"
+
+    // Maintenance log
+    fun maintenanceLogCreateRoute(islandId: String) = "maintenance_log_form/$islandId"
+    fun islandHealthRoute(islandId: String) = "island_health/$islandId"
+
+    // Check-up
+    fun checkUpCreateRoute(islandId: String? = null) =
+        if (islandId != null) "checkup_create?islandId=$islandId" else "checkup_create"
+    fun checkupDetail(checkUpId: String) = "checkup_detail/$checkUpId"
+    fun camera(checkItemId: String) = "camera/$checkItemId"
+    fun photoGallery(checkItemId: String) = "photo_gallery/$checkItemId"
+    fun photoImportCreateRoute(checkItemId: String, photoUri: String) =
+        "photo_import_preview/$checkItemId?photoUri=$photoUri"
+
+    fun exportOptions(checkUpId: String) = "export_options/$checkUpId"
+}
+
+/**
+ * List of bottom navigation destinations
+ */
+val bottomNavDestinations = listOf(
+    QReportDestination.Home,
+    QReportDestination.Clients,
+    QReportDestination.CheckUps,
+    QReportDestination.Settings
+)
+
+/**
+ * Main navigation composable
+ */
+@Composable
+fun QReportNavigation(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+) {
+    Column(modifier = modifier) {
+        // Main content area
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = QReportRoutes.HOME,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // ============================================================
+                // MAIN DESTINATIONS (Bottom Navigation)
+                // ============================================================
+
+                composable(QReportRoutes.HOME) {
+                    HomeScreen(
+                        onNavigateToCheckUps = {
+                            navController.navigate(QReportRoutes.CHECKUPS)
+                        },
+                        onNavigateToClients = {
+                            navController.navigate(QReportRoutes.CLIENTS)
+                        },
+                        onNavigateToIslands = {
+                            navController.navigate(QReportRoutes.ISLAND_LIST_ALL)
+                        },
+                        onNavigateToIslandDetail = { facilityId, islandId ->
+                            navController.navigate(QReportRoutes.islandDetailRoute(facilityId, islandId))
+                        },
+
+                        onNavigateToNewCheckUp = {
+                            navController.navigate(QReportRoutes.CHECKUP_CREATE)
+                        },
+                        onNavigateToTechnicalInterventions = {
+                            navController.navigate(QReportRoutes.TI)
+                        },
+                        onNavigateToCheckUpDetail = { checkUpId ->
+                            navController.navigate(QReportRoutes.checkupDetail(checkUpId))
+                        },
+                        onNavigateToHomePreferences = {
+                            navController.navigate(QReportRoutes.HOME_PREFERENCES)
+                        }
+                    )
+                }
+
+                composable(QReportRoutes.HOME_PREFERENCES) {
+                    HomePreferencesScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.CLIENTS) {
+                    ClientListScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToClientDetail = { clientId, clientName ->
+                            navController.navigate(
+                                QReportRoutes.clientDetail(
+                                    clientId,
+                                    clientName
+                                )
+                            )
+                        },
+                        onNavigateToEditClient = { clientId ->
+                            navController.navigate(QReportRoutes.clientEdit(clientId))
+                        },
+                        onCreateNewClient = {
+                            navController.navigate(QReportRoutes.CLIENT_CREATE)
+                        }
+                    )
+                }
+
+                composable(QReportRoutes.CHECKUPS) {
+                    CheckUpListScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToCheckUpDetail = { checkUpId ->
+                            navController.navigate(QReportRoutes.checkupDetail(checkUpId))
+                        },
+                        onNavigateToEditCheckUp = { checkUpId ->
+                            navController.navigate(QReportRoutes.checkupDetail(checkUpId))
+                        },
+                        onCreateNewCheckUp = {
+                            navController.navigate(QReportRoutes.CHECKUP_CREATE)
+                        },
+                        onNavigateToCheckUpSettings = {
+                            navController.navigate(QReportRoutes.CHECKUP_SETTINGS)
+                        }
+                    )
+                }
+
+                composable(QReportRoutes.SETTINGS) {
+                    SettingsScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToBackup = {
+                            navController.navigate(QReportRoutes.BACKUP)
+                        },
+                        onNavigateToTechnicianSettings = {
+                            navController.navigate(QReportRoutes.TECHNICIAN_SETTINGS)
+                        },
+                        onNavigateToSyncSettings = {
+                            navController.navigate(QReportRoutes.SYNC_SETTINGS)
+                        },
+                        onNavigateToHomePreferences = {
+                            navController.navigate(QReportRoutes.HOME_PREFERENCES)
+                        }
+                    )
+                }
+
+                composable(QReportRoutes.CHECKUP_SETTINGS) {
+                    CheckUpSettingsScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToIslandTypes = {
+                            navController.navigate(QReportRoutes.ISLAND_TYPES_MANAGEMENT)
+                        },
+                        onNavigateToModuleTypes = {
+                            navController.navigate(QReportRoutes.MODULE_TYPES_MANAGEMENT)
+                        },
+                        onNavigateToCriticalityLevels = {
+                            navController.navigate(QReportRoutes.CRITICALITY_LEVELS_MANAGEMENT)
+                        },
+                        onNavigateToCheckItemTemplates = {
+                            navController.navigate(QReportRoutes.CHECK_ITEM_TEMPLATES_MANAGEMENT)
+                        },
+                        onNavigateToModuleIslandAssociation = {
+                            navController.navigate(QReportRoutes.MODULE_ISLAND_ASSOCIATION_MANAGEMENT)
+                        },
+                        onNavigateToCheckUpStatuses = {
+                            navController.navigate(QReportRoutes.CHECKUP_STATUSES_MANAGEMENT)
+                        },
+                        onNavigateToCheckUpStatusTransitions = {
+                            navController.navigate(QReportRoutes.CHECKUP_STATUS_TRANSITIONS_MANAGEMENT)
+                        }
+                    )
+                }
+
+                composable(QReportRoutes.ISLAND_TYPES_MANAGEMENT) {
+                    IslandTypesManagementScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.MODULE_TYPES_MANAGEMENT) {
+                    ModuleTypesManagementScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.CRITICALITY_LEVELS_MANAGEMENT) {
+                    CriticalityLevelsManagementScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.CHECK_ITEM_TEMPLATES_MANAGEMENT) {
+                    CheckItemTemplatesManagementScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.MODULE_ISLAND_ASSOCIATION_MANAGEMENT) {
+                    ModuleIslandAssociationScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.CHECKUP_STATUSES_MANAGEMENT) {
+                    CheckUpStatusesManagementScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.CHECKUP_STATUS_TRANSITIONS_MANAGEMENT) {
+                    CheckUpStatusTransitionsScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(QReportRoutes.TI) {
+                    TechnicalInterventionListScreen(
+                        onNavigateToCreateIntervention = {
+                            navController.navigate(QReportRoutes.tiCreateRoute())
+                        },
+                        onNavigateToEditIntervention = { interventionId ->
+                            navController.navigate(QReportRoutes.tiEditRoute(interventionId))
+                        },
+                        onNavigateBack = {
+                            navController.navigate(QReportRoutes.HOME) {
+                                popUpTo(QReportRoutes.HOME) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                // ============================================================
+                // INTERVENTION DESTINATIONS
+                // ============================================================
+
+                composable(
+                    route = QReportRoutes.TI_CREATE,
+                    arguments = listOf(
+                        navArgument("islandId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        }
+                    )
+                ) {
+                    TechnicalInterventionFormScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onInterventionSaved = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = QReportRoutes.TI_EDIT,
+                    arguments = listOf(
+                        navArgument("interventionId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) {
+                    val tiID = it.arguments?.getString("interventionId") ?: ""
+
+                    EditInterventionScreen(
+                        interventionId = tiID,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+
+                // ============================================================
+                // SETTINGS DESTINATIONS
+                // ============================================================
+
+                composable(QReportRoutes.TECHNICIAN_SETTINGS) {
+                    TechnicianSettingsScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+
+                // ============================================================
+                // SYNC DESTINATIONS
+                // ============================================================
+
+                composable(QReportRoutes.SYNC_SETTINGS) {
+                    SyncSettingsScreen(
+                        onNavigateBack = {
+                            navController.popBackStack() },
+                        onNavigateToLogin = { navController.navigate(QReportRoutes.SYNC_LOGIN) }
+                    )
+                }
+
+                composable(QReportRoutes.SYNC_LOGIN) {
+                    SyncLoginScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onLoginSuccess = {
+                            navController.popBackStack()
+                            // Refresh login state in SyncSettingsViewModel
+                        }
+                    )
+                }
+
+                // ============================================================
+                // CHECK-UP MANAGEMENT DESTINATIONS
+                // ============================================================
+
+                // New Check-up Creation
+                composable(
+                    QReportRoutes.CHECKUP_CREATE,
+                    arguments = listOf(
+                        navArgument("islandId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        }
+                    )
+                ) {
+                    NewCheckUpScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onNavigateToCheckUpDetail = { checkUpId ->
+                            // Navigate to detail and clear creation from stack
+                            navController.navigate(QReportRoutes.checkupDetail(checkUpId)) {
+                                popUpTo(QReportRoutes.CHECKUPS) {
+                                    inclusive = false
+                                }
+                            }
+                        }
+                    )
+                }
+
+                // Check-up Detail
+                composable(
+                    route = QReportRoutes.CHECKUP_DETAIL,
+                    arguments = listOf(
+                        navArgument("checkUpId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val checkUpId = backStackEntry.arguments?.getString("checkUpId") ?: ""
+
+                    CheckUpDetailScreen(
+                        checkUpId = checkUpId,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onNavigateToCamera = { checkItemId ->
+                            navController.navigate(QReportRoutes.camera(checkItemId))
+                        },
+                        onNavigateToPhotoGallery = { checkItemId ->
+                            navController.navigate(QReportRoutes.photoGallery(checkItemId))
+                        },
+                        onNavigateToExportOptions = { checkUpId ->
+                            navController.navigate(QReportRoutes.exportOptions(checkUpId))
+                        },
+                        onNavigateToDeleteCheckUp = {
+                            // Navigate back to checkup list after delete
+                            navController.navigate(QReportRoutes.CHECKUPS) {
+                                popUpTo(QReportRoutes.checkupDetail(checkUpId)) {
+                                    inclusive = true // Remove checkup detail from stack
+                                }
+                            }
+                        }
+                    )
+                }
+
+                // Camera
+                composable(
+                    route = QReportRoutes.CAMERA,
+                    arguments = listOf(
+                        navArgument("checkItemId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val checkItemId = backStackEntry.arguments?.getString("checkItemId") ?: ""
+
+                    CameraScreen(
+                        checkItemId = checkItemId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onPhotoSaved = {
+                            // Go back after saving the photo
+                            navController.popBackStack()
+                        }
+                    )
+                }
+
+                composable(
+                    route = QReportRoutes.PHOTO_GALLERY,
+                    arguments = listOf(
+                        navArgument("checkItemId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val checkItemId = backStackEntry.arguments?.getString("checkItemId") ?: ""
+
+                    PhotoGalleryScreen(
+                        checkItemId = checkItemId,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onNavigateToCamera = {
+                            navController.navigate(QReportRoutes.camera(checkItemId))
+                        },
+                        onNavigateToPhotoImport = { photoUri ->
+                            navController.navigate(
+                                QReportRoutes.photoImportCreateRoute(
+                                    checkItemId,
+                                    photoUri.toString()
+                                )
+                            )
+                        }
+                    )
+                }
+
+                // Photo Import Preview Screen
+                composable(
+                    route = QReportRoutes.PHOTO_IMPORT_PREVIEW,
+                    arguments = listOf(
+                        navArgument("checkItemId") { type = NavType.StringType },
+                        navArgument("photoUri") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val checkItemId =
+                        backStackEntry.arguments?.getString("checkItemId") ?: return@composable
+                    val photoUriString =
+                        backStackEntry.arguments?.getString("photoUri") ?: return@composable
+
+                    val photoUri = photoUriString.toUri()
+
+                    PhotoImportPreviewScreen(
+                        checkItemId = checkItemId,
+                        photoUri = photoUri,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onImportSuccess = {
+                            // Return to gallery after a successful import
+                            navController.popBackStack()
+                        }
+                    )
+                }
+
+                composable(
+                    route = QReportRoutes.EXPORT_OPTIONS,
+                    arguments = listOf(
+                        navArgument("checkUpId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val checkUpId = backStackEntry.arguments?.getString("checkUpId") ?: ""
+
+                    ExportOptionsScreen(
+                        checkUpId = checkUpId,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+
+                // ============================================================
+                // CLIENT MANAGEMENT DESTINATIONS
+                // ============================================================
+
+                composable(
+                    route = QReportRoutes.CLIENT_DETAIL,
+                    arguments = listOf(
+                        navArgument("clientId") { type = NavType.StringType },
+                        navArgument("clientName") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val clientName = backStackEntry.arguments?.getString("clientName") ?: ""
+
+                    ClientDetailScreen(
+                        clientId = clientId,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onDeleteClient = {
+                            // Navigate back to client list after delete
+                            navController.navigate(QReportRoutes.CLIENTS) {
+                                popUpTo(QReportRoutes.clientDetail(clientId, clientName)) {
+                                    inclusive = true // Remove client detail from stack
+                                }
+                            }
+                        },
+                        onNavigateToEdit = { clientId ->
+                            navController.navigate(QReportRoutes.clientEdit(clientId))
+                        },
+                        onNavigateToContactList = { clientId, clientName ->
+                            navController.navigate(
+                                QReportRoutes.contactListRoute(clientId, clientName)
+                            )
+                        },
+                        onNavigateToCreateContact = { clientId, clientName ->
+                            navController.navigate(
+                                QReportRoutes.contactCreateRoute(clientId, clientName)
+                            )
+                        },
+                        onNavigateToEditContact = { contactId ->
+                            navController.navigate(
+                                QReportRoutes.contactEditRoute(clientId, clientName, contactId)
+                            )
+                        },
+                        onNavigateToContactDetail = { },
+                        onNavigateToContractList = { clientId, clientName ->
+                            navController.navigate(
+                                QReportRoutes.contractListRoute(clientId, clientName)
+                            )
+                        },
+                        onNavigateToCreateContract = { clientId, clientName ->
+                            navController.navigate(
+                                QReportRoutes.contractCreateRoute(clientId, clientName)
+                            )
+                        },
+                        onNavigateToEditContract = { contractId ->
+                            navController.navigate(
+                                QReportRoutes.contractEditRoute(clientId, clientName, contractId)
+                            )
+                        },
+                        onNavigateToFacilityList = { clientId ->
+                            navController.navigate(QReportRoutes.facilityListRoute(clientId))
+                        },
+                        onNavigateToCreateFacility = { clientId ->
+                            navController.navigate(QReportRoutes.facilityCreateRoute(clientId))
+                        },
+                        onNavigateToEditFacility = { clientId, facilityId ->
+                            navController.navigate(
+                                QReportRoutes.facilityEditRoute(clientId, facilityId)
+                            )
+                        },
+                        onNavigateToFacilityDetail = { clientId, facilityId ->
+                            navController.navigate(
+                                QReportRoutes.facilityDetailRoute(clientId, facilityId)
+                            )
+                        },
+                        onNavigateToIslandDetail = { facilityId, islandId ->
+                            navController.navigate(
+                                QReportRoutes.islandDetailRoute(facilityId, islandId)
+                            )
+                        },
+                        onNavigateToCreateCheckUp = {
+                            navController.navigate(
+                                QReportRoutes.checkUpCreateRoute()
+                            )
+                        },
+                    )
+                }
+
+                // Client Create
+                composable(QReportRoutes.CLIENT_CREATE) {
+                    ClientFormScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onClientSaved = { clientId, clientName ->
+                            navController.popBackStack()
+//                            navController.navigate(
+//                                QReportRoutes.clientDetail(clientId, clientName)
+//                            ) {
+//                                popUpTo(QReportRoutes.CLIENTS) {
+//                                    inclusive = false
+//                                }
+//                            }
+                        }
+                    )
+                }
+
+                // Client Edit
+                composable(
+                    route = QReportRoutes.CLIENT_EDIT,
+                    arguments = listOf(
+                        navArgument("clientId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+
+                    ClientFormScreen(
+                        clientId = clientId,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onClientSaved = { clientId, clientName ->
+                            navController.popBackStack()
+//                            navController.navigate(
+//                                QReportRoutes.clientDetail(clientId, clientName)
+//                            ) {
+//                                popUpTo(QReportRoutes.CLIENTS) {
+//                                    inclusive = false
+//                                }
+//                            }
+                        }
+                    )
+                }
+
+                // ============================================================
+                // CONTACT DESTINATIONS
+                // ============================================================
+
+                // CREATE
+                composable(
+                    QReportRoutes.CONTACT_CREATE,
+                    arguments = listOf(
+                        navArgument("clientId") { type = NavType.StringType },
+                        navArgument("clientName") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val clientName = backStackEntry.arguments?.getString("clientName")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: "Customer"
+
+                    ContactFormScreen(
+                        clientId = clientId,
+                        clientName = clientName,
+                        contactId = null,
+                        onNavigateBack = { navController.popBackStack() },
+                        onContactSaved = { newContactId ->
+                            if (newContactId.isNotBlank()) {
+                                navController.navigate(
+                                    QReportRoutes.contactListRoute(
+                                        clientId,
+                                        clientName,
+                                        //newContactId
+                                    )
+                                ) {
+                                    popUpTo(QReportRoutes.CLIENTS) {
+                                        inclusive = false
+                                    }
+                                }
+                            } else {
+                                Timber.e("🔥 COMPOSABLE: ContactId is empty, cannot navigate!")
+                            }
+                        }
+                    )
+                }
+
+                // FORM SCREEN (Unified Create/Edit)
+                composable(
+                    route = QReportRoutes.CONTACT_EDIT,
+                    arguments = listOf(
+                        navArgument("clientId") { type = NavType.StringType },
+                        navArgument("clientName") { type = NavType.StringType },
+                        navArgument("contactId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        }
+                    )
+                ) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val contactId = backStackEntry.arguments?.getString("contactId") ?: ""
+                    val clientName = backStackEntry.arguments?.getString("clientName")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: "Customer" // Get clientName from route parameter
+
+                    ContactFormScreen(
+                        clientId = clientId,
+                        clientName = clientName,
+                        contactId = contactId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onContactSaved = { contactId ->
+                            // Go back
+                            navController.popBackStack()
+                        }
+                    )
+                }
+
+                // LIST
+                composable(
+                    route = QReportRoutes.CONTACT_LIST,
+                    arguments = listOf(
+                        navArgument("clientId") { type = NavType.StringType },
+                        navArgument("clientName") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val clientName = backStackEntry.arguments?.getString("clientName")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: "Customer"
+
+                    ContactListScreen(
+                        clientId = clientId,
+                        clientName = clientName,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToCreateContact = { clientId ->
+                            navController.navigate(
+                                QReportRoutes.contactCreateRoute(clientId, clientName)
+                            )
+                        },
+                        onNavigateToEditContact = { contactId ->
+                            navController.navigate(
+                                QReportRoutes.contactEditRoute(
+                                    clientId, clientName, contactId
+                                )
+                            )
+                        },
+                        onNavigateToContactDetail = {
+                        }
+                    )
+                }
+
+                // ============================================================
+                // CONTRACT DESTINATIONS
+                // ============================================================
+
+                composable(
+                    route = QReportRoutes.CONTRACT_LIST,
+                    arguments = listOf(
+                        navArgument("clientId") { type = NavType.StringType },
+                        navArgument("clientName") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val clientName = backStackEntry.arguments?.getString("clientName") ?: ""
+                    ContractListScreen(
+                        onNavigateToCreateContract = { contractId ->
+                            navController.navigate(
+                                QReportRoutes.contractCreateRoute(clientId, clientName)
+                            )
+                        },
+                        clientId = clientId,
+                        clientName = clientName,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToEditContract = { contractId ->
+                            navController.navigate(
+                                QReportRoutes.contractEditRoute(clientId, clientName, contractId)
+                            )
+                        },
+                    )
+                }
+
+                // CREATE
+                composable(
+                    QReportRoutes.CONTRACT_CREATE,
+                    arguments = listOf(
+                        navArgument("clientId") { type = NavType.StringType },
+                        navArgument("clientName") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val clientName = backStackEntry.arguments?.getString("clientName")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: "Customer"
+
+                    ContractFormScreen(
+                        clientId = clientId,
+                        clientName = clientName,
+                        contractId = null,
+                        onNavigateBack = { navController.popBackStack() },
+                        onContractSaved = { newId ->
+                            if (newId.isNotBlank()) {
+                                navController.navigate(
+                                    QReportRoutes.contractListRoute(
+                                        // TODO: eval a detail screen
+                                        clientId,
+                                        clientName,
+                                        //newId
+                                    )
+                                ) {
+                                    popUpTo(QReportRoutes.CLIENTS) {
+                                        inclusive = false
+                                    }
+                                }
+                            } else {
+                                Timber.e("🔥 COMPOSABLE: ContractId is empty, cannot navigate!")
+                            }
+                        }
+                    )
+                }
+
+                // FORM SCREEN (Unified Create/Edit)
+                composable(
+                    route = QReportRoutes.CONTRACT_EDIT,
+                    arguments = listOf(
+                        navArgument("clientId") { type = NavType.StringType },
+                        navArgument("clientName") { type = NavType.StringType },
+                        navArgument("contractId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        }
+                    )
+                ) { backStackEntry ->
+                    val contractId = backStackEntry.arguments?.getString("contractId") ?: ""
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val clientName = backStackEntry.arguments?.getString("clientName")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: "Customer" // Get clientName from route parameter
+
+                    ContractFormScreen(
+                        clientId = clientId,
+                        clientName = clientName,
+                        contractId = contractId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onContractSaved = { newId ->
+                            if (newId.isNotBlank()) {
+                                navController.navigate(
+                                    QReportRoutes.contractListRoute(
+                                        clientId,
+                                        clientName,
+                                        //newId
+                                    )
+                                ) {
+                                    popUpTo(QReportRoutes.CLIENTS) {
+                                        inclusive = false
+                                    }
+                                }
+                            } else {
+                                Timber.e("🔥 COMPOSABLE: ContractId is empty, cannot navigate!")
+                            }
+                        }
+                    )
+                }
+
+                // ============================================================
+                // FACILITY DESTINATIONS
+                // ============================================================
+
+                // 1. DETAIL
+                composable(QReportRoutes.FACILITY_DETAIL) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val facilityId = backStackEntry.arguments?.getString("facilityId") ?: ""
+
+                    FacilityDetailScreen(
+                        facilityId = facilityId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToEdit = { facilityId ->
+                            navController.navigate(
+                                QReportRoutes.facilityEditRoute(clientId, facilityId)
+                            )
+                        },
+                        onNavigateToCreateIsland = { facilityId ->
+                            navController.navigate(QReportRoutes.islandCreateRoute(facilityId))
+                        },
+                        onNavigateToEditIsland = { islandId ->
+                            navController.navigate(
+                                QReportRoutes.islandEditRoute(facilityId, islandId)
+                            )
+                        },
+                        onNavigateToIslandsList = { facilityId ->
+                            navController.navigate(QReportRoutes.islandListRoute(facilityId))
+                        },
+                        onNavigateToIslandDetail = { islandId ->
+                            navController.navigate(
+                                QReportRoutes.islandDetailRoute(facilityId, islandId)
+                            )
+                        },
+                        onDeleted = { navController.popBackStack() }
+                    )
+                }
+
+                // 2. CREATE
+                composable(QReportRoutes.FACILITY_CREATE) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+
+                    FacilityFormScreen(
+                        clientId = clientId,
+                        facilityId = null, // Create mode
+                        onNavigateBack = { navController.popBackStack() },
+                        onFacilitySaved = { savedFacilityId ->
+//                            navController.popBackStack()
+                            navController.navigate(
+                                QReportRoutes.facilityDetailRoute(
+                                    clientId,
+                                    savedFacilityId
+                                )
+                            ) {
+                                // TODO use the correct route, ClientDetail, once the clientName has been passed
+                                popUpTo(QReportRoutes.CLIENTS) { inclusive = false }
+                            }
+                        }
+                    )
+                }
+
+                // 3. EDIT
+                composable(QReportRoutes.FACILITY_EDIT) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+                    val facilityId = backStackEntry.arguments?.getString("facilityId") ?: ""
+
+                    FacilityFormScreen(
+                        clientId = clientId,
+                        facilityId = facilityId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onFacilitySaved = { savedFacilityId ->
+                            navController.popBackStack()
+//                            navController.navigate(
+//                                QReportRoutes.facilityDetailRoute(
+//                                    clientId,
+//                                    savedFacilityId
+//                                )
+//                            ) {
+//                                // TODO use the correct route, ClientDetail, once the clientName has been passed
+//                                popUpTo(QReportRoutes.CLIENTS) { inclusive = false }
+//                            }
+                        }
+                    )
+                }
+
+                // 4. LIST
+                composable(QReportRoutes.FACILITY_LIST) { backStackEntry ->
+                    val clientId = backStackEntry.arguments?.getString("clientId") ?: ""
+
+                    FacilityListScreen(
+                        clientId = clientId,
+                        onNavigateToFacilityDetail = { facilityId ->
+                            navController.navigate(
+                                QReportRoutes.facilityDetailRoute(clientId, facilityId)
+                            )
+                        },
+                        onCreateNewFacility = {
+                            navController.navigate(QReportRoutes.facilityCreateRoute(clientId))
+                        },
+                        onEditFacility = { facilityId ->
+                            navController.navigate(
+                                QReportRoutes.facilityEditRoute(clientId, facilityId)
+                            )
+                        },
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // ============================================================
+                // ISLAND DESTINATIONS
+                // ============================================================
+
+                // 1. CREATE
+                composable(
+                    QReportRoutes.ISLAND_CREATE,
+                    arguments = listOf(
+                        navArgument("facilityId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val facilityId = backStackEntry.arguments?.getString("facilityId") ?: ""
+
+                    IslandFormScreen(
+                        facilityId = facilityId,
+                        facilityName = "", // Let ViewModel handle facilityName lookup
+                        islandId = null, // Create mode
+                        onNavigateBack = { navController.popBackStack() },
+                        onIslandSaved = { savedIslandId ->
+//                            navController.popBackStack()
+                            navController.navigate(
+                                QReportRoutes.islandDetailRoute(
+                                    facilityId,
+                                    savedIslandId
+                                )
+                            ) {
+                                // TODO use the correct route, FacilityDetail, once the clientName has been passed
+                                popUpTo(QReportRoutes.CLIENTS) { inclusive = false }
+                            }
+                        }
+                    )
+                }
+
+                // 2. EDIT
+                composable(
+                    QReportRoutes.ISLAND_EDIT,
+                    arguments = listOf(
+                        navArgument("facilityId") { type = NavType.StringType },
+                        navArgument("islandId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val facilityId = backStackEntry.arguments?.getString("facilityId") ?: ""
+                    val islandId = backStackEntry.arguments?.getString("islandId") ?: ""
+
+                    IslandFormScreen(
+                        facilityId = facilityId,
+                        facilityName = "", // Let ViewModel handle facilityName lookup
+                        islandId = islandId, // Edit mode
+                        onNavigateBack = { navController.popBackStack() },
+                        onIslandSaved = { savedIslandId ->
+                            navController.popBackStack()
+//                            navController.navigate(
+//                                QReportRoutes.islandDetailRoute(
+//                                    facilityId,
+//                                    savedIslandId
+//                                )
+//                            ) {
+//                                // TODO use the correct route, FacilityDetail, once the clientName has been passed
+//                                popUpTo(QReportRoutes.CLIENTS) { inclusive = false }
+//                            }
+                        }
+                    )
+                }
+
+                // 3. DETAIL
+                composable(
+                    QReportRoutes.ISLAND_DETAIL,
+                    arguments = listOf(
+                        navArgument("facilityId") { type = NavType.StringType },
+                        navArgument("islandId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val facilityId = backStackEntry.arguments?.getString("facilityId") ?: ""
+                    val islandId = backStackEntry.arguments?.getString("islandId") ?: ""
+
+                    IslandDetailScreen(
+                        facilityId = facilityId,
+                        islandId = islandId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToEdit = { facilityId, islandId ->
+                            navController.navigate(
+                                QReportRoutes.islandEditRoute(
+                                    facilityId,
+                                    islandId
+                                )
+                            )
+                        },
+//                        onNavigateToMaintenance = { islandId ->
+//                            // TODO: Navigate to maintenance screen when implemented
+//                        },
+                        onNavigateToCreateUnit = { islandId ->
+                            navController.navigate(
+                                QReportRoutes.unitAdd(
+                                    islandId
+                                )
+                            )
+                        },
+                        onNavigateToEditUnit = { unitId ->
+                            navController.navigate(
+                                QReportRoutes.unitEdit(
+                                    islandId, unitId
+                                )
+                            )
+                        },
+                        onNavigateToUnitList = { islandId ->
+                            navController.navigate(QReportRoutes.unitList(islandId))
+                        },
+                        onIslandDeleted = {
+                            navController.popBackStack()
+                        },
+                        // Maintenance log
+                        onNavigateToCreateMaintenanceLog = { iId ->
+                            // islandName is resolved by IslandDetailViewModel;
+                            navController.navigate(
+                                QReportRoutes.maintenanceLogCreateRoute(iId)
+                            )
+                        },
+                        onNavigateToIslandHealth = { iId ->
+                            navController.navigate(QReportRoutes.islandHealthRoute(iId))
+                        },
+                        onNavigateToCreateCheckUp = { iId ->
+                            navController.navigate(QReportRoutes.checkUpCreateRoute(iId))
+                        },
+                        onNavigateToCreateIntervention = { iId ->
+                            navController.navigate(QReportRoutes.tiCreateRoute(iId))
+                        }
+                    )
+                }
+
+                // 4. LIST
+                composable(
+                    QReportRoutes.ISLAND_LIST,
+                    arguments = listOf(
+                        navArgument("facilityId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val facilityId = backStackEntry.arguments?.getString("facilityId") ?: ""
+
+                    IslandListScreen(
+                        facilityId = facilityId,
+                        facilityName = "", // Let ViewModel handle facilityName lookup
+                        onNavigateToIslandDetail = { islandId ->
+                            navController.navigate(
+                                QReportRoutes.islandDetailRoute(
+                                    facilityId,
+                                    islandId
+                                )
+                            )
+                        },
+                        onCreateNewIsland = {
+                            navController.navigate(QReportRoutes.islandCreateRoute(facilityId))
+                        },
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // 4b. LIST ALL — no facility filter, navigated from HomeScreen
+                composable(QReportRoutes.ISLAND_LIST_ALL) {
+                    IslandListScreen(
+                        facilityId = "", // blank = load all islands
+                        facilityName = "",
+                        onNavigateToIslandDetail = { islandId ->
+                            navController.navigate(
+                                QReportRoutes.islandDetailRoute("", islandId)
+                            )
+                        },
+                        onCreateNewIsland = {
+                            navController.navigate(QReportRoutes.islandCreateRoute(""))
+                        },
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // ============================================================
+                // UNIT DESTINATIONS
+                // ============================================================
+
+                // Unit list
+                composable(
+                    route = QReportRoutes.UNIT_LIST,
+                    arguments = listOf(navArgument("islandId") { type = NavType.StringType })
+                ) { backStack ->
+                    val islandId = backStack.arguments?.getString("islandId")!!
+
+                    MechanicalUnitListScreen(
+                        islandId = islandId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToAdd = {
+                            navController.navigate(QReportRoutes.unitAdd(islandId))
+                        },
+                        onNavigateToEdit = { unitId ->
+                            navController.navigate(QReportRoutes.unitEdit(islandId, unitId))
+                        }
+                    )
+                }
+
+                // Unit create
+                composable(
+                    route = QReportRoutes.UNIT_CREATE,
+                    arguments = listOf(navArgument("islandId") { type = NavType.StringType })
+                ) {
+                    MechanicalUnitFormScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // Unit edit
+                composable(
+                    route = QReportRoutes.UNIT_EDIT,
+                    arguments = listOf(
+                        navArgument("islandId") { type = NavType.StringType },
+                        navArgument("unitId") { type = NavType.StringType }
+                    )
+                ) {
+                    MechanicalUnitFormScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // ============================================================
+                // MAINTENANCE LOG DESTINATIONS
+                // ============================================================
+
+                // Create maintenance log
+                composable(
+                    route = QReportRoutes.MAINTENANCE_LOG_CREATE,
+                    arguments = listOf(
+                        navArgument("islandId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val islandId = backStackEntry.arguments?.getString("islandId") ?: ""
+
+                    MaintenanceLogFormScreen(
+                        islandId       = islandId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onLogSaved     = { navController.popBackStack() }
+                    )
+                }
+
+                // Island health analysis
+                composable(
+                    route = QReportRoutes.ISLAND_HEALTH,
+                    arguments = listOf(
+                        navArgument("islandId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val islandId = backStackEntry.arguments?.getString("islandId") ?: ""
+
+                    IslandHealthScreen(
+                        islandId       = islandId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // ============================================================
+                // BACKUP DESTINATIONS
+                // ============================================================
+
+                composable(QReportRoutes.BACKUP) {
+                    BackupScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            }
+        } // END OF BOX
+
+        // Bottom Navigation Bar (only for main destinations)
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+        val currentRoute = currentDestination?.route
+
+        // Hide bottom nav for secondary destinations
+        val shouldShowBottomNav = when (currentRoute) {
+            QReportRoutes.HOME,
+            QReportRoutes.CLIENTS,
+            QReportRoutes.CHECKUPS,
+            QReportRoutes.SETTINGS -> true
+
+            else -> false
+        }
+
+        if (shouldShowBottomNav) {
+            QReportBottomNavigation(
+                navController = navController,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+/**
+ * Bottom Navigation Bar
+ */
+@Composable
+fun QReportBottomNavigation(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    NavigationBar(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
+        bottomNavDestinations.forEach { destination ->
+            val isSelected = currentDestination?.hierarchy?.any {
+                it.route == destination.route
+            } == true
+
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = if (isSelected) {
+                            destination.selectedIcon
+                        } else {
+                            destination.unselectedIcon
+                        },
+                        contentDescription = destination.title.asString()
+                    )
+                },
+                label = {
+                    Text(
+                        text = destination.title.asString(),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = isSelected,
+                onClick = {
+                    if (destination.route == QReportRoutes.HOME) {
+                        // For Home, navigate without saving/restoring state
+                        navController.navigate(destination.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = false
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+                            // NO saveState nor restoreState
+                        }
+                    } else {
+                        navController.navigate(destination.route) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
+                        }
+                    }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+        }
+    }
+}

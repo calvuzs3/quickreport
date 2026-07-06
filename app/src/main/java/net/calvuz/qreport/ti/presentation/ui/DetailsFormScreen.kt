@@ -1,0 +1,497 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package net.calvuz.qreport.ti.presentation.ui
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QrFormField
+
+/**
+ * Form screen for editing intervention details:
+ * - Intervention Description
+ * - Materials Used (DDT + 6 fixed items)
+ * - External Report
+ * - Completion flag
+ *
+ * UPDATED: Unified card styling matching WorkDayFormScreen and SignaturesFormScreen
+ */
+@Suppress("ParamsComparedByRef")
+@Composable
+fun DetailsFormScreen(
+    interventionId: String,
+    modifier: Modifier = Modifier,
+    viewModel: DetailsFormViewModel = hiltViewModel()
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding()
+            .verticalScroll(scrollState)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+
+        // Dirty state indicator
+        if (state.isDirty) {
+            DirtyStateIndicator(
+                message = stringResource(R.string.intervention_general_unsaved_changes),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Auto-save indicator
+        if (state.isSaving) {
+            AutoSaveIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Error display
+        state.errorMessage?.let { errorMessage ->
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    Text(
+                        text = errorMessage.asString(),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        }
+
+        // ===== INTERVENTION DESCRIPTION SECTION =====
+        InterventionDescriptionSection(
+            description = state.interventionDescription,
+            onDescriptionChange = viewModel::updateInterventionDescription,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // ===== MATERIALS USED SECTION =====
+        MaterialsUsedSection(
+            ddtNumber = state.ddtNumber,
+            onDdtNumberChange = viewModel::updateDdtNumber,
+            ddtDate = state.ddtDate,
+            onDdtDateChange = viewModel::updateDdtDate,
+            materialItems = state.materialItems,
+            onMaterialItemChange = viewModel::updateMaterialItem,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // ===== EXTERNAL REPORT SECTION =====
+        ExternalReportSection(
+            reportNumber = state.externalReportNumber,
+            onReportNumberChange = viewModel::updateExternalReportNumber,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // ===== COMPLETION SECTION =====
+        CompletionSection(
+            isComplete = state.isComplete,
+            onCompletionChange = viewModel::updateCompletionStatus,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        // Bottom spacing
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun InterventionDescriptionSection(
+    description: String,
+    onDescriptionChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Section header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Description,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.intervention_details_section_description),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            QrFormField(
+                value = description,
+                onValueChange = onDescriptionChange,
+                label = stringResource(R.string.intervention_details_description_label),
+                placeholder = stringResource(R.string.intervention_details_description_placeholder),
+                singleLine = false,
+                minLines = 5,
+                maxLines = 10
+            )
+        }
+    }
+}
+
+@Composable
+private fun MaterialsUsedSection(
+    ddtNumber: String,
+    onDdtNumberChange: (String) -> Unit,
+    ddtDate: String,
+    onDdtDateChange: (String) -> Unit,
+    materialItems: List<MaterialItemState>,
+    onMaterialItemChange: (Int, String, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Section header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Inventory,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.intervention_details_section_materials),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            // DDT Reference
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                QrFormField(
+                    value = ddtNumber,
+                    onValueChange = onDdtNumberChange,
+                    label = stringResource(R.string.intervention_details_ddt_number_label),
+                    placeholder = stringResource(R.string.intervention_details_ddt_number_placeholder),
+                    modifier = Modifier.weight(1f)
+                )
+
+                QrFormField(
+                    value = ddtDate,
+                    onValueChange = onDdtDateChange,
+                    label = stringResource(R.string.intervention_details_ddt_date_label),
+                    placeholder = stringResource(R.string.intervention_details_ddt_date_placeholder),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            HorizontalDivider()
+
+            // Material Items (Fixed 6 rows)
+            Text(
+                text = stringResource(R.string.intervention_details_materials_max_rows),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            repeat(6) { index ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.intervention_details_material_item_label, index + 1),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            QrFormField(
+                                value = if (index < materialItems.size) materialItems[index].quantity else "",
+                                onValueChange = { newQuantity ->
+                                    val currentDescription = if (index < materialItems.size) materialItems[index].description else ""
+                                    onMaterialItemChange(index, newQuantity, currentDescription)
+                                },
+                                label = stringResource(R.string.intervention_details_material_quantity_label),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.width(80.dp)
+                            )
+
+                            QrFormField(
+                                value = if (index < materialItems.size) materialItems[index].description else "",
+                                onValueChange = { newDescription ->
+                                    val currentQuantity = if (index < materialItems.size) materialItems[index].quantity else ""
+                                    onMaterialItemChange(index, currentQuantity, newDescription)
+                                },
+                                label = stringResource(R.string.field_description),
+                                placeholder = stringResource(R.string.intervention_details_material_description_placeholder),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExternalReportSection(
+    reportNumber: String,
+    onReportNumberChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Section header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.Assignment,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.intervention_details_section_external_report),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            QrFormField(
+                value = reportNumber,
+                onValueChange = onReportNumberChange,
+                label = stringResource(R.string.intervention_details_report_number_label),
+                placeholder = stringResource(R.string.intervention_details_report_number_placeholder)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompletionSection(
+    isComplete: Boolean,
+    onCompletionChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Section header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.intervention_details_section_completion),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            // Completion toggle card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isComplete)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.surfaceVariant
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Switch(
+                        checked = isComplete,
+                        onCheckedChange = onCompletionChange
+                    )
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (isComplete) stringResource(R.string.intervention_details_completed_title)
+                            else stringResource(R.string.intervention_details_in_progress_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = if (isComplete)
+                                stringResource(R.string.intervention_details_completed_description)
+                            else
+                                stringResource(R.string.intervention_details_in_progress_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    if (isComplete) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Data class for material item state
+ */
+data class MaterialItemState(
+    val quantity: String = "",
+    val description: String = ""
+)
+
+/**
+ * Dirty state indicator component
+ */
+@Composable
+private fun DirtyStateIndicator(
+    message: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+    }
+}
+
+/**
+ * Auto-save indicator component
+ */
+@Composable
+private fun AutoSaveIndicator(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Text(
+                text = stringResource(R.string.msg_saving),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+    }
+}

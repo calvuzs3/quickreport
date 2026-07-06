@@ -1,0 +1,314 @@
+package net.calvuz.qreport.checkup.checkup.presentation
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import net.calvuz.qreport.app.app.presentation.ui.theme.Spacing
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.calvuz.qreport.R
+import net.calvuz.qreport.checkup.checkup.presentation.components.CheckupCard
+import net.calvuz.qreport.checkup.checkup.presentation.model.CheckUpFilter
+import net.calvuz.qreport.checkup.checkup.presentation.model.CheckUpSortOrder
+import net.calvuz.qreport.checkup.checkup.presentation.model.CheckUpWithStats
+import net.calvuz.qreport.checkup.checkup.presentation.model.getDisplayName
+import net.calvuz.qreport.checkup.status.domain.model.CheckUpStatusMaster
+import net.calvuz.qreport.app.error.presentation.asUiText
+import net.calvuz.qreport.app.app.presentation.components.ActiveFiltersChipRow
+import net.calvuz.qreport.app.app.presentation.components.EmptyState
+import net.calvuz.qreport.app.app.presentation.components.ErrorDialog
+import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
+import net.calvuz.qreport.app.app.presentation.components.QReportPullToRefresh
+import net.calvuz.qreport.app.app.presentation.components.QReportSearchBar
+import net.calvuz.qreport.settings.domain.model.ListViewMode
+import net.calvuz.qreport.settings.presentation.model.getCardVariantDescription
+import net.calvuz.qreport.settings.presentation.model.getCardVariantIcon
+
+/**
+ * Check up list Screen
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CheckUpListScreen(
+    onNavigateBack: () -> Unit,
+    onNavigateToCheckUpDetail: (String) -> Unit,
+    onNavigateToEditCheckUp: (String) -> Unit,
+    onCreateNewCheckUp: () -> Unit,
+    onNavigateToCheckUpSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: CheckUpListViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        // Top App Bar con ricerca
+        TopAppBar(
+            title = { Text(stringResource(R.string.checkup_screen_list_title)) },
+            navigationIcon = {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBackIosNew,
+                        contentDescription = stringResource(R.string.client_form_action_back)
+                    )
+                }
+            },
+            actions = {
+                var showFilterMenu by remember { mutableStateOf(false) }
+                var showSortMenu by remember { mutableStateOf(false) }
+
+                // View mode toggle button
+                IconButton(onClick = viewModel::cycleCardVariant) {
+                    Icon(
+                        imageVector = uiState.cardVariant.getCardVariantIcon(),
+                        contentDescription = uiState.cardVariant.getCardVariantDescription()
+                    )
+                }
+
+                // Sort button
+                IconButton(onClick = { showSortMenu = true }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.Sort,
+                        contentDescription = stringResource(R.string.checkup_screen_list_action_sort)
+                    )
+                }
+
+                IconButton(onClick = { showFilterMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = stringResource(R.string.checkup_screen_list_action_filter)
+                    )
+                }
+
+                // Checkup settings (module/criticality/template/island-type master data)
+                IconButton(onClick = onNavigateToCheckUpSettings) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.checkup_screen_list_action_settings)
+                    )
+                }
+
+                // Filter menu
+                FilterMenu(
+                    expanded = showFilterMenu,
+                    selectedFilter = uiState.selectedFilter,
+                    statusMasters = uiState.statusMasters,
+                    onFilterSelected = viewModel::updateFilter,
+                    onDismiss = { showFilterMenu = false }
+                )
+
+                // Sort menu
+                SortMenu(
+                    expanded = showSortMenu,
+                    selectedSort = uiState.checkUpSortOrder,
+                    onSortSelected = viewModel::updateSortOrder,
+                    onDismiss = { showSortMenu = false }
+                )
+            }
+        )
+
+        // Search bar usando component riutilizzabile
+        QReportSearchBar(
+            query = uiState.searchQuery,
+            onQueryChange = viewModel::updateSearchQuery,
+            placeholder = stringResource(R.string.checkup_screen_list_search_placeholder),
+            modifier = Modifier.padding(Spacing.lg)
+        )
+
+        // Filter chips
+        if (uiState.selectedFilter != CheckUpFilter.ALL || uiState.checkUpSortOrder != CheckUpSortOrder.RECENT_FIRST) {
+            ActiveFiltersChipRow(
+                selectedFilter = uiState.selectedFilter.getDisplayName(uiState.statusMasters),
+                avoidFilter = CheckUpFilter.ALL.getDisplayName(uiState.statusMasters),
+                selectedSort = uiState.checkUpSortOrder.getDisplayName(),
+                avoidSort = CheckUpSortOrder.RECENT_FIRST.getDisplayName(),
+                onClearFilter = { viewModel.updateFilter(CheckUpFilter.ALL) },
+                onClearSort = { viewModel.updateSortOrder(CheckUpSortOrder.RECENT_FIRST) },
+                modifier = Modifier.padding(horizontal = Spacing.lg)
+            )
+        }
+
+        QReportPullToRefresh(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = viewModel::refresh,
+            modifier = Modifier.fillMaxSize()
+        ) {
+
+
+            // Store error in local variable to avoid smart cast issues
+            val currentError = uiState.error
+
+            when {
+                uiState.isLoading -> {
+                    QrLoadingState()
+                }
+
+                currentError != null -> {
+                    ErrorDialog(
+                        onDismiss = viewModel::dismissError,
+                        message = "",
+                        title = currentError.asUiText().asString(),
+                    )
+                }
+
+                uiState.filteredCheckUps.isEmpty() -> {
+                    val (title, message) = when {
+                        uiState.checkUps.isEmpty() -> {
+                            stringResource(R.string.checkup_screen_list_empty_title) to
+                                    stringResource(R.string.checkup_screen_list_empty_message)
+                        }
+
+                        uiState.selectedFilter != CheckUpFilter.ALL -> {
+                            stringResource(R.string.checkup_screen_list_empty_no_results_title) to
+                                    stringResource(
+                                        R.string.checkup_screen_list_empty_no_results_message,
+                                        uiState.selectedFilter.getDisplayName(uiState.statusMasters)
+                                    )
+                        }
+
+                        else -> {
+                            stringResource(R.string.checkup_screen_list_empty_error_title) to
+                                    stringResource(R.string.checkup_screen_list_empty_error_message)
+                        }
+                    }
+                    EmptyState(
+                        textTitle = title,
+                        textMessage = message,
+                        iconImageVector = Icons.AutoMirrored.Filled.Assignment,
+                        iconContentDescription = stringResource(R.string.checkup_screen_list_empty_icon_content_desc),
+                        iconActionImageVector = Icons.Default.Add,
+                        iconActionContentDescription = stringResource(R.string.checkup_screen_list_fab_new),
+                        textAction = stringResource(R.string.checkup_screen_list_action_new),
+                        onAction = onCreateNewCheckUp
+                    )
+                }
+
+                else -> {
+                    CheckupListContent(
+                        checkups = uiState.filteredCheckUps,
+                        statusMasters = uiState.statusMasters,
+                        variant = uiState.cardVariant,
+                        onClick = onNavigateToCheckUpDetail,
+                        onEdit = onNavigateToEditCheckUp,
+                        onDelete = {}
+                    )
+                }
+            }
+
+            // FAB
+            FloatingActionButton(
+                onClick = onCreateNewCheckUp,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(Spacing.lg)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.checkup_screen_list_fab_new)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CheckupListContent(
+    checkups: List<CheckUpWithStats>,
+    statusMasters: List<CheckUpStatusMaster>,
+    onClick: (String) -> Unit,
+    onEdit: (String) -> Unit,
+    onDelete: (String) -> Unit,
+    variant: ListViewMode
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        // Extra bottom padding so the FAB doesn't cover the last item
+        contentPadding = PaddingValues(start = Spacing.lg, top = Spacing.lg, end = Spacing.lg, bottom = 88.dp),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+    ) {
+        items(
+            items = checkups,
+            key = { it.checkUp.id }
+        ) { checkupWithStats ->
+            CheckupCard(
+                checkup = checkupWithStats.checkUp,
+                stats = checkupWithStats.statistics,
+                statusMaster = statusMasters.find { it.id == checkupWithStats.checkUp.status },
+                onClick = { onClick(checkupWithStats.checkUp.id) },
+                onEdit = { onEdit(checkupWithStats.checkUp.id) },
+                //onDelete = { onDelete(checkupWithStats.checkUp.id) },
+                onDelete = null,
+                variant = variant
+            )
+        }
+    }
+}
+
+@Composable
+private fun SortMenu(
+    expanded: Boolean,
+    selectedSort: CheckUpSortOrder,
+    onSortSelected: (CheckUpSortOrder) -> Unit,
+    onDismiss: () -> Unit
+) {
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss
+    ) {
+        CheckUpSortOrder.entries.forEach { checkupSortOrder ->
+            DropdownMenuItem(
+                text = { Text(checkupSortOrder.getDisplayName()) },
+                onClick = {
+                    onSortSelected(checkupSortOrder)
+                    onDismiss()
+                },
+                leadingIcon = if (selectedSort == checkupSortOrder) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null
+            )
+        }
+    }
+}
+
+@Composable
+private fun FilterMenu(
+    expanded: Boolean,
+    selectedFilter: CheckUpFilter,
+    statusMasters: List<CheckUpStatusMaster>,
+    onFilterSelected: (CheckUpFilter) -> Unit,
+    onDismiss: () -> Unit
+) {
+
+    val filters = listOf(CheckUpFilter.ALL) +
+        statusMasters.sortedBy { it.sortOrder }.map { CheckUpFilter(it.id) }
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismiss
+    ) {
+        filters.forEach { filter ->
+            DropdownMenuItem(
+                text = { Text(filter.getDisplayName(statusMasters)) },
+                onClick = {
+                    onFilterSelected(filter)
+                    onDismiss()
+                },
+                leadingIcon = if (selectedFilter == filter) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null
+            )
+        }
+    }
+}
