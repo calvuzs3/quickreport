@@ -64,8 +64,11 @@ fun InfoTabContent(
 
             item { IslandBasicInfoCard(island = island, islandTypes = islandTypes) }
             statistics?.let { item { OperationalStatsCard(statistics = it) } }
-            item { WarrantyStatusCard(island = island, statistics = statistics) }
-            item { PerformanceMetricsCard(statistics = statistics) }
+            // Garanzia: feature marginale/non ancora in uso — nessuna card se non c'è un dato.
+            if (island.warrantyExpiration != null) {
+                item { WarrantyStatusCard(island = island, statistics = statistics) }
+            }
+            statistics?.let { item { PerformanceMetricsCard(statistics = it) } }
         }
     }
 }

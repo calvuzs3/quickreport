@@ -79,7 +79,11 @@ interface CheckUpDao {
     @Query("UPDATE checkups SET is_deleted = 1, updated_at = :now WHERE id = :id")
     suspend fun softDeleteById(id: String, now: kotlinx.datetime.Instant)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // @Upsert (real UPDATE on conflict), not @Insert(REPLACE): CheckUpEntity is
+    // the parent of an onDelete=CASCADE FK from check_items (which in turn
+    // cascades to photos) — REPLACE's delete+reinsert on a checkup echoed back
+    // by sync would silently wipe its items and photos. See SyncDao.kt.
+    @Upsert
     suspend fun upsertAll(checkUps: List<CheckUpEntity>)
 
     @Query("UPDATE checkups SET synced_at = :now WHERE id IN (:ids)")

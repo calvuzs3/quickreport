@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusEntity
 import net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusTransitionCrossRef
@@ -79,7 +80,9 @@ interface CheckUpStatusDao {
 
     // ===== SYNC =====
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // @Upsert instead of @Insert(REPLACE): see SyncDao.kt for why REPLACE's
+    // delete+reinsert is unsafe for records echoed back on every sync.
+    @Upsert
     suspend fun upsertAll(statuses: List<CheckUpStatusEntity>)
 
     @Query("""

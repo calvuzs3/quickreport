@@ -3,6 +3,7 @@
 package net.calvuz.qreport.client.island.maintenance.presentation.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -76,6 +77,42 @@ fun MaintenanceLogFormScreen(
             dismissButton = {
                 TextButton(onClick = { onFormEvent(MaintenanceLogFormEvent.DismissUnsavedDialog) }) {
                     Text(stringResource(R.string.maint_form_unsaved_keep_editing))
+                }
+            }
+        )
+    }
+
+    // ── Save confirmation dialog ──────────────────────────────────────────────
+    if (uiState.showSaveConfirmation) {
+        AlertDialog(
+            onDismissRequest = { onFormEvent(MaintenanceLogFormEvent.DismissSaveConfirmation) },
+            title = { Text(stringResource(R.string.maint_form_save_confirmation_title)) },
+            text = {
+                Column {
+                    Text(stringResource(R.string.maint_form_save_confirmation_message))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            onFormEvent(MaintenanceLogFormEvent.UpdateMaintenanceOnSaveChanged(!uiState.updateMaintenanceOnSave))
+                        }
+                    ) {
+                        Checkbox(
+                            checked = uiState.updateMaintenanceOnSave,
+                            onCheckedChange = { onFormEvent(MaintenanceLogFormEvent.UpdateMaintenanceOnSaveChanged(it)) }
+                        )
+                        Text(stringResource(R.string.maint_form_save_update_maintenance_label))
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { onFormEvent(MaintenanceLogFormEvent.ConfirmSaveLog) }) {
+                    Text(stringResource(R.string.action_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onFormEvent(MaintenanceLogFormEvent.DismissSaveConfirmation) }) {
+                    Text(stringResource(R.string.action_cancel))
                 }
             }
         )

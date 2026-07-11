@@ -1,9 +1,8 @@
 package net.calvuz.qreport.sync.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import net.calvuz.qreport.client.client.data.local.entity.ClientEntity
 import net.calvuz.qreport.client.contact.data.local.entity.ContactEntity
 import net.calvuz.qreport.client.contract.data.local.entity.ContractEntity
@@ -75,7 +74,7 @@ interface SyncDao {
 
     @Query("""
         SELECT * FROM maintenance_logs
-        WHERE updated_at > COALESCE(synced_at, 0) AND is_deleted = 1
+        WHERE updated_at > COALESCE(synced_at, 0)
         ORDER BY updated_at ASC
     """)
     suspend fun getMaintenanceLogsPendingSync(): List<MaintenanceLogEntity>
@@ -110,29 +109,37 @@ interface SyncDao {
     // ===== UPSERT FROM SERVER — apply incoming records =====
 
     /**
-     * Insert or replace records received from the server.
-     * OnConflictStrategy.REPLACE implements last-write-wins:
-     * the incoming record overwrites the local one unconditionally.
+     * Insert or update records received from the server (last-write-wins).
+     *
+     * Uses `@Upsert`, NOT `@Insert(onConflict = REPLACE)`: on a primary-key
+     * conflict, REPLACE tells SQLite to DELETE the existing row and INSERT the
+     * new one — and several of these entities are the parent side of an
+     * `onDelete = CASCADE` foreign key (facility_islands -> maintenance_logs /
+     * mechanical_units, clients -> contacts/contracts/facilities, facilities ->
+     * facility_islands). Every sync round that echoes back an already-existing
+     * parent record (which happens on essentially every sync right after that
+     * record was pushed) would silently wipe all of its children. `@Upsert`
+     * performs a real UPDATE on conflict instead, never triggering the cascade.
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertClients(clients: List<ClientEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertContacts(contacts: List<ContactEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertContracts(contracts: List<ContractEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertFacilities(facilities: List<FacilityEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertFacilityIslands(islands: List<IslandEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertMechanicalUnits(units: List<MechanicalUnitEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertMaintenanceLogs(logs: List<MaintenanceLogEntity>)
 
     // ===== ID LOOKUPS — used by SyncUseCase to validate FK references before upsert =====

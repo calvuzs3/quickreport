@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import net.calvuz.qreport.client.document.data.local.entity.DocumentEntity
 
@@ -219,10 +220,12 @@ interface DocumentDao {
     suspend fun markSynced(id: String, syncedAt: Long)
 
     /**
-     * Bulk upsert used by sync pull — inserts new records and replaces
+     * Bulk upsert used by sync pull — inserts new records and updates
      * existing ones (last-write-wins via updated_at comparison at use case level).
+     * @Upsert instead of @Insert(REPLACE): see SyncDao.kt for why REPLACE's
+     * delete+reinsert is unsafe for records echoed back on every sync.
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun upsertDocuments(documents: List<DocumentEntity>)
 
     // =========================================================================

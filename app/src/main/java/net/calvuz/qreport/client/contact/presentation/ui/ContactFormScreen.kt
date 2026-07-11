@@ -23,14 +23,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import net.calvuz.qreport.client.contact.domain.model.ContactMethod
 import timber.log.Timber
 import net.calvuz.qreport.R
 import net.calvuz.qreport.client.contact.presentation.model.getDisplayName
-import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 /**
  * Screen per la creazione/modifica di un contatto
@@ -108,22 +109,6 @@ fun ContactFormScreen(
                         contentDescription = stringResource(R.string.action_back)
                     )
                 }
-            },
-            actions = {
-                // Save button
-                TextButton(
-                    onClick = viewModel::saveContact,
-                    enabled = uiState.canSave && !uiState.isSaving
-                ) {
-                    if (uiState.isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(stringResource(R.string.action_save))
-                    }
-                }
             }
         )
 
@@ -146,6 +131,7 @@ fun ContactFormScreen(
                 onNotesChange = viewModel::updateNotes,
                 onIsPrimaryChange = viewModel::updateIsPrimary,
                 onSave = viewModel::saveContact,
+                onCancel = onNavigateBack,
                 focusManager = focusManager
             )
         }
@@ -175,6 +161,7 @@ private fun ContactFormContent(
     onNotesChange: (String) -> Unit,
     onIsPrimaryChange: (Boolean) -> Unit,
     onSave: () -> Unit,
+    onCancel: () -> Unit,
     focusManager: FocusManager
 ) {
     Column(
@@ -242,7 +229,8 @@ private fun ContactFormContent(
             }
         }
 
-        // ===== DATI ANAGRAFICI =====
+        // ===== DATI ANAGRAFICI + RUOLO ===== (unificate: gruppi troppo
+        // piccoli per giustificare due card separate)
         ContactFormSection(title = stringResource(R.string.contact_form_section_data)) {
             // Nome (obbligatorio)
             QrFormField(
@@ -280,10 +268,7 @@ private fun ContactFormContent(
                     imeAction = ImeAction.Next
                 )
             )
-        }
 
-        // ===== RUOLO AZIENDALE =====
-        ContactFormSection(title = stringResource(R.string.contact_form_section_role)) {
             // Ruolo
             QrFormField(
                 value = uiState.role,
@@ -436,52 +421,32 @@ private fun ContactFormContent(
             }
         }
 
-        // ===== NOTE =====
-        ContactFormSection(title = stringResource(R.string.contact_form_section_note)) {
-            QrFormField(
-                value = uiState.notes,
-                onValueChange = onNotesChange,
-                label = stringResource(R.string.contact_form_field_notes),
-                placeholder = stringResource(R.string.contact_form_field_notes_placeholder),
-                singleLine = false,
-                minLines = 3,
-                maxLines = 6,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Sentences,
-                    imeAction = ImeAction.Done
-                )
+        // ===== NOTE ===== (campo singolo: nessuna card/titolo di sezione,
+        // la label del campo già dice "Note")
+        QrFormField(
+            value = uiState.notes,
+            onValueChange = onNotesChange,
+            label = stringResource(R.string.contact_form_field_notes),
+            placeholder = stringResource(R.string.contact_form_field_notes_placeholder),
+            singleLine = false,
+            minLines = 3,
+            maxLines = 6,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Done
             )
-        }
+        )
 
-        // ===== SAVE BUTTON =====
-        Button(
-            onClick = {
+        // ===== SAVE / CANCEL =====
+        QrFormActionsRow(
+            onCancel = onCancel,
+            onSave = {
                 focusManager.clearFocus()
                 onSave()
             },
-            enabled = uiState.canSave && !uiState.isSaving,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-        ) {
-            if (uiState.isSaving) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-            Text(
-                text = if (uiState.isSaving) {
-                    stringResource(R.string.label_saving)
-                } else if (uiState.isEditMode) {
-                    stringResource(R.string.label_updating)
-                } else {
-                    stringResource(R.string.label_creating)
-                }
-            )
-        }
+            saveEnabled = uiState.canSave,
+            isSaving = uiState.isSaving
+        )
 
         // Bottom spacing
         Spacer(modifier = Modifier.height(32.dp))
@@ -493,20 +458,23 @@ private fun ContactFormSection(
     title: String,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
+    QReportCard {
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            content = content
-        )
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                content = content
+            )
+        }
     }
 }
 

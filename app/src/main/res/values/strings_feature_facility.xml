@@ -67,6 +67,7 @@
     <string name="facility_form_title_edit">Modifica Stabilimento</string>
     <string name="facility_form_action_back">Indietro</string>
     <string name="facility_form_action_save">Salva</string>
+    <string name="facility_form_section_general">Dati Generali</string>
     <string name="facility_form_field_name">Nome Stabilimento *</string>
     <string name="facility_form_field_name_placeholder">Es. Stabilimento Principale</string>
     <string name="facility_form_field_code">Codice Interno</string>

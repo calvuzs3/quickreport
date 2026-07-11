@@ -31,6 +31,7 @@ import net.calvuz.qreport.client.facility.domain.usecase.GetFacilitiesByClientUs
 import net.calvuz.qreport.client.island.domain.usecase.GetIslandByIdUseCase
 import net.calvuz.qreport.client.island.domain.usecase.GetIslandsByFacilityUseCase
 import net.calvuz.qreport.client.island.domain.usecase.ObserveIslandTypesUseCase
+import net.calvuz.qreport.client.island.domain.usecase.UpdateMaintenanceUseCase
 import net.calvuz.qreport.photo.domain.usecase.CapturePhotoUseCase
 import net.calvuz.qreport.photo.domain.usecase.DeletePhotoUseCase
 import net.calvuz.qreport.photo.domain.usecase.GetCheckItemPhotosUseCase
@@ -81,6 +82,7 @@ class CheckUpDetailViewModel @Inject constructor(
     private val getAssociationsForCheckUpUseCase: GetAssociationsForCheckUpUseCase,
     private val removeCheckUpAssociationUseCase: RemoveCheckUpAssociationUseCase,
     private val observeIslandTypesUseCase: ObserveIslandTypesUseCase,
+    private val updateMaintenanceUseCase: UpdateMaintenanceUseCase,
     private val observeModuleTypesUseCase: ObserveModuleTypesUseCase,
     private val observeActiveCheckUpStatusesUseCase: ObserveActiveCheckUpStatusesUseCase,
 
@@ -335,17 +337,48 @@ class CheckUpDetailViewModel @Inject constructor(
         }
     }
 
+    fun showCompleteConfirmation() {
+        _uiState.update { it.copy(showCompleteConfirmation = true, updateMaintenanceOnComplete = true) }
+    }
+
+    fun hideCompleteConfirmation() {
+        _uiState.update { it.copy(showCompleteConfirmation = false) }
+    }
+
+    fun setUpdateMaintenanceOnComplete(value: Boolean) {
+        _uiState.update { it.copy(updateMaintenanceOnComplete = value) }
+    }
+
     fun completeCheckUp() {
+        val updateMaintenance = _uiState.value.updateMaintenanceOnComplete
         viewModelScope.launch {
             try {
-                val checkUpId = _uiState.value.checkUp?.id ?: return@launch
+                val checkUp = _uiState.value.checkUp ?: return@launch
+                val checkUpId = checkUp.id
                 Timber.d("Completing check-up: $checkUpId")
 
-                _uiState.value = _uiState.value.copy(isUpdating = true)
+                _uiState.value = _uiState.value.copy(isUpdating = true, showCompleteConfirmation = false)
 
                 when( val result = completeCheckUpUseCase(checkUpId)) {
                     is QrResult.Success -> {
                         Timber.d("Check-up finalized: ${result.data}")
+
+                        if (updateMaintenance) {
+                            _uiState.value.checkUpAssociations.forEach { association ->
+                                when (val maintenanceResult = updateMaintenanceUseCase(
+                                    islandId = association.islandId,
+                                    maintenanceDate = checkUp.header.checkUpDate
+                                )) {
+                                    is QrResult.Error -> Timber.w(
+                                        "Failed to update maintenance date for island ${association.islandId}: ${maintenanceResult.error}"
+                                    )
+                                    is QrResult.Success -> Timber.d(
+                                        "Maintenance date updated for island ${association.islandId}"
+                                    )
+                                }
+                            }
+                        }
+
                         // Reload to update status
                         reloadCheckUpData(checkUpId)
                     }

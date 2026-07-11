@@ -139,7 +139,9 @@ interface CheckUpAssociationDao {
     @Query("SELECT * FROM checkup_island_associations WHERE updated_at > COALESCE(synced_at, 0) ORDER BY updated_at ASC")
     suspend fun getPendingSync(): List<CheckUpIslandAssociationEntity>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // @Upsert instead of @Insert(REPLACE): see SyncDao.kt for why REPLACE's
+    // delete+reinsert is unsafe for records echoed back on every sync.
+    @Upsert
     suspend fun upsertAll(associations: List<CheckUpIslandAssociationEntity>)
 
     @Query("UPDATE checkup_island_associations SET synced_at = :now WHERE id IN (:ids)")

@@ -19,8 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,8 +44,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import net.calvuz.qreport.app.app.presentation.components.QrDatePickerField
+import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.R
 
@@ -112,26 +112,6 @@ fun ContractFormScreen(
                         contentDescription = stringResource(R.string.action_back)
                     )
                 }
-            },
-            actions = {
-                // Save button
-                IconButton(
-                    onClick = { viewModel.onFormEvent(ContractFormEvent.SaveForm) },
-                    enabled = uiState.canSave && !uiState.isSaving
-                ) {
-                    if (uiState.isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Icon(
-                            imageVector = if (uiState.canSave) Icons.Default.Save else Icons.Outlined.Save,
-                            contentDescription = stringResource(R.string.action_save),
-                            tint = if (uiState.canSave) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
             }
         )
 
@@ -144,6 +124,7 @@ fun ContractFormScreen(
                 onFormEvent = viewModel::onFormEvent,
 
                 onSave = { viewModel.onFormEvent(ContractFormEvent.SaveForm) },
+                onCancel = onNavigateBack,
                 focusManager = focusManager
             )
         }
@@ -164,6 +145,7 @@ private fun ContractFormContent(
     onFormEvent: (ContractFormEvent) -> Unit,
 
     onSave: () -> Unit,
+    onCancel: () -> Unit,
     focusManager: FocusManager
 ) {
     Column(
@@ -287,40 +269,17 @@ private fun ContractFormContent(
             }
         }
 
-        // ===== SAVE BUTTON =====
-        IconButton(
-            onClick = {
+        // ===== SAVE / CANCEL =====
+        QrFormActionsRow(
+            onCancel = onCancel,
+            onSave = {
                 focusManager.clearFocus()
                 onSave()
             },
-            enabled = uiState.canSave && !uiState.isSaving,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-        ) {
-            if (uiState.isSaving) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-            Icon(
-                imageVector = if (uiState.canSave) Icons.Default.Save else Icons.Outlined.Save,
-                contentDescription = stringResource(R.string.action_save),
-                tint = if (uiState.canSave) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = if (uiState.isSaving) {
-                    stringResource(R.string.label_saving)
-                } else if (uiState.isEditMode) {
-                    stringResource(R.string.action_update)
-                } else {
-                    stringResource(R.string.action_save)
-                }
-            )
-        }
+            saveEnabled = uiState.canSave,
+            isSaving = uiState.isSaving,
+            saveText = if (uiState.isEditMode) stringResource(R.string.action_update) else stringResource(R.string.action_save)
+        )
 
         // Bottom spacing
         Spacer(modifier = Modifier.height(32.dp))
@@ -335,19 +294,22 @@ private fun ContractFormSection(
     title: String,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
+    QReportCard {
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            content = content
-        )
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                content = content
+            )
+        }
     }
 }

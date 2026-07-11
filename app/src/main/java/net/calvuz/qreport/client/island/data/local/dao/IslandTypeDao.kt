@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import net.calvuz.qreport.client.island.data.local.entity.IslandTypeEntity
 
@@ -32,7 +33,10 @@ interface IslandTypeDao {
     @Query("SELECT * FROM island_types WHERE id = :id LIMIT 1")
     suspend fun getById(id: String): IslandTypeEntity?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // @Upsert (real UPDATE on conflict) instead of @Insert(REPLACE): sync pulls
+    // back an already-existing row on almost every round-trip, and REPLACE's
+    // delete+reinsert would risk cascading to any future FK children.
+    @Upsert
     suspend fun upsertAll(types: List<IslandTypeEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -16,11 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrDatePickerField
 import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.island.domain.model.IslandTypeMaster
-import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,14 +73,6 @@ fun IslandFormScreen(
                         contentDescription = stringResource(R.string.island_form_action_back)
                     )
                 }
-            },
-            actions = {
-                TextButton(
-                    onClick = { viewModel.onFormEvent(FacilityIslandFormEvent.SaveIsland) },
-                    enabled = uiState.isFormValid && !uiState.isLoading
-                ) {
-                    Text(stringResource(R.string.island_form_action_save))
-                }
             }
         )
 
@@ -89,7 +82,12 @@ fun IslandFormScreen(
                     CircularProgressIndicator()
                 }
             } else {
-                FacilityIslandFormContent(uiState = uiState, onFormEvent = viewModel::onFormEvent)
+                FacilityIslandFormContent(
+                    uiState = uiState,
+                    onFormEvent = viewModel::onFormEvent,
+                    onSave = { viewModel.onFormEvent(FacilityIslandFormEvent.SaveIsland) },
+                    onCancel = onNavigateBack
+                )
             }
             uiState.error?.let { LaunchedEffect(it) { viewModel.dismissError() } }
         }
@@ -99,7 +97,9 @@ fun IslandFormScreen(
 @Composable
 private fun FacilityIslandFormContent(
     uiState: FacilityIslandFormUiState,
-    onFormEvent: (FacilityIslandFormEvent) -> Unit
+    onFormEvent: (FacilityIslandFormEvent) -> Unit,
+    onSave: () -> Unit,
+    onCancel: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -113,7 +113,15 @@ private fun FacilityIslandFormContent(
         MaintenanceInfoSection(uiState = uiState, onFormEvent = onFormEvent)
         ConfigurationSection(uiState = uiState, onFormEvent = onFormEvent)
         NotesSection(uiState = uiState, onFormEvent = onFormEvent)
-        Spacer(modifier = Modifier.height(80.dp))
+
+        QrFormActionsRow(
+            onCancel = onCancel,
+            onSave = onSave,
+            saveEnabled = uiState.isFormValid,
+            isSaving = uiState.isLoading
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -122,7 +130,7 @@ private fun IslandBasicInfoSection(
     uiState: FacilityIslandFormUiState,
     onFormEvent: (FacilityIslandFormEvent) -> Unit
 ) {
-    Card {
+    QReportCard {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.island_form_section_basic), style = MaterialTheme.typography.titleMedium)
 
@@ -195,7 +203,7 @@ private fun TechnicalInfoSection(
     uiState: FacilityIslandFormUiState,
     onFormEvent: (FacilityIslandFormEvent) -> Unit
 ) {
-    Card {
+    QReportCard {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.island_form_section_technical), style = MaterialTheme.typography.titleMedium)
 
@@ -238,7 +246,7 @@ private fun MaintenanceInfoSection(
     uiState: FacilityIslandFormUiState,
     onFormEvent: (FacilityIslandFormEvent) -> Unit
 ) {
-    Card {
+    QReportCard {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.island_form_section_maintenance), style = MaterialTheme.typography.titleMedium)
 
@@ -263,7 +271,7 @@ private fun ConfigurationSection(
     uiState: FacilityIslandFormUiState,
     onFormEvent: (FacilityIslandFormEvent) -> Unit
 ) {
-    Card {
+    QReportCard {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.island_form_section_configuration), style = MaterialTheme.typography.titleMedium)
             Row(
@@ -293,23 +301,20 @@ private fun NotesSection(
     uiState: FacilityIslandFormUiState,
     onFormEvent: (FacilityIslandFormEvent) -> Unit
 ) {
-    Card {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(stringResource(R.string.island_form_section_notes), style = MaterialTheme.typography.titleMedium)
-            OutlinedTextField(
-                value = uiState.notes,
-                onValueChange = { onFormEvent(FacilityIslandFormEvent.NotesChanged(it)) },
-                label = { Text(stringResource(R.string.island_form_field_notes)) },
-                placeholder = { Text(stringResource(R.string.island_form_field_notes_placeholder)) },
-                isError = uiState.notesError != null,
-                supportingText = if (uiState.notesError != null) {
-                    { Text(uiState.notesError.asString()) }
-                } else {
-                    { Text(stringResource(R.string.island_form_field_notes_counter, uiState.notes.length, 1000)) }
-                },
-                maxLines = 4,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
+    // Campo singolo: nessuna card/titolo di sezione, la label del campo
+    // già dice "Note" (stessa scelta di Contact/Client per i campi isolati).
+    OutlinedTextField(
+        value = uiState.notes,
+        onValueChange = { onFormEvent(FacilityIslandFormEvent.NotesChanged(it)) },
+        label = { Text(stringResource(R.string.island_form_field_notes)) },
+        placeholder = { Text(stringResource(R.string.island_form_field_notes_placeholder)) },
+        isError = uiState.notesError != null,
+        supportingText = if (uiState.notesError != null) {
+            { Text(uiState.notesError.asString()) }
+        } else {
+            { Text(stringResource(R.string.island_form_field_notes_counter, uiState.notes.length, 1000)) }
+        },
+        maxLines = 4,
+        modifier = Modifier.fillMaxWidth()
+    )
 }

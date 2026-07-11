@@ -103,4 +103,9 @@
     <string name="maint_form_unsaved_discard">Abbandona</string>
     <string name="maint_form_unsaved_keep_editing">Continua a modificare</string>
 
+    <!-- ===== Save confirmation dialog ===== -->
+    <string name="maint_form_save_confirmation_title">Salva intervento</string>
+    <string name="maint_form_save_confirmation_message">Confermi il salvataggio dell\'intervento?</string>
+    <string name="maint_form_save_update_maintenance_label">Aggiorna data ultima manutenzione dell\'isola</string>
+
 </resources>

@@ -7,22 +7,23 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QReportFormAddressSection
 import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.facility.domain.model.FacilityType
 import timber.log.Timber
-import net.calvuz.qreport.app.app.presentation.components.QrTextButton as TextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,31 +72,6 @@ fun FacilityFormScreen(
                         contentDescription = stringResource(R.string.facility_form_action_back)
                     )
                 }
-            },
-            actions = {
-                IconButton(
-                    onClick = viewModel::saveFacility,
-                    enabled = uiState.isFormValid && !uiState.isLoading
-                ) {
-                    if (uiState.isSaving) {
-                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                    } else {
-                        Icon(
-                            imageVector = if (uiState.isFormValid) Icons.Default.Save else Icons.Outlined.Save,
-                            contentDescription = stringResource(R.string.facility_form_action_save),
-                            tint = if (uiState.isFormValid)
-                                MaterialTheme.colorScheme.onPrimary
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                TextButton(
-                    onClick = viewModel::saveFacility,
-                    enabled = uiState.isFormValid && !uiState.isLoading
-                ) {
-                    Text(stringResource(R.string.facility_form_button_save_text))
-                }
             }
         )
 
@@ -107,7 +83,9 @@ fun FacilityFormScreen(
             } else {
                 FacilityFormContent(
                     uiState = uiState,
-                    onFormEvent = viewModel::onFormEvent
+                    onFormEvent = viewModel::onFormEvent,
+                    onSave = viewModel::saveFacility,
+                    onCancel = onNavigateBack
                 )
             }
 
@@ -121,7 +99,9 @@ fun FacilityFormScreen(
 @Composable
 private fun FacilityFormContent(
     uiState: FacilityFormUiState,
-    onFormEvent: (FacilityFormEvent) -> Unit
+    onFormEvent: (FacilityFormEvent) -> Unit,
+    onSave: () -> Unit,
+    onCancel: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -130,52 +110,63 @@ private fun FacilityFormContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Name
-        QrFormField(
-            value = uiState.name,
-            onValueChange = { onFormEvent(FacilityFormEvent.NameChanged(it)) },
-            label = stringResource(R.string.facility_form_field_name),
-            placeholder = stringResource(R.string.facility_form_field_name_placeholder),
-            errorText = uiState.nameError?.asString()
-        )
+        // Dati Generali: nome, codice, tipo, note — un'unica card invece di
+        // quattro campi sciolti sul fondo pagina
+        QReportCard {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.facility_form_section_general),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
 
-        // Code
-        QrFormField(
-            value = uiState.code,
-            onValueChange = { onFormEvent(FacilityFormEvent.CodeChanged(it)) },
-            label = stringResource(R.string.facility_form_field_code),
-            placeholder = stringResource(R.string.facility_form_field_code_placeholder),
-            errorText = uiState.codeError?.asString()
-        )
+                QrFormField(
+                    value = uiState.name,
+                    onValueChange = { onFormEvent(FacilityFormEvent.NameChanged(it)) },
+                    label = stringResource(R.string.facility_form_field_name),
+                    placeholder = stringResource(R.string.facility_form_field_name_placeholder),
+                    errorText = uiState.nameError?.asString()
+                )
 
-        // Notes
-        QrFormField(
-            value = uiState.notes,
-            onValueChange = { onFormEvent(FacilityFormEvent.NotesChanged(it)) },
-            label = stringResource(R.string.facility_form_field_notes),
-            placeholder = stringResource(R.string.facility_form_field_notes_placeholder),
-            singleLine = false,
-            maxLines = 3
-        )
+                QrFormField(
+                    value = uiState.code,
+                    onValueChange = { onFormEvent(FacilityFormEvent.CodeChanged(it)) },
+                    label = stringResource(R.string.facility_form_field_code),
+                    placeholder = stringResource(R.string.facility_form_field_code_placeholder),
+                    errorText = uiState.codeError?.asString()
+                )
 
-        // Facility Type dropdown
-        QrDropdownField(
-            selected = uiState.facilityType,
-            options = FacilityType.entries,
-            label = stringResource(R.string.facility_form_field_type),
-            optionLabel = { stringResource(it.labelResId) },
-            onSelect = { onFormEvent(FacilityFormEvent.TypeChanged(it)) },
-            optionContent = { type ->
-                Column {
-                    Text(stringResource(type.labelResId))
-                    Text(
-                        text = stringResource(type.descriptionResId),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                QrDropdownField(
+                    selected = uiState.facilityType,
+                    options = FacilityType.entries,
+                    label = stringResource(R.string.facility_form_field_type),
+                    optionLabel = { stringResource(it.labelResId) },
+                    onSelect = { onFormEvent(FacilityFormEvent.TypeChanged(it)) },
+                    optionContent = { type ->
+                        Column {
+                            Text(stringResource(type.labelResId))
+                            Text(
+                                text = stringResource(type.descriptionResId),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                )
+
+                QrFormField(
+                    value = uiState.notes,
+                    onValueChange = { onFormEvent(FacilityFormEvent.NotesChanged(it)) },
+                    label = stringResource(R.string.facility_form_field_notes),
+                    placeholder = stringResource(R.string.facility_form_field_notes_placeholder),
+                    singleLine = false,
+                    maxLines = 3
+                )
             }
-        )
+        }
 
         // Address
         QReportFormAddressSection(
@@ -194,7 +185,7 @@ private fun FacilityFormContent(
         )
 
         // Options
-        Card {
+        QReportCard {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -224,6 +215,13 @@ private fun FacilityFormContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(80.dp))
+        QrFormActionsRow(
+            onCancel = onCancel,
+            onSave = onSave,
+            saveEnabled = uiState.isFormValid,
+            isSaving = uiState.isSaving
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

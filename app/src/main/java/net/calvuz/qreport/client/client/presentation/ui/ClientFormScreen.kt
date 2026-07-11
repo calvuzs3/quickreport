@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.app.app.presentation.components.QReportFormAddressSection
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import timber.log.Timber
@@ -84,17 +85,6 @@ fun ClientFormScreen(
                         contentDescription = stringResource(R.string.client_form_action_back)
                     )
                 }
-            },
-            actions = {
-                IconButton(
-                    onClick = viewModel::saveClient,
-                    enabled = uiState.canSave && !uiState.isSaving
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Save,
-                        contentDescription = stringResource(R.string.client_form_action_save)
-                    )
-                }
             }
         )
 
@@ -119,25 +109,18 @@ fun ClientFormScreen(
                 }
             } else {
 
-                // Section 1: Company Data
+                // Section 1: Company Data (nome + note — un solo campo a testa
+                // non giustifica due card separate, ognuna col proprio titolo)
                 item {
                     CompanyDataSection(
                         companyName = uiState.companyName,
                         companyNameError = uiState.companyNameError,
+                        notes = uiState.notes,
                         onEvent = viewModel::onFormEvent
                     )
                 }
 
-                // Section 2: Notes
-                item {
-                    NotesSection(
-                        notes = uiState.notes,
-                        onEvent = viewModel::onFormEvent,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                // Section 3: Address
+                // Section 2: Address
                 item {
                     QReportFormAddressSection(
                         street = uiState.street,
@@ -191,9 +174,10 @@ private fun CompanyDataSection(
     modifier: Modifier = Modifier,
     companyName: String,
     companyNameError: UiText? = null,
+    notes: String,
     onEvent: (ClientFormEvent) -> Unit
 ) {
-    Card(modifier = modifier.fillMaxWidth()) {
+    QReportCard(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -213,26 +197,6 @@ private fun CompanyDataSection(
                     capitalization = KeyboardCapitalization.Characters
                 ),
                 errorText = companyNameError?.asString()
-            )
-        }
-    }
-}
-
-@Composable
-private fun NotesSection(
-    notes: String,
-    onEvent: (ClientFormEvent) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(modifier = modifier) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.client_form_section_notes),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
             )
 
             QrFormField(

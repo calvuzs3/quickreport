@@ -17,7 +17,14 @@ import net.calvuz.qreport.app.app.presentation.ui.theme.onWarningContainer
 import net.calvuz.qreport.app.app.presentation.ui.theme.successContainer
 import net.calvuz.qreport.app.app.presentation.ui.theme.warningContainer
 import net.calvuz.qreport.client.island.domain.usecase.WarrantyStatus
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 
+/**
+ * Mostrata solo quando [Island.warrantyExpiration] è valorizzato — la
+ * garanzia è una feature marginale/non ancora usata, non merita una card
+ * sempre visibile con "nessuna informazione disponibile" (vedi call site
+ * in InfoTabContent.kt).
+ */
 @Composable
 fun WarrantyStatusCard(island: Island, statistics: SingleIslandStatistics?) {
     val warrantyStatus = statistics?.warrantyStats?.status
@@ -39,7 +46,7 @@ fun WarrantyStatusCard(island: Island, statistics: SingleIslandStatistics?) {
         else                                 -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    Card {
+    QReportCard {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -85,8 +92,6 @@ fun WarrantyStatusCard(island: Island, statistics: SingleIslandStatistics?) {
                         }
                     }
                 }
-            } ?: run {
-                Text(text = stringResource(R.string.island_warranty_not_available), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

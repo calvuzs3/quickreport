@@ -58,6 +58,7 @@
     <string name="unit_form_title_create">Nuova unit\u00e0</string>
     <string name="unit_form_title_edit">Modifica unit\u00e0</string>
     <string name="unit_form_action_back">Indietro</string>
+    <string name="unit_form_section_general">Dati Unit\u00e0</string>
     <string name="unit_form_field_type">Tipo unit\u00e0 *</string>
     <string name="unit_form_field_name">Nome *</string>
     <string name="unit_form_field_name_placeholder">Es. Robot R1, Asse 7\u00b0, Rack Tool A</string>

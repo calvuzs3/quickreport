@@ -183,6 +183,11 @@
     <string name="checkup_screen_detail_action_delete">Elimina Check-up</string>
     <string name="checkup_screen_detail_action_delete_confirmation">Sei sicuro di voler eliminare %1$s? Questa azione non può essere annullata.</string>
 
+    <!-- Complete confirmation dialog -->
+    <string name="checkup_screen_detail_complete_confirmation_title">Completa Check-up</string>
+    <string name="checkup_screen_detail_complete_confirmation_message">Confermi il completamento del check-up?</string>
+    <string name="checkup_screen_detail_complete_update_maintenance_label">Aggiorna data ultima manutenzione dell\'isola</string>
+
     <!-- Error State -->
     <string name="checkup_screen_detail_error_retry">Riprova</string>
 

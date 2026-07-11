@@ -115,6 +115,42 @@ fun CheckUpDetailScreen(
         )
     }
 
+    // ✅ Complete check-up confirmation dialog
+    if (uiState.showCompleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = viewModel::hideCompleteConfirmation,
+            title = { Text(stringResource(R.string.checkup_screen_detail_complete_confirmation_title)) },
+            text = {
+                Column {
+                    Text(stringResource(R.string.checkup_screen_detail_complete_confirmation_message))
+                    Spacer(modifier = Modifier.height(Spacing.md))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable {
+                            viewModel.setUpdateMaintenanceOnComplete(!uiState.updateMaintenanceOnComplete)
+                        }
+                    ) {
+                        Checkbox(
+                            checked = uiState.updateMaintenanceOnComplete,
+                            onCheckedChange = viewModel::setUpdateMaintenanceOnComplete
+                        )
+                        Text(stringResource(R.string.checkup_screen_detail_complete_update_maintenance_label))
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = viewModel::completeCheckUp) {
+                    Text(stringResource(R.string.action_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::hideCompleteConfirmation) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
+    }
+
     // Initialize with checkUpId
     LaunchedEffect(checkUpId) {
         if (checkUpId.isNotBlank()) {
@@ -226,7 +262,7 @@ fun CheckUpDetailScreen(
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.checkup_screen_detail_action_complete)) },
                         onClick = {
-                            viewModel.completeCheckUp()
+                            viewModel.showCompleteConfirmation()
                             showStatusMenu = false
                         },
                         leadingIcon = {

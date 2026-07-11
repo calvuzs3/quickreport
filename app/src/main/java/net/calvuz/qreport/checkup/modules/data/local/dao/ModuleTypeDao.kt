@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import net.calvuz.qreport.checkup.modules.data.local.entity.ModuleTypeEntity
 import net.calvuz.qreport.checkup.modules.data.local.entity.ModuleTypeIslandTypeCrossRef
@@ -80,7 +81,9 @@ interface ModuleTypeDao {
     @Query("DELETE FROM module_type_island_types")
     suspend fun deleteAllModuleIslandLinks()
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    // @Upsert instead of @Insert(REPLACE): see SyncDao.kt for why REPLACE's
+    // delete+reinsert is unsafe for records echoed back on every sync.
+    @Upsert
     suspend fun upsertAll(types: List<ModuleTypeEntity>)
 
     @Query("""

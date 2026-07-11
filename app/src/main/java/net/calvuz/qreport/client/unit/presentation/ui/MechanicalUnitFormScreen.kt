@@ -5,17 +5,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
+import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.client.unit.domain.model.UnitType
 
@@ -49,25 +50,6 @@ fun MechanicalUnitFormScreen(
                             contentDescription = stringResource(R.string.unit_form_action_back)
                         )
                     }
-                },
-                actions = {
-                    IconButton(
-                        onClick = { formEvent(MechanicalUnitFormEvent.SaveForm(onSuccess = onNavigateBack)) },
-                        enabled = !state.isSaving
-                    ) {
-                        if (state.isSaving) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Icon(
-                                imageVector = if (state.isValid) Icons.Default.Save else Icons.Outlined.Save,
-                                contentDescription = stringResource(R.string.action_save),
-                                tint = if (state.isValid) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
                 }
             )
         },
@@ -82,61 +64,65 @@ fun MechanicalUnitFormScreen(
                 .imePadding(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            UnitTypeDropdown(selected = state.unitType, onSelected = {
-                formEvent(
-                    MechanicalUnitFormEvent.UnitTypeChanged(it)
-                )
-            })
+            QReportCard {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.unit_form_section_general),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
 
-            QrFormField(
-                value = state.name,
-                onValueChange = { formEvent(MechanicalUnitFormEvent.NameChanged(it)) },
-                label = stringResource(R.string.unit_form_field_name),
-                placeholder = stringResource(R.string.unit_form_field_name_placeholder),
-                errorText = if (state.showValidation && !state.isNameValid)
-                    stringResource(R.string.unit_form_error_name_required)
-                else null
-            )
+                    UnitTypeDropdown(selected = state.unitType, onSelected = {
+                        formEvent(
+                            MechanicalUnitFormEvent.UnitTypeChanged(it)
+                        )
+                    })
 
-            QrFormField(
-                value = state.serialNumber,
-                onValueChange = { formEvent(MechanicalUnitFormEvent.SerialNumberChanged(it)) },
-                label = stringResource(R.string.unit_form_field_serial)
-            )
+                    QrFormField(
+                        value = state.name,
+                        onValueChange = { formEvent(MechanicalUnitFormEvent.NameChanged(it)) },
+                        label = stringResource(R.string.unit_form_field_name),
+                        placeholder = stringResource(R.string.unit_form_field_name_placeholder),
+                        errorText = if (state.showValidation && !state.isNameValid)
+                            stringResource(R.string.unit_form_error_name_required)
+                        else null
+                    )
 
-            QrFormField(
-                value = state.model,
-                onValueChange = { formEvent(MechanicalUnitFormEvent.ModelChanged(it)) },
-                label = stringResource(R.string.unit_form_field_model)
-            )
+                    QrFormField(
+                        value = state.serialNumber,
+                        onValueChange = { formEvent(MechanicalUnitFormEvent.SerialNumberChanged(it)) },
+                        label = stringResource(R.string.unit_form_field_serial)
+                    )
 
-            QrFormField(
-                value = state.notes,
-                onValueChange = { formEvent(MechanicalUnitFormEvent.NotesChanged(it)) },
-                label = stringResource(R.string.unit_form_field_notes),
-                singleLine = false,
-                minLines = 2,
-                maxLines = 5
-            )
+                    QrFormField(
+                        value = state.model,
+                        onValueChange = { formEvent(MechanicalUnitFormEvent.ModelChanged(it)) },
+                        label = stringResource(R.string.unit_form_field_model)
+                    )
 
-            Button(
-                onClick = { formEvent(MechanicalUnitFormEvent.SaveForm(onSuccess = onNavigateBack)) },
-                enabled = !state.isSaving,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 24.dp)
-            ) {
-                if (state.isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.padding(end = 8.dp),
-                        strokeWidth = 2.dp
+                    QrFormField(
+                        value = state.notes,
+                        onValueChange = { formEvent(MechanicalUnitFormEvent.NotesChanged(it)) },
+                        label = stringResource(R.string.unit_form_field_notes),
+                        singleLine = false,
+                        minLines = 2,
+                        maxLines = 5
                     )
                 }
-                Text(
-                    if (viewModel.isEditing) stringResource(R.string.unit_form_button_save_changes)
-                    else stringResource(R.string.unit_form_button_create)
-                )
             }
+
+            QrFormActionsRow(
+                onCancel = onNavigateBack,
+                onSave = { formEvent(MechanicalUnitFormEvent.SaveForm(onSuccess = onNavigateBack)) },
+                saveEnabled = !state.isSaving,
+                isSaving = state.isSaving,
+                saveText = if (viewModel.isEditing) stringResource(R.string.unit_form_button_save_changes)
+                else stringResource(R.string.unit_form_button_create),
+                modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+            )
         }
     }
 }

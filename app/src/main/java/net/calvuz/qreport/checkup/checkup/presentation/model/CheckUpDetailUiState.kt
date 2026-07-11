@@ -55,6 +55,8 @@ data class CheckUpDetailUiState(
     // Dialog states
     val showEditHeaderDialog: Boolean = false,
     val showExportDialog: Boolean = false,
+    val showCompleteConfirmation: Boolean = false,
+    val updateMaintenanceOnComplete: Boolean = true,
 
     // Spare parts
     val spareParts: List<CheckUpSparePart> = emptyList(),

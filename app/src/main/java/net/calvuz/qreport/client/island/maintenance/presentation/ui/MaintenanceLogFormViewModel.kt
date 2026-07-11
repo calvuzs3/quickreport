@@ -17,6 +17,7 @@ import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceLog
 import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceOperationType
 import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceOutcome
 import net.calvuz.qreport.client.island.domain.usecase.GetIslandByIdUseCase
+import net.calvuz.qreport.client.island.domain.usecase.UpdateMaintenanceUseCase
 import net.calvuz.qreport.client.island.maintenance.domain.usecase.CreateMaintenanceLogUseCase
 import net.calvuz.qreport.client.unit.domain.model.MechanicalUnit
 import net.calvuz.qreport.client.unit.domain.usecase.GetMechanicalUnitsByIslandUseCase
@@ -73,7 +74,11 @@ data class MaintenanceLogFormUiState(
 
     // ===== UNSAVED CHANGES GUARD =====
     val hasUnsavedChanges: Boolean = false,
-    val showUnsavedChangesDialog: Boolean = false
+    val showUnsavedChangesDialog: Boolean = false,
+
+    // ===== SAVE CONFIRMATION =====
+    val showSaveConfirmation: Boolean = false,
+    val updateMaintenanceOnSave: Boolean = true
 ) {
     val isFormValid: Boolean
         get() = description.isNotBlank() &&
@@ -105,7 +110,8 @@ class MaintenanceLogFormViewModel @Inject constructor(
     private val createMaintenanceLogUseCase: CreateMaintenanceLogUseCase,
     private val getUnitsByIslandUseCase: GetMechanicalUnitsByIslandUseCase,
     private val technicianSettingsUseCase: TechnicianSettingsUseCase,
-    private val getIslandByIdUseCase: GetIslandByIdUseCase
+    private val getIslandByIdUseCase: GetIslandByIdUseCase,
+    private val updateMaintenanceUseCase: UpdateMaintenanceUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MaintenanceLogFormUiState())
@@ -289,7 +295,19 @@ class MaintenanceLogFormViewModel @Inject constructor(
                     it.copy(notes = event.text, hasUnsavedChanges = true)
                 }
 
-            is MaintenanceLogFormEvent.SaveLog -> saveLog()
+            is MaintenanceLogFormEvent.SaveLog -> {
+                val state = _uiState.value
+                if (!state.isFormValid || state.isLoading) return
+                _uiState.update { it.copy(showSaveConfirmation = true, updateMaintenanceOnSave = true) }
+            }
+
+            is MaintenanceLogFormEvent.ConfirmSaveLog -> saveLog()
+
+            is MaintenanceLogFormEvent.DismissSaveConfirmation ->
+                _uiState.update { it.copy(showSaveConfirmation = false) }
+
+            is MaintenanceLogFormEvent.UpdateMaintenanceOnSaveChanged ->
+                _uiState.update { it.copy(updateMaintenanceOnSave = event.value) }
 
             // ── Unsaved changes guard ──────────────────────────────────────────
             is MaintenanceLogFormEvent.BackPressed -> {
@@ -317,12 +335,27 @@ class MaintenanceLogFormViewModel @Inject constructor(
         if (!state.isFormValid || state.isLoading) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true, error = null, showSaveConfirmation = false) }
 
             val log = buildLogFromState(state)
             when (val result = createMaintenanceLogUseCase(log)) {
                 is QrResult.Success -> {
                     Timber.d("MaintenanceLog saved for island ${state.islandId}")
+
+                    if (state.updateMaintenanceOnSave) {
+                        when (val maintenanceResult = updateMaintenanceUseCase(
+                            islandId = state.islandId,
+                            maintenanceDate = state.performedAt
+                        )) {
+                            is QrResult.Error -> Timber.w(
+                                "Failed to update maintenance date for island ${state.islandId}: ${maintenanceResult.error}"
+                            )
+                            is QrResult.Success -> Timber.d(
+                                "Maintenance date updated for island ${state.islandId}"
+                            )
+                        }
+                    }
+
                     _uiState.update {
                         it.copy(isLoading = false, saved = true, hasUnsavedChanges = false)
                     }
@@ -463,6 +496,9 @@ sealed class MaintenanceLogFormEvent {
     data class TechnicianCompanyChanged(val company: String) : MaintenanceLogFormEvent()
     data class NotesChanged(val text: String) : MaintenanceLogFormEvent()
     object SaveLog : MaintenanceLogFormEvent()
+    object ConfirmSaveLog : MaintenanceLogFormEvent()
+    object DismissSaveConfirmation : MaintenanceLogFormEvent()
+    data class UpdateMaintenanceOnSaveChanged(val value: Boolean) : MaintenanceLogFormEvent()
     object BackPressed : MaintenanceLogFormEvent()
     object ConfirmDiscard : MaintenanceLogFormEvent()
     object DismissUnsavedDialog : MaintenanceLogFormEvent()
