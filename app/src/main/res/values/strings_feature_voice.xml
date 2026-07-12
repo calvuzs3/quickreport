@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ======================================================= -->
+    <!-- VoiceSearchScreen — landing screen for App Actions       -->
+    <!-- voice deep links (open contact / facility address)      -->
+    <!-- ======================================================= -->
+
+    <string name="voice_search_title">Ricerca vocale</string>
+    <string name="voice_search_action_back">Indietro</string>
+    <string name="voice_search_loading">Ricerca di \"%1$s\" in corso…</string>
+    <string name="voice_search_error">Errore durante la ricerca vocale</string>
+    <string name="voice_search_empty_title">Nessun risultato</string>
+    <string name="voice_search_empty_message_contact">Nessun cliente trovato per \"%1$s\"</string>
+    <string name="voice_search_empty_message_facility">Nessuno stabilimento trovato per \"%1$s\"</string>
+    <string name="voice_search_empty_message_island">Nessuna isola trovata per \"%1$s\"</string>
+    <string name="voice_search_disambiguation_message">Più risultati trovati per \"%1$s\", seleziona quello corretto</string>
+
+</resources>

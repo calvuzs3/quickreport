@@ -6,7 +6,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.RoomWarnings
 import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -126,13 +125,12 @@ interface FacilityDao {
 
     // ===== SEARCH & FILTER =====
 
-    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     @Query(
         """
-        SELECT * FROM facilities f
+        SELECT f.* FROM facilities f
         INNER JOIN clients c ON f.client_id = c.id
         WHERE f.is_active = 1 AND c.is_active = 1
-        AND (f.name LIKE '%' || :query || '%' 
+        AND (f.name LIKE '%' || :query || '%'
              OR f.code LIKE '%' || :query || '%'
              OR c.company_name LIKE '%' || :query || '%')
         ORDER BY f.name ASC

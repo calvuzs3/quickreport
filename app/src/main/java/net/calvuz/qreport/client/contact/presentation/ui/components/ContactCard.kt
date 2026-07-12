@@ -1,6 +1,7 @@
 package net.calvuz.qreport.client.contact.presentation.ui.components
 
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -288,9 +289,15 @@ private fun FullContactCard(
 @Suppress("ParamsComparedByRef")@Composable
 private fun CompactContactCard(
     contact: Contact,
-    onCall: () -> Unit = { },
-    onEmail: () -> Unit = { }
 ) {
+    val context = LocalContext.current
+
+    // Prefer mobile over landline (field technicians are usually reachable on mobile);
+    // guard against blank-but-non-null values, which otherwise render an icon with no text.
+    val displayPhone = contact.mobilePhone?.takeIf { it.isNotBlank() }
+        ?: contact.phone?.takeIf { it.isNotBlank() }
+    val displayEmail = contact.email?.takeIf { it.isNotBlank() }
+
     Row(
         modifier = Modifier.padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -334,60 +341,67 @@ private fun CompactContactCard(
                 }
             }
 
-            // PHONE
-            contact.phone?.let { phone ->
-                Row {
-                    IconButton(
-                        onClick = onCall,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Call,
-                                contentDescription = stringResource(R.string.action_call),
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.size(20.dp)
+            // PHONE (mobile preferred, falls back to landline)
+            displayPhone?.let { phone ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val intent = Intent(
+                                Intent.ACTION_DIAL,
+                                context.getString(R.string.intent_action_dial, phone).toUri()
                             )
-                            Text(
-                                text = phone,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                            context.startActivity(intent)
                         }
-                    }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Call,
+                        contentDescription = stringResource(R.string.action_call),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = phone,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 
             // EMAIL
-            contact.email?.let { email ->
-                Row {
-                    IconButton(
-                        onClick = onEmail,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Email,
-                                contentDescription = stringResource(R.string.action_send_email),
-                                tint = MaterialTheme.colorScheme.onSurface
+            displayEmail?.let { email ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val intent = Intent(
+                                Intent.ACTION_SENDTO,
+                                context.getString(R.string.intent_action_mailto, email).toUri()
                             )
-                            Text(
-                                text = email,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                            context.startActivity(intent)
                         }
-                    }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Email,
+                        contentDescription = stringResource(R.string.action_send_email),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = email,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
         }

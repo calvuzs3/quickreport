@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- "Apri il contatto di [cliente]" — resolves the spoken client name and
+         opens its contact list inside QuickReport. See VoiceSearchScreen. -->
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="net.calvuz.quickreport"
+            android:targetClass="net.calvuz.qreport.app.app.presentation.ui.MainActivity"
+            android:data="quickreport://contact">
+            <parameter
+                android:name="feature"
+                android:key="query" />
+        </intent>
+    </capability>
+
+    <!-- "Indirizzo dello stabilimento [nome]" — resolves the spoken facility name
+         and opens its detail screen (address) inside QuickReport. -->
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="net.calvuz.quickreport"
+            android:targetClass="net.calvuz.qreport.app.app.presentation.ui.MainActivity"
+            android:data="quickreport://facility">
+            <parameter
+                android:name="feature"
+                android:key="query" />
+        </intent>
+    </capability>
+
+    <!-- "Apri l'isola [nome]" — resolves the spoken island name (custom name,
+         serial number or model) and opens its detail screen inside QuickReport. -->
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="net.calvuz.quickreport"
+            android:targetClass="net.calvuz.qreport.app.app.presentation.ui.MainActivity"
+            android:data="quickreport://island">
+            <parameter
+                android:name="feature"
+                android:key="query" />
+        </intent>
+    </capability>
+
+</shortcuts>

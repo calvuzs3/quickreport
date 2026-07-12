@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import androidx.navigation.NavType
 import net.calvuz.qreport.backup.presentation.ui.BackupScreen
 import net.calvuz.qreport.app.app.presentation.ui.home.HomeScreen
@@ -67,6 +68,8 @@ import net.calvuz.qreport.sync.presentation.ui.SyncSettingsScreen
 import net.calvuz.qreport.ti.presentation.ui.EditInterventionScreen
 import net.calvuz.qreport.ti.presentation.ui.TechnicalInterventionFormScreen
 import net.calvuz.qreport.ti.presentation.ui.TechnicalInterventionListScreen
+import net.calvuz.qreport.app.voice.presentation.ui.VoiceSearchScreen
+import net.calvuz.qreport.app.voice.presentation.ui.VoiceSearchMode
 
 /**
  * QReport Navigation System
@@ -192,6 +195,12 @@ object QReportRoutes {
     // Backup routes
     const val BACKUP = "backup"
 
+    // Voice App Actions routes — landing/resolver screen for Assistant deep links.
+    // "query" is the free-text spoken by the user (e.g. a client or facility name).
+    const val VOICE_CONTACT = "voice_contact?query={query}"
+    const val VOICE_FACILITY = "voice_facility?query={query}"
+    const val VOICE_ISLAND = "voice_island?query={query}"
+
     // ------------------------------------------------------------
     // Helper functions
     // ------------------------------------------------------------
@@ -274,6 +283,11 @@ object QReportRoutes {
         "photo_import_preview/$checkItemId?photoUri=$photoUri"
 
     fun exportOptions(checkUpId: String) = "export_options/$checkUpId"
+
+    // Voice App Actions
+    fun voiceContactRoute(query: String) = "voice_contact?query=${query.encodeUrl()}"
+    fun voiceFacilityRoute(query: String) = "voice_facility?query=${query.encodeUrl()}"
+    fun voiceIslandRoute(query: String) = "voice_island?query=${query.encodeUrl()}"
 }
 
 /**
@@ -1449,6 +1463,97 @@ fun QReportNavigation(
                         onNavigateBack = {
                             navController.popBackStack()
                         }
+                    )
+                }
+
+                // ============================================================
+                // VOICE APP ACTIONS DESTINATIONS
+                // ============================================================
+
+                composable(
+                    route = QReportRoutes.VOICE_CONTACT,
+                    arguments = listOf(
+                        navArgument("query") { type = NavType.StringType; defaultValue = "" }
+                    ),
+                    deepLinks = listOf(
+                        navDeepLink { uriPattern = "quickreport://contact?query={query}" }
+                    )
+                ) { backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: ""
+
+                    VoiceSearchScreen(
+                        mode = VoiceSearchMode.CONTACT,
+                        query = query,
+                        onNavigateToContactList = { clientId, clientName ->
+                            navController.navigate(
+                                QReportRoutes.contactListRoute(clientId, clientName)
+                            ) {
+                                popUpTo(QReportRoutes.VOICE_CONTACT) { inclusive = true }
+                            }
+                        },
+                        onNavigateToFacilityDetail = { _, _ -> },
+                        onNavigateToIslandDetail = { _, _ -> },
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = QReportRoutes.VOICE_FACILITY,
+                    arguments = listOf(
+                        navArgument("query") { type = NavType.StringType; defaultValue = "" }
+                    ),
+                    deepLinks = listOf(
+                        navDeepLink { uriPattern = "quickreport://facility?query={query}" }
+                    )
+                ) { backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: ""
+
+                    VoiceSearchScreen(
+                        mode = VoiceSearchMode.FACILITY,
+                        query = query,
+                        onNavigateToContactList = { _, _ -> },
+                        onNavigateToFacilityDetail = { clientId, facilityId ->
+                            navController.navigate(
+                                QReportRoutes.facilityDetailRoute(clientId, facilityId)
+                            ) {
+                                popUpTo(QReportRoutes.VOICE_FACILITY) { inclusive = true }
+                            }
+                        },
+                        onNavigateToIslandDetail = { _, _ -> },
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = QReportRoutes.VOICE_ISLAND,
+                    arguments = listOf(
+                        navArgument("query") { type = NavType.StringType; defaultValue = "" }
+                    ),
+                    deepLinks = listOf(
+                        navDeepLink { uriPattern = "quickreport://island?query={query}" }
+                    )
+                ) { backStackEntry ->
+                    val query = backStackEntry.arguments?.getString("query")?.let {
+                        URLDecoder.decode(it, "UTF-8")
+                    } ?: ""
+
+                    VoiceSearchScreen(
+                        mode = VoiceSearchMode.ISLAND,
+                        query = query,
+                        onNavigateToContactList = { _, _ -> },
+                        onNavigateToFacilityDetail = { _, _ -> },
+                        onNavigateToIslandDetail = { facilityId, islandId ->
+                            navController.navigate(
+                                QReportRoutes.islandDetailRoute(facilityId, islandId)
+                            ) {
+                                popUpTo(QReportRoutes.VOICE_ISLAND) { inclusive = true }
+                            }
+                        },
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
             }

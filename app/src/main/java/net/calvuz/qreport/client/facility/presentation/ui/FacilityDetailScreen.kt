@@ -32,7 +32,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,6 +60,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.app.presentation.components.EmptyState
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.app.presentation.components.QReportErrorState
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
 import net.calvuz.qreport.client.facility.domain.model.Facility
@@ -472,7 +472,7 @@ private fun MaintenanceTabContent(
         modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Card {
+            QReportCard {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -512,7 +512,7 @@ private fun MaintenanceTabContent(
             }
         }
         item {
-            Card {
+            QReportCard {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -636,7 +636,7 @@ private fun WarrantyIslandItem(island: Island, onIslandClick: (String) -> Unit) 
 private fun InfoCard(
     title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    QReportCard {
         Column(
             modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

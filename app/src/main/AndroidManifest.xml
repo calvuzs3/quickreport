@@ -88,6 +88,22 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Voice App Actions deep links: quickreport://contact?query=...,
+                 quickreport://facility?query=... and quickreport://island?query=...
+                 — see res/xml/shortcuts.xml -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="quickreport" android:host="contact" />
+                <data android:scheme="quickreport" android:host="facility" />
+                <data android:scheme="quickreport" android:host="island" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <!-- File provider per condivisione documenti -->

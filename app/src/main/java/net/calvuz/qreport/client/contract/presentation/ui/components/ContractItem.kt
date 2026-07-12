@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.calvuz.qreport.R
+import net.calvuz.qreport.app.app.presentation.components.QReportCard
 import net.calvuz.qreport.app.util.DateTimeUtils.toItalianDate
 import net.calvuz.qreport.client.contract.data.local.mapper.isValid
 import net.calvuz.qreport.client.contract.domain.model.Contract
@@ -32,9 +32,8 @@ fun ContractListItem(
     onContractClick: (String) -> Unit = {},
     onEditContract: (String) -> Unit = {},
 ) {
-    Card(
-        onClick = { onContractClick(contract.id) },
-        modifier = Modifier.fillMaxWidth()
+    QReportCard(
+        onClick = { onContractClick(contract.id) }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
