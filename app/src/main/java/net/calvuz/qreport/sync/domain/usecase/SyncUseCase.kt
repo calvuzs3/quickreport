@@ -245,24 +245,66 @@ class SyncUseCase @Inject constructor(
                 it
             )
         })
-        if (payload.facilities.isNotEmpty()) syncDao.upsertFacilities(payload.facilities.map {
-            syncMapper.facilityToEntity(
-                it
-            )
-        })
-        if (payload.facilityIslands.isNotEmpty()) syncDao.upsertFacilityIslands(payload.facilityIslands.map {
-            syncMapper.facilityIslandToEntity(
-                it
-            )
-        })
-        if (payload.mechanicalUnits.isNotEmpty()) syncDao.upsertMechanicalUnits(payload.mechanicalUnits.map {
-            syncMapper.mechanicalUnitToEntity(
-                it
-            )
-        })
-        if (payload.maintenanceLogs.isNotEmpty()) syncDao.upsertMaintenanceLogs(payload.maintenanceLogs.map {
-            syncMapper.maintenanceLogToEntity(it)
-        })
+        if (payload.facilities.isNotEmpty()) {
+            // Guard against FK violations: the server computes each entity's delta
+            // independently by its own updated_at, so a pull batch can contain a
+            // facility whose client wasn't itself modified recently enough to be
+            // included — or wasn't ever synced to this device. Same pattern as the
+            // checkupIslandAssociations guard below.
+            val knownClientIds = payload.clients.map { it.id }.toHashSet()
+                .also { it.addAll(syncDao.getAllClientIds()) }
+
+            val validFacilities = payload.facilities
+                .filter { it.clientId in knownClientIds }
+                .map { syncMapper.facilityToEntity(it) }
+
+            val skippedFacilities = payload.facilities.size - validFacilities.size
+            if (skippedFacilities > 0) {
+                Timber.w("SyncUseCase: skipped $skippedFacilities facilities with unresolvable client FK — will retry on next sync")
+            }
+            if (validFacilities.isNotEmpty()) syncDao.upsertFacilities(validFacilities)
+        }
+        if (payload.facilityIslands.isNotEmpty()) {
+            val knownFacilityIds = payload.facilities.map { it.id }.toHashSet()
+                .also { it.addAll(syncDao.getAllFacilityIds()) }
+
+            val validIslands = payload.facilityIslands
+                .filter { it.facilityId in knownFacilityIds }
+                .map { syncMapper.facilityIslandToEntity(it) }
+
+            val skippedIslands = payload.facilityIslands.size - validIslands.size
+            if (skippedIslands > 0) {
+                Timber.w("SyncUseCase: skipped $skippedIslands facility islands with unresolvable facility FK — will retry on next sync")
+            }
+            if (validIslands.isNotEmpty()) syncDao.upsertFacilityIslands(validIslands)
+        }
+        if (payload.mechanicalUnits.isNotEmpty() || payload.maintenanceLogs.isNotEmpty()) {
+            val knownIslandIds = payload.facilityIslands.map { it.id }.toHashSet()
+                .also { it.addAll(syncDao.getAllFacilityIslandIds()) }
+
+            if (payload.mechanicalUnits.isNotEmpty()) {
+                val validUnits = payload.mechanicalUnits
+                    .filter { it.islandId in knownIslandIds }
+                    .map { syncMapper.mechanicalUnitToEntity(it) }
+
+                val skippedUnits = payload.mechanicalUnits.size - validUnits.size
+                if (skippedUnits > 0) {
+                    Timber.w("SyncUseCase: skipped $skippedUnits mechanical units with unresolvable island FK — will retry on next sync")
+                }
+                if (validUnits.isNotEmpty()) syncDao.upsertMechanicalUnits(validUnits)
+            }
+            if (payload.maintenanceLogs.isNotEmpty()) {
+                val validLogs = payload.maintenanceLogs
+                    .filter { it.islandId in knownIslandIds }
+                    .map { syncMapper.maintenanceLogToEntity(it) }
+
+                val skippedLogs = payload.maintenanceLogs.size - validLogs.size
+                if (skippedLogs > 0) {
+                    Timber.w("SyncUseCase: skipped $skippedLogs maintenance logs with unresolvable island FK — will retry on next sync")
+                }
+                if (validLogs.isNotEmpty()) syncDao.upsertMaintenanceLogs(validLogs)
+            }
+        }
         if (payload.documents.isNotEmpty()) {
             // filePath isn't in the DTO (device-local) — preserve the existing
             // local path for already-known documents; blank for new ones,

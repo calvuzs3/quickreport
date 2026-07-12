@@ -144,6 +144,12 @@ interface SyncDao {
 
     // ===== ID LOOKUPS — used by SyncUseCase to validate FK references before upsert =====
 
+    @Query("SELECT id FROM clients")
+    suspend fun getAllClientIds(): List<String>
+
+    @Query("SELECT id FROM facilities")
+    suspend fun getAllFacilityIds(): List<String>
+
     @Query("SELECT id FROM facility_islands")
     suspend fun getAllFacilityIslandIds(): List<String>
 
