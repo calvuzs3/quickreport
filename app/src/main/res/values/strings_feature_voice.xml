@@ -16,4 +16,17 @@
     <string name="voice_search_empty_message_island">Nessuna isola trovata per \"%1$s\"</string>
     <string name="voice_search_disambiguation_message">Più risultati trovati per \"%1$s\", seleziona quello corretto</string>
 
+    <!-- ======================================================= -->
+    <!-- App Actions static shortcuts (res/xml/shortcuts.xml) —  -->
+    <!-- fixed sections reachable via "Ok Google, apri X su      -->
+    <!-- QuickReport" once the app is published on Play Store.   -->
+    <!-- ======================================================= -->
+
+    <string name="voice_shortcut_clients_short">Clienti</string>
+    <string name="voice_shortcut_clients_long">Apri Clienti su QuickReport</string>
+    <string name="voice_shortcut_checkups_short">Check-up</string>
+    <string name="voice_shortcut_checkups_long">Apri Check-up su QuickReport</string>
+    <string name="voice_shortcut_interventions_short">Interventi</string>
+    <string name="voice_shortcut_interventions_long">Apri Interventi su QuickReport</string>
+
 </resources>

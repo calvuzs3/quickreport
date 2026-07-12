@@ -360,7 +360,10 @@ fun QReportNavigation(
                     )
                 }
 
-                composable(QReportRoutes.CLIENTS) {
+                composable(
+                    route = QReportRoutes.CLIENTS,
+                    deepLinks = listOf(navDeepLink { uriPattern = "quickreport://clients" })
+                ) {
                     ClientListScreen(
                         onNavigateBack = { navController.popBackStack() },
                         onNavigateToClientDetail = { clientId, clientName ->
@@ -380,7 +383,10 @@ fun QReportNavigation(
                     )
                 }
 
-                composable(QReportRoutes.CHECKUPS) {
+                composable(
+                    route = QReportRoutes.CHECKUPS,
+                    deepLinks = listOf(navDeepLink { uriPattern = "quickreport://checkups" })
+                ) {
                     CheckUpListScreen(
                         onNavigateBack = { navController.popBackStack() },
                         onNavigateToCheckUpDetail = { checkUpId ->
@@ -485,7 +491,10 @@ fun QReportNavigation(
                     )
                 }
 
-                composable(QReportRoutes.TI) {
+                composable(
+                    route = QReportRoutes.TI,
+                    deepLinks = listOf(navDeepLink { uriPattern = "quickreport://interventions" })
+                ) {
                     TechnicalInterventionListScreen(
                         onNavigateToCreateIntervention = {
                             navController.navigate(QReportRoutes.tiCreateRoute())

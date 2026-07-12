@@ -89,13 +89,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Voice App Actions deep links: quickreport://contact?query=...,
-                 quickreport://facility?query=... and quickreport://island?query=...
-                 — see res/xml/shortcuts.xml -->
+            <!-- Voice App Actions deep links — see res/xml/shortcuts.xml.
+                 clients/checkups/interventions: fixed sections, bound to static
+                 shortcuts (actual App Actions entry points, Play-Console-valid).
+                 contact/facility/island: free-text resolver deep links, kept for
+                 local/manual use — NOT wired to a shortcut (Play Console rejects
+                 free-text OPEN_APP_FEATURE parameters with no closed inventory). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="quickreport" android:host="clients" />
+                <data android:scheme="quickreport" android:host="checkups" />
+                <data android:scheme="quickreport" android:host="interventions" />
                 <data android:scheme="quickreport" android:host="contact" />
                 <data android:scheme="quickreport" android:host="facility" />
                 <data android:scheme="quickreport" android:host="island" />
