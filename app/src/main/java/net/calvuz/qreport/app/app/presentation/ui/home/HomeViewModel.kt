@@ -10,7 +10,7 @@ import kotlinx.datetime.Clock
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.error.presentation.UiText
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
-import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpStatusCodes
+import net.calvuz.qreport.shared.codes.CheckUpStatusCodes
 import net.calvuz.qreport.checkup.checkup.domain.usecase.CreateCheckUpUseCase
 import net.calvuz.qreport.checkup.checkup.domain.usecase.GetCheckUpStatsUseCase
 import net.calvuz.qreport.checkup.checkup.domain.usecase.GetCheckUpsUseCase

@@ -6,7 +6,7 @@ import kotlinx.datetime.Clock
 import net.calvuz.qreport.R
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
-import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpStatusCodes
+import net.calvuz.qreport.shared.codes.CheckUpStatusCodes
 import net.calvuz.qreport.checkup.checkup.domain.repository.CheckUpAssociationRepository
 import net.calvuz.qreport.checkup.checkup.domain.repository.CheckUpRepository
 import net.calvuz.qreport.client.island.maintenance.domain.model.MaintenanceLog

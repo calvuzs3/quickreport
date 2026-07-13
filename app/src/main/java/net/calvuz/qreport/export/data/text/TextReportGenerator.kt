@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 import net.calvuz.qreport.checkup.items.domain.model.CheckItem
 import net.calvuz.qreport.checkup.items.domain.model.CheckItemStatus
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
-import net.calvuz.qreport.checkup.criticality.domain.model.CriticalityCodes
+import net.calvuz.qreport.shared.codes.CriticalityCodes
 import net.calvuz.qreport.checkup.criticality.domain.model.CriticalityMaster
 import net.calvuz.qreport.photo.domain.model.Photo
 import net.calvuz.qreport.checkup.items.presentation.model.CheckItemStatusExt.getDisplayName

@@ -45,7 +45,7 @@ import net.calvuz.qreport.sync.qstore.QStoreAvailability
 import net.calvuz.qreport.checkup.items.domain.model.CheckItem
 import net.calvuz.qreport.checkup.items.domain.model.CheckItemStatus
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpSingleStatistics
-import net.calvuz.qreport.checkup.criticality.domain.model.CriticalityCodes
+import net.calvuz.qreport.shared.codes.CriticalityCodes
 import net.calvuz.qreport.checkup.modules.presentation.model.resolveModuleTypeLabel
 import net.calvuz.qreport.photo.domain.model.Photo
 import net.calvuz.qreport.checkup.checkup.presentation.components.AssociationManagementDialog

@@ -6,7 +6,7 @@ import net.calvuz.qreport.checkup.items.domain.model.CheckItemStatus
 import net.calvuz.qreport.checkup.items.domain.repository.CheckItemTemplateMasterRepository
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpHeader
-import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpStatusCodes
+import net.calvuz.qreport.shared.codes.CheckUpStatusCodes
 import net.calvuz.qreport.checkup.modules.domain.repository.ModuleTypeMasterRepository
 import net.calvuz.qreport.checkup.checkup.domain.repository.CheckUpRepository
 import timber.log.Timber
