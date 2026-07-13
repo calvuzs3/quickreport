@@ -2,8 +2,8 @@ package net.calvuz.qreport.sync.data.remote
 
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
-import net.calvuz.qreport.sync.data.remote.dto.SyncPayloadDto
-import net.calvuz.qreport.sync.data.remote.dto.SyncResponseDto
+import net.calvuz.qreport.shared.dto.SyncPayloadDto
+import net.calvuz.qreport.shared.dto.SyncResponseDto
 
 /**
  * Abstraction over the remote server API.

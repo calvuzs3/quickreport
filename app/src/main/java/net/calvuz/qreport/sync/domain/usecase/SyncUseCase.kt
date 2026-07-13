@@ -21,7 +21,7 @@ import net.calvuz.qreport.sync.data.local.SyncSettingsDataStore
 import net.calvuz.qreport.sync.data.local.TokenStorage
 import net.calvuz.qreport.sync.data.local.dao.SyncDao
 import net.calvuz.qreport.sync.data.remote.RemoteDataSource
-import net.calvuz.qreport.sync.data.remote.dto.SyncPayloadDto
+import net.calvuz.qreport.shared.dto.SyncPayloadDto
 import net.calvuz.qreport.sync.domain.model.SyncMode
 import net.calvuz.qreport.sync.domain.model.SyncResult
 import net.calvuz.qreport.sync.mapper.SyncMapper

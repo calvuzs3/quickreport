@@ -131,6 +131,9 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.kotlinx.serialization.json)
 
+    // KMP shared sync DTOs (composite build — see settings.gradle.kts)
+    implementation("net.calvuz:shared:0.1.0")
+
     // Date/Time
     implementation(libs.kotlinx.datetime)
 

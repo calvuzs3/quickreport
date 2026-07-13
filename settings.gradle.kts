@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Quick Report"
 include(":app")
- 
+
+includeBuild("../quickreport-shared")

@@ -1,10 +1,10 @@
 package net.calvuz.qreport.sync.data.remote
 
-import net.calvuz.qreport.sync.data.remote.dto.LoginRequest
-import net.calvuz.qreport.sync.data.remote.dto.LoginResponse
+import net.calvuz.qreport.shared.dto.LoginRequest
+import net.calvuz.qreport.shared.dto.LoginResponse
 import net.calvuz.qreport.sync.data.remote.dto.ServerVersionDto
-import net.calvuz.qreport.sync.data.remote.dto.SyncPayloadDto
-import net.calvuz.qreport.sync.data.remote.dto.SyncResponseDto
+import net.calvuz.qreport.shared.dto.SyncPayloadDto
+import net.calvuz.qreport.shared.dto.SyncResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
