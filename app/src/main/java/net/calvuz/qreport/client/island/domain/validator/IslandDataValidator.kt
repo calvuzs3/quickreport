@@ -4,6 +4,7 @@ import kotlinx.datetime.Clock
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
 import net.calvuz.qreport.client.island.domain.model.Island
+import net.calvuz.qreport.shared.validation.IslandValidationRules
 import javax.inject.Inject
 
 /**
@@ -28,28 +29,25 @@ class IslandDataValidator @Inject constructor() {
         island.serialNumber.isBlank() ->
             QrResult.Error(QrError.IslandError.MissingSerialNumber())
 
-        island.serialNumber.length < 3 ->
+        !IslandValidationRules.isSerialNumberLengthValid(island.serialNumber) ->
             QrResult.Error(QrError.IslandError.ValidationError.InvalidSerialNumberLength())
 
-        island.serialNumber.length > 50 ->
-            QrResult.Error(QrError.IslandError.ValidationError.InvalidSerialNumberLength())
-
-        !isValidCode(island.serialNumber) ->
+        !IslandValidationRules.isValidCode(island.serialNumber) ->
             QrResult.Error(QrError.IslandError.ValidationError.InvalidSerialNumber())
 
-        island.commissioningNumber != null && !isValidCode(island.commissioningNumber) ->
+        island.commissioningNumber != null && !IslandValidationRules.isValidCode(island.commissioningNumber) ->
             QrResult.Error(QrError.IslandError.ValidationError.InvalidCommissioningNumber())
 
-        (island.customName?.length ?: 0) > 100 ->
+        (island.customName?.length ?: 0) > IslandValidationRules.MAX_CUSTOM_NAME_LENGTH ->
             QrResult.Error(QrError.IslandError.ValidationError.InvalidCustomNameLength())
 
-        (island.location?.length ?: 0) > 200 ->
+        (island.location?.length ?: 0) > IslandValidationRules.MAX_LOCATION_LENGTH ->
             QrResult.Error(QrError.IslandError.ValidationError.InvalidLocationLength())
 
-        island.operatingHours < 0 ->
+        !IslandValidationRules.isOperatingHoursValid(island.operatingHours) ->
             QrResult.Error(QrError.IslandError.ValidationError.InvalidOperatingHours())
 
-        island.cycleCount < 0 ->
+        !IslandValidationRules.isCycleCountValid(island.cycleCount) ->
             QrResult.Error(QrError.IslandError.ValidationError.InvalidCycleCount())
 
         else -> QrResult.Success(Unit)
@@ -61,34 +59,26 @@ class IslandDataValidator @Inject constructor() {
      * Called after [invoke] succeeds, both in create and update flows.
      */
     fun validateDates(island: Island): QrResult<Unit, QrError.IslandError>? {
-        val now = Clock.System.now()
+        val nowMs = Clock.System.now().toEpochMilliseconds()
+        val installationMs = island.installationDate?.toEpochMilliseconds()
+        val warrantyMs = island.warrantyExpiration?.toEpochMilliseconds()
+        val lastMaintenanceMs = island.lastMaintenanceDate?.toEpochMilliseconds()
+        val nextMaintenanceMs = island.nextScheduledMaintenance?.toEpochMilliseconds()
+
         return when {
-            island.installationDate?.let { it > now } == true ->
+            !IslandValidationRules.isInstallationDateValid(installationMs, nowMs) ->
                 QrResult.Error(QrError.IslandError.ValidationError.InvalidInstallationDate())
 
-            island.warrantyExpiration?.let { exp ->
-                island.installationDate?.let { install -> exp < install }
-            } == true ->
+            !IslandValidationRules.isWarrantyDateValid(warrantyMs, installationMs) ->
                 QrResult.Error(QrError.IslandError.ValidationError.InvalidWarrantyDate())
 
-            island.lastMaintenanceDate?.let { last ->
-                island.installationDate?.let { install -> last < install }
-            } == true ->
+            !IslandValidationRules.isMaintenanceDateValid(lastMaintenanceMs, installationMs, nowMs) ->
                 QrResult.Error(QrError.IslandError.ValidationError.InvalidMaintenanceDate())
 
-            island.lastMaintenanceDate?.let { it > now } == true ->
-                QrResult.Error(QrError.IslandError.ValidationError.InvalidMaintenanceDate())
-
-            island.nextScheduledMaintenance?.let { next ->
-                island.lastMaintenanceDate?.let { last -> next <= last }
-            } == true ->
+            !IslandValidationRules.isNextMaintenanceValid(nextMaintenanceMs, lastMaintenanceMs) ->
                 QrResult.Error(QrError.IslandError.ValidationError.InvalidMaintenanceDate())
 
             else -> null
         }
     }
-
-    /** Alphanumeric, dashes, underscores, dots. Blank is valid (field is optional). */
-    private fun isValidCode(value: String): Boolean =
-        value.isBlank() || value.matches(Regex("[A-Za-z0-9.\\-_]+"))
 }

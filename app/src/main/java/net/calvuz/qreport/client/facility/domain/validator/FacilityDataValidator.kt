@@ -4,6 +4,7 @@ import net.calvuz.qreport.app.app.domain.model.Address
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
 import net.calvuz.qreport.client.facility.domain.model.Facility
+import net.calvuz.qreport.shared.validation.FacilityValidationRules
 import javax.inject.Inject
 
 /**
@@ -25,10 +26,7 @@ class FacilityDataValidator @Inject constructor() {
         facility.name.isBlank() ->
             QrResult.Error(QrError.FacilityError.MissingName())
 
-        facility.name.length < 2 ->
-            QrResult.Error(QrError.FacilityError.ValidationError.InvalidFacilityNameLength())
-
-        facility.name.length > 100 ->
+        !FacilityValidationRules.isNameLengthValid(facility.name) ->
             QrResult.Error(QrError.FacilityError.ValidationError.InvalidFacilityNameLength())
 
         else -> QrResult.Success(Unit)

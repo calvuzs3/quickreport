@@ -1,9 +1,9 @@
 package net.calvuz.qreport.client.contact.domain.validator
 
-import android.util.Patterns
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
 import net.calvuz.qreport.client.contact.domain.model.Contact
+import net.calvuz.qreport.shared.validation.ContactValidationRules
 import javax.inject.Inject
 
 /**
@@ -19,13 +19,10 @@ class ContactDataValidator @Inject constructor() {
             contact.firstName.isBlank() ->
                 QrResult.Error(QrError.ContactsError.ValidationError.InvalidContactNameLength())
 
-            contact.firstName.length < 2 ->
+            !ContactValidationRules.isFirstNameLengthValid(contact.firstName) ->
                 QrResult.Error(QrError.ContactsError.ValidationError.InvalidContactNameLength())
 
-            contact.firstName.length > 100 ->
-                QrResult.Error(QrError.ContactsError.ValidationError.InvalidContactNameLength())
-
-            contact.lastName?.let { it.length > 100 } == true ->
+            (contact.lastName?.length ?: 0) > ContactValidationRules.MAX_LAST_NAME_LENGTH ->
                 QrResult.Error(QrError.ContactsError.ValidationError.InvalidContactLastNameLength())
 
             contact.email?.isNotBlank() == true && !isValidEmail(contact.email) ->
@@ -37,13 +34,13 @@ class ContactDataValidator @Inject constructor() {
             contact.mobilePhone?.isNotBlank() == true && !isValidPhone(contact.mobilePhone) ->
                 QrResult.Error(QrError.ContactsError.ValidationError.InvalidMobile())
 
-            (contact.title?.length ?: 0) > 100 ->
+            (contact.title?.length ?: 0) > ContactValidationRules.MAX_TITLE_LENGTH ->
                 QrResult.Error(QrError.ContactsError.ValidationError.InvalidTitleLength())
 
-            (contact.role?.length ?: 0) > 100 ->
+            (contact.role?.length ?: 0) > ContactValidationRules.MAX_ROLE_LENGTH ->
                 QrResult.Error(QrError.ContactsError.ValidationError.InvalidRoleLength())
 
-            (contact.department?.length ?: 0) > 100 ->
+            (contact.department?.length ?: 0) > ContactValidationRules.MAX_DEPARTMENT_LENGTH ->
                 QrResult.Error(QrError.ContactsError.ValidationError.InvalidDepartmentLength())
 
             !hasAnyContactInfo(contact) ->
@@ -53,40 +50,13 @@ class ContactDataValidator @Inject constructor() {
         }
     }
 
+    fun isValidEmail(email: String): Boolean = ContactValidationRules.isEmailValid(email)
 
-    /**
-     * Email validation
-     */
-    fun isValidEmail(email: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    /**
-     * Phone vvalidation
-     */
-    fun isValidPhone(phone: String): Boolean {
-        val cleanPhone = phone.replace("\\s+".toRegex(), "").replace("-", "")
-
-        return when {
-            // Numero italiano fisso/mobile
-            cleanPhone.matches("\\+39\\d{9,10}".toRegex()) -> true
-            cleanPhone.matches("39\\d{9,10}".toRegex()) -> true
-            cleanPhone.matches("0\\d{8,10}".toRegex()) -> true // Fisso
-            cleanPhone.matches("3\\d{8,9}".toRegex()) -> true  // Mobile
-            // Formato internazionale generico
-            cleanPhone.matches("\\+\\d{7,15}".toRegex()) -> true
-            // Solo numeri (minimo 7, massimo 15 cifre)
-            cleanPhone.matches("\\d{7,15}".toRegex()) -> true
-            else -> false
-        }
-    }
+    fun isValidPhone(phone: String): Boolean = ContactValidationRules.isPhoneValid(phone)
 
     /**
      * Check for at least one contact method
      */
-    fun hasAnyContactInfo(contact: Contact): Boolean {
-        return contact.email?.isNotBlank() == true ||
-                contact.phone?.isNotBlank() == true ||
-                contact.mobilePhone?.isNotBlank() == true
-    }
+    fun hasAnyContactInfo(contact: Contact): Boolean =
+        ContactValidationRules.hasAnyContactInfo(contact.email, contact.phone, contact.mobilePhone)
 }

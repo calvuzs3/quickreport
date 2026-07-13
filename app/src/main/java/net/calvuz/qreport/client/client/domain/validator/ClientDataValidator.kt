@@ -3,6 +3,7 @@ package net.calvuz.qreport.client.client.domain.validator
 import net.calvuz.qreport.app.error.domain.model.QrError
 import net.calvuz.qreport.app.result.domain.QrResult
 import net.calvuz.qreport.client.client.domain.model.Client
+import net.calvuz.qreport.shared.validation.ClientValidationRules
 import javax.inject.Inject
 
 /**
@@ -24,9 +25,8 @@ class ClientDataValidator @Inject constructor() {
 
         client.companyName.isBlank() -> QrResult.Error(QrError.ClientError.MissingCompanyName())
 
-        client.companyName.length < 2 -> QrResult.Error(QrError.ClientError.InvalidCompanyName())
-
-        client.companyName.length > 255 -> QrResult.Error(QrError.ClientError.InvalidCompanyName())
+        !ClientValidationRules.isCompanyNameLengthValid(client.companyName) ->
+            QrResult.Error(QrError.ClientError.InvalidCompanyName())
 
         else -> QrResult.Success(Unit)
     }
