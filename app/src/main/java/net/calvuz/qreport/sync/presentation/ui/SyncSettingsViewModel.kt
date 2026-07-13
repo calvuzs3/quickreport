@@ -22,6 +22,7 @@ import net.calvuz.qreport.sync.domain.model.SyncMode
 import net.calvuz.qreport.sync.domain.model.SyncResult
 import net.calvuz.qreport.sync.domain.model.SyncStatus
 import net.calvuz.qreport.sync.domain.repository.SyncRepository
+import net.calvuz.qreport.sync.domain.usecase.ResetAndResyncUseCase
 import net.calvuz.qreport.sync.domain.usecase.SyncUseCase
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class SyncSettingsViewModel @Inject constructor(
     private val syncRepository: SyncRepository,
     private val syncUseCase: SyncUseCase,
+    private val resetAndResyncUseCase: ResetAndResyncUseCase,
     private val fileSyncCoordinator: FileSyncCoordinator,
     private val tokenStorage: TokenStorage,
     private val serverUrlHolder: ServerUrlHolder,
@@ -199,6 +201,37 @@ class SyncSettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Wipes all local data and re-downloads everything from the server.
+     * The caller must confirm this destructive action with the user first.
+     */
+    fun resetAndResync() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSyncing = true, error = null, syncResult = null)
+
+            when (val result = resetAndResyncUseCase()) {
+                is QrResult.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        syncResult = result.data,
+                        message = UiText.StringResources(
+                            R.string.sync_settings_message_reset_completed,
+                            result.data.pulledCount
+                        )
+                    )
+                    loadSyncStatus()
+                    fileSyncCoordinator.launchAfterEntitySync()
+                }
+                is QrResult.Error -> {
+                    _uiState.value = _uiState.value.copy(
+                        isSyncing = false,
+                        error = mapSyncError(result.error)
+                    )
+                }
+            }
+        }
+    }
+
     fun onLoginSuccess() {
         _uiState.value = _uiState.value.copy(isLoggedIn = true)
     }
@@ -249,28 +282,29 @@ class SyncSettingsViewModel @Inject constructor(
                 fileSyncCoordinator.launchAfterEntitySync()
             }
             is QrResult.Error -> {
-                val message = when (val err = result.error) {
-                    is QrError.NetworkError.Unauthorized -> {
-                        tokenStorage.clearToken()
-                        tokenStorage.clearRole()
-                        _uiState.value = _uiState.value.copy(isLoggedIn = false, canPushMasterData = false)
-                        UiText.StringResource(R.string.sync_error_session_expired)
-                    }
-                    is QrError.NetworkError.ServerVersionIncompatible ->
-                        UiText.StringResources(
-                            R.string.sync_error_server_version_incompatible,
-                            err.serverVersion,
-                            err.minVersion,
-                            err.maxVersionExclusive
-                        )
-                    is QrError.NetworkError.NoConnection -> UiText.StringResource(R.string.error_no_connection)
-                    is QrError.NetworkError.SyncDisabled -> UiText.StringResource(R.string.sync_error_sync_disabled)
-                    is QrError.NetworkError.ServerError -> UiText.StringResource(R.string.error_server)
-                    else -> UiText.StringResource(R.string.sync_error_generic)
-                }
-                _uiState.value = _uiState.value.copy(isSyncing = false, error = message)
+                _uiState.value = _uiState.value.copy(isSyncing = false, error = mapSyncError(result.error))
             }
         }
+    }
+
+    private fun mapSyncError(err: QrError): UiText = when (err) {
+        is QrError.NetworkError.Unauthorized -> {
+            tokenStorage.clearToken()
+            tokenStorage.clearRole()
+            _uiState.value = _uiState.value.copy(isLoggedIn = false, canPushMasterData = false)
+            UiText.StringResource(R.string.sync_error_session_expired)
+        }
+        is QrError.NetworkError.ServerVersionIncompatible ->
+            UiText.StringResources(
+                R.string.sync_error_server_version_incompatible,
+                err.serverVersion,
+                err.minVersion,
+                err.maxVersionExclusive
+            )
+        is QrError.NetworkError.NoConnection -> UiText.StringResource(R.string.error_no_connection)
+        is QrError.NetworkError.SyncDisabled -> UiText.StringResource(R.string.sync_error_sync_disabled)
+        is QrError.NetworkError.ServerError -> UiText.StringResource(R.string.error_server)
+        else -> UiText.StringResource(R.string.sync_error_generic)
     }
 }
 

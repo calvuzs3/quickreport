@@ -255,15 +255,10 @@ class ShareBackupUseCase @Inject constructor(
                 )
             }
 
-            // ✅ FUTURE OPTIONS (placeholders for UI)
-            shareOptions.add(
-                ShareOptionOldVersion(
-                    type = ShareOptionType.APP_GENERIC,
-                    shareMethod = ShareMethod.EMAIL_ATTACHMENT,
-                    title = "Invia via Email",
-                    subtitle = "Allega backup a email (non ancora disponibile)"
-                )
-            )
+            // Note: EMAIL_ATTACHMENT/CLOUD_UPLOAD/MESSAGING_ATTACHMENT are not
+            // implemented — their ShareBackupUseCase branches fall back to sharing
+            // the raw JSON file directly, silently dropping photos/signatures/documents.
+            // Not offered here until properly implemented; see ShareMethod usage above.
 
             Timber.d("Generated ${shareOptions.size} share options:")
             shareOptions.forEach { option ->

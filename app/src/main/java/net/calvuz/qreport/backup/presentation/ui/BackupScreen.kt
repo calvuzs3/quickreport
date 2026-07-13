@@ -164,7 +164,7 @@ fun BackupScreen(
             BackupTopBar(
                 onNavigateBack = onNavigateBack,
                 onRefresh = backupViewModel::refreshData,
-                onImport = { importLauncher.launch(arrayOf("application/zip")) },
+                onImport = { importLauncher.launch(arrayOf("application/zip", "application/json")) },
                 isRefreshing = backupUiState.isLoading,
                 isImporting = backupUiState.isImporting
             )

@@ -20,6 +20,9 @@
     <string name="sync_settings_syncing_in_progress">Sincronizzazione in corso…</string>
     <string name="sync_settings_action_sync_now">Sincronizza ora</string>
     <string name="sync_settings_action_full_sync">Sync completa (scarica tutto)</string>
+    <string name="sync_settings_action_reset_and_resync">Azzera dati locali e riscarica</string>
+    <string name="sync_settings_reset_dialog_title">Azzerare i dati locali?</string>
+    <string name="sync_settings_reset_dialog_message">Tutti i dati presenti su questo dispositivo verranno cancellati e sostituiti con quelli scaricati dal server. Le modifiche locali non ancora sincronizzate andranno perse. L\'operazione non è reversibile.</string>
     <string name="sync_settings_action_login">Accedi al server</string>
     <string name="sync_settings_section_status">Stato</string>
     <string name="sync_settings_last_sync_label">Ultima sincronizzazione</string>
@@ -34,6 +37,7 @@
     <string name="sync_settings_error_unexpected">Errore inaspettato: %1$s</string>
     <string name="sync_settings_error_save_url">Errore salvataggio URL: %1$s</string>
     <string name="sync_settings_message_sync_completed">Sincronizzazione completata — inviati: %1$d, ricevuti: %2$d</string>
+    <string name="sync_settings_message_reset_completed">Dati locali azzerati e riscaricati dal server — %1$d record ricevuti</string>
 
     <!-- Shared sync errors -->
     <string name="sync_error_session_expired">Sessione scaduta, effettua nuovamente il login</string>

@@ -20,6 +20,8 @@ import androidx.compose.material.icons.filled.DeviceHub
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -70,6 +72,7 @@ fun SyncSettingsScreen(
     val lastSyncTimestamp by viewModel.lastSyncTimestamp.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    var showResetConfirmation by remember { mutableStateOf(false) }
 
     // Show messages via Snackbar
     LaunchedEffect(uiState.error) {
@@ -196,6 +199,17 @@ fun SyncSettingsScreen(
                         Text(stringResource(R.string.sync_settings_action_full_sync))
                     }
 
+                    OutlinedButton(
+                        onClick = { showResetConfirmation = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !uiState.isSyncing,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(stringResource(R.string.sync_settings_action_reset_and_resync))
+                    }
+
                 } else {
                     // Not logged in — show login button
                     Button(
@@ -246,9 +260,61 @@ fun SyncSettingsScreen(
             }
         }
     }
+
+    if (showResetConfirmation) {
+        ResetAndResyncConfirmationDialog(
+            onConfirm = {
+                showResetConfirmation = false
+                viewModel.resetAndResync()
+            },
+            onDismiss = { showResetConfirmation = false }
+        )
+    }
 }
 
 // ===== PRIVATE COMPOSABLES =====
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ResetAndResyncConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+                Text(stringResource(R.string.sync_settings_reset_dialog_title))
+            }
+        },
+        text = {
+            Text(stringResource(R.string.sync_settings_reset_dialog_message))
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text(stringResource(R.string.sync_settings_action_reset_and_resync))
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_cancel))
+            }
+        }
+    )
+}
 
 @Composable
 private fun SyncSection(

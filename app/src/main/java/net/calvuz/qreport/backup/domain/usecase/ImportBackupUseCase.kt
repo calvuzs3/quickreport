@@ -67,11 +67,15 @@ class ImportBackupUseCase @Inject constructor(
                 backupDir.mkdirs()
             }
 
-            // 3. Extract ZIP to backup directory
+            // 3. Extract ZIP (or copy a raw JSON backup) to backup directory
             emit(ImportProgress.InProgress("Estrazione archivio...", 0.2f))
 
             val extractedFiles = withContext(Dispatchers.IO) {
-                extractZipToDirectory(sourceUri, backupDir)
+                if (isZipFile(sourceUri)) {
+                    extractZipToDirectory(sourceUri, backupDir)
+                } else {
+                    copyJsonBackupToDirectory(sourceUri, backupDir)
+                }
             }
 
             if (extractedFiles == 0) {
@@ -122,6 +126,50 @@ class ImportBackupUseCase @Inject constructor(
         }
 
     }.flowOn(Dispatchers.IO)
+
+    /**
+     * Detects whether the source Uri points to a ZIP archive by checking its
+     * local file header signature ("PK\x03\x04"), rather than trusting the
+     * SAF-reported MIME type (unreliable for some providers) or file extension.
+     */
+    private fun isZipFile(sourceUri: Uri): Boolean {
+        return try {
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                val header = ByteArray(4)
+                val bytesRead = input.read(header)
+                bytesRead == 4 &&
+                    header[0] == 0x50.toByte() && header[1] == 0x4B.toByte() &&
+                    header[2] == 0x03.toByte() && header[3] == 0x04.toByte()
+            } ?: false
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to inspect file header, assuming not a ZIP")
+            false
+        }
+    }
+
+    /**
+     * Copy a plain JSON backup file (e.g. the file produced when sharing via
+     * an unimplemented share method, or any single-file backup) directly as
+     * database.json — the same name [findMainBackupFile]-equivalent lookups
+     * in the backup repository expect. It won't include photos/documents,
+     * since those live in separate archives only present in a full ZIP export.
+     *
+     * @return 1 on success, 0 on failure
+     */
+    private fun copyJsonBackupToDirectory(sourceUri: Uri, destDir: File): Int {
+        return try {
+            val outputFile = File(destDir, "database.json")
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                BufferedOutputStream(FileOutputStream(outputFile)).use { output ->
+                    input.copyTo(output)
+                }
+            } ?: return 0
+            if (outputFile.length() > 0) 1 else 0
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to copy JSON backup")
+            0
+        }
+    }
 
     /**
      * Extract ZIP contents to destination directory
