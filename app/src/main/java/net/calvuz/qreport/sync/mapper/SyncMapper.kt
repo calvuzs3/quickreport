@@ -4,7 +4,6 @@ package net.calvuz.qreport.sync.mapper
 import net.calvuz.qreport.client.client.data.local.entity.ClientEntity
 import net.calvuz.qreport.client.contact.data.local.entity.ContactEntity
 import net.calvuz.qreport.client.contract.data.local.entity.ContractEntity
-import net.calvuz.qreport.client.document.data.local.entity.DocumentEntity
 import net.calvuz.qreport.client.facility.data.local.entity.FacilityEntity
 import net.calvuz.qreport.client.island.data.local.entity.IslandEntity
 import net.calvuz.qreport.client.island.maintenance.data.local.entity.MaintenanceLogEntity
@@ -16,25 +15,24 @@ import net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusEntity
 import net.calvuz.qreport.client.island.data.local.entity.IslandTypeEntity
 import net.calvuz.qreport.checkup.checkup.data.local.entity.CheckUpEntity
 import net.calvuz.qreport.checkup.checkup.data.local.entity.CheckUpIslandAssociationEntity
-import net.calvuz.qreport.sync.data.remote.dto.CheckItemTemplateDto
+import net.calvuz.qreport.shared.dto.CheckItemTemplateDto
 import net.calvuz.qreport.checkup.items.data.local.entity.CheckItemEntity
-import net.calvuz.qreport.sync.data.remote.dto.CheckItemDto
-import net.calvuz.qreport.sync.data.remote.dto.CheckUpIslandAssociationDto
-import net.calvuz.qreport.sync.data.remote.dto.CheckUpRecordDto
-import net.calvuz.qreport.sync.data.remote.dto.CheckUpStatusDto
+import net.calvuz.qreport.shared.dto.CheckItemDto
+import net.calvuz.qreport.shared.dto.CheckUpIslandAssociationDto
+import net.calvuz.qreport.shared.dto.CheckUpRecordDto
+import net.calvuz.qreport.shared.dto.CheckUpStatusDto
 import kotlinx.datetime.Instant
-import net.calvuz.qreport.sync.data.remote.dto.ClientDto
-import net.calvuz.qreport.sync.data.remote.dto.ContactDto
-import net.calvuz.qreport.sync.data.remote.dto.ContractDto
-import net.calvuz.qreport.sync.data.remote.dto.CriticalityLevelDto
-import net.calvuz.qreport.sync.data.remote.dto.FacilityDto
-import net.calvuz.qreport.sync.data.remote.dto.FacilityIslandDto
-import net.calvuz.qreport.sync.data.remote.dto.IslandDocumentDto
-import net.calvuz.qreport.sync.data.remote.dto.IslandTypeDto
-import net.calvuz.qreport.sync.data.remote.dto.MaintenanceLogDto
-import net.calvuz.qreport.sync.data.remote.dto.MechanicalUnitDto
-import net.calvuz.qreport.sync.data.remote.dto.ModuleTypeDto
-import net.calvuz.qreport.sync.data.remote.dto.PhotoDto
+import net.calvuz.qreport.shared.dto.ClientDto
+import net.calvuz.qreport.shared.dto.ContactDto
+import net.calvuz.qreport.shared.dto.ContractDto
+import net.calvuz.qreport.shared.dto.CriticalityLevelDto
+import net.calvuz.qreport.shared.dto.FacilityDto
+import net.calvuz.qreport.shared.dto.FacilityIslandDto
+import net.calvuz.qreport.shared.dto.IslandTypeDto
+import net.calvuz.qreport.shared.dto.MaintenanceLogDto
+import net.calvuz.qreport.shared.dto.MechanicalUnitDto
+import net.calvuz.qreport.shared.dto.ModuleTypeDto
+import net.calvuz.qreport.shared.dto.PhotoDto
 import net.calvuz.qreport.photo.data.local.entity.PhotoEntity
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -234,7 +232,7 @@ class SyncMapper @Inject constructor() {
         model = entity.model,
         installationDate = entity.installationDate,
         warrantyExpiration = entity.warrantyExpiration,
-        operatingHours = entity.operatingHours,   // Int in entity, Int in DTO
+        operatingHours = entity.operatingHours,
         cycleCount = entity.cycleCount,
         lastMaintenanceDate = entity.lastMaintenanceDate,
         nextScheduledMaintenance = entity.nextScheduledMaintenance,
@@ -353,52 +351,6 @@ class SyncMapper @Inject constructor() {
         isDeleted = dto.isDeleted
     )
 
-    // ===== END =====
-
-    @Suppress("unused")
-    fun islandDocumentToDto(entity: DocumentEntity) = IslandDocumentDto(
-        id = entity.id,
-        scope = entity.scope,
-        islandId = entity.islandId,
-        facilityId = entity.facilityId,
-        clientId = entity.clientId,
-        fileName = entity.fileName,
-        filePath = entity.filePath,
-        fileSize = entity.fileSize,
-        mimeType = entity.mimeType,
-        fileHash = entity.fileHash,
-        title = entity.title,
-        category = entity.category,
-        notes = entity.notes,
-        createdAt = entity.createdAt,
-        updatedAt = entity.updatedAt,
-        syncedAt = entity.syncedAt,
-        isActive = entity.isActive,
-        isDeleted = entity.isDeleted
-    )
-    
-    @Suppress("unused")
-    fun islandDocumentToEntity(dto: IslandDocumentDto) = DocumentEntity(
-        id = dto.id,
-        scope = dto.scope,
-        islandId = dto.islandId,
-        facilityId = dto.facilityId,
-        clientId = dto.clientId,
-        fileName = dto.fileName,
-        filePath = dto.filePath,
-        fileSize = dto.fileSize,
-        mimeType = dto.mimeType,
-        fileHash = dto.fileHash,
-        title = dto.title,
-        category = dto.category,
-        notes = dto.notes,
-        createdAt = dto.createdAt,
-        updatedAt = dto.updatedAt,
-        syncedAt = dto.syncedAt,
-        isActive = dto.isActive,
-        isDeleted = dto.isDeleted
-    )
-
     // ===== CHECKUP MASTER DATA =====
 
     fun moduleTypeToDto(entity: ModuleTypeEntity) = ModuleTypeDto(
@@ -430,24 +382,24 @@ class SyncMapper @Inject constructor() {
     )
 
     fun moduleIslandLinkToDto(entity: net.calvuz.qreport.checkup.modules.data.local.entity.ModuleTypeIslandTypeCrossRef) =
-        net.calvuz.qreport.sync.data.remote.dto.ModuleTypeIslandTypeLinkDto(
+        net.calvuz.qreport.shared.dto.ModuleTypeIslandTypeLinkDto(
             islandTypeId = entity.islandTypeId,
             moduleTypeId = entity.moduleTypeId
         )
 
-    fun moduleIslandLinkToEntity(dto: net.calvuz.qreport.sync.data.remote.dto.ModuleTypeIslandTypeLinkDto) =
+    fun moduleIslandLinkToEntity(dto: net.calvuz.qreport.shared.dto.ModuleTypeIslandTypeLinkDto) =
         net.calvuz.qreport.checkup.modules.data.local.entity.ModuleTypeIslandTypeCrossRef(
             islandTypeId = dto.islandTypeId,
             moduleTypeId = dto.moduleTypeId
         )
 
     fun checkUpStatusTransitionToDto(entity: net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusTransitionCrossRef) =
-        net.calvuz.qreport.sync.data.remote.dto.CheckUpStatusTransitionDto(
+        net.calvuz.qreport.shared.dto.CheckUpStatusTransitionDto(
             fromStatusId = entity.fromStatusId,
             toStatusId = entity.toStatusId
         )
 
-    fun checkUpStatusTransitionToEntity(dto: net.calvuz.qreport.sync.data.remote.dto.CheckUpStatusTransitionDto) =
+    fun checkUpStatusTransitionToEntity(dto: net.calvuz.qreport.shared.dto.CheckUpStatusTransitionDto) =
         net.calvuz.qreport.checkup.status.data.local.entity.CheckUpStatusTransitionCrossRef(
             fromStatusId = dto.fromStatusId,
             toStatusId = dto.toStatusId

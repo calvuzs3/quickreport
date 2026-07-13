@@ -1,51 +1,16 @@
 @file:Suppress("HardCodedStringLiteral")
 package net.calvuz.qreport.client.document.sync.remote
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import net.calvuz.qreport.client.document.domain.model.Document
 import net.calvuz.qreport.client.document.domain.model.DocumentCategory
 import net.calvuz.qreport.client.document.domain.model.DocumentScope
-
-/**
- * DTO for [net.calvuz.qreport.client.document.domain.model.Document]
- * in the entity sync JSON payload.
- *
- * Note: filePath is intentionally absent — paths are local to each device.
- * Each device resolves its own path via [DocumentDirectories.forScope()] after
- * receiving the metadata. The bytes travel through the separate file sync channel.
- *
- * [fileHash] is included so the receiving device knows whether it needs to
- * download the file or already has an identical copy.
- */
-@Serializable
-data class DocumentDto(
-    val id: String,
-    val scope: String,
-
-    @SerialName("island_id")   val islandId: String?   = null,
-    @SerialName("facility_id") val facilityId: String? = null,
-    @SerialName("client_id")   val clientId: String?   = null,
-
-    @SerialName("file_name")   val fileName: String,
-    @SerialName("file_size")   val fileSize: Long,
-    @SerialName("mime_type")   val mimeType: String,
-    @SerialName("file_hash")   val fileHash: String?   = null,
-
-    val title: String,
-    val category: String,
-    val notes: String?         = null,
-
-    @SerialName("created_at")  val createdAt: Long,
-    @SerialName("updated_at")  val updatedAt: Long,
-    @SerialName("is_active")   val isActive: Boolean,
-    @SerialName("is_deleted")  val isDeleted: Boolean,
-    @SerialName("synced_at")   val syncedAt: Long?     = null
-)
+import net.calvuz.qreport.shared.dto.DocumentDto
 
 /**
  * Maps a domain [Document] to its wire representation for the entity sync
  * JSON channel — see [net.calvuz.qreport.sync.domain.usecase.SyncUseCase].
+ * The DTO itself now lives in `:shared` (`net.calvuz.qreport.shared.dto.DocumentDto`),
+ * consumed identically by the Ktor server.
  */
 fun Document.toDto() = DocumentDto(
     id = id,
