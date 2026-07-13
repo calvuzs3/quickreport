@@ -10,7 +10,7 @@ import net.calvuz.qreport.checkup.items.domain.model.CheckItemStatus
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUp
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpProgress
 import net.calvuz.qreport.checkup.checkup.domain.model.CheckUpSingleStatistics
-import net.calvuz.qreport.checkup.criticality.domain.model.CriticalityCodes
+import net.calvuz.qreport.shared.codes.CriticalityCodes
 import net.calvuz.qreport.checkup.modules.domain.model.ModuleProgress
 import net.calvuz.qreport.checkup.data.local.mapper.toDomain
 import net.calvuz.qreport.checkup.data.local.mapper.toEntity
