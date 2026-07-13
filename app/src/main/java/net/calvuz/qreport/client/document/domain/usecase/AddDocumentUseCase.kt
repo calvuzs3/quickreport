@@ -16,6 +16,7 @@ import net.calvuz.qreport.client.document.domain.model.DocumentScope
 import net.calvuz.qreport.client.document.domain.model.Document
 import net.calvuz.qreport.client.document.domain.repository.DocumentRepository
 import net.calvuz.qreport.client.document.sync.DocumentHash
+import net.calvuz.qreport.shared.protocol.SyncLimits
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -45,11 +46,6 @@ class AddDocumentUseCase @Inject constructor(
     private val coreFileRepo: CoreFileRepository,
     @ApplicationContext private val context: Context
 ) {
-    companion object {
-        /** Maximum accepted file size. Protects internal storage on industrial devices. */
-        private const val MAX_FILE_SIZE_BYTES = 50L * 1024 * 1024  // 50 MB
-    }
-
     suspend operator fun invoke(
         scope: DocumentScope,
         scopeEntityId: String?,         // null when scope == GLOBAL
@@ -66,9 +62,9 @@ class AddDocumentUseCase @Inject constructor(
             )
 
         // 2. File size check
-        if (fileSize > MAX_FILE_SIZE_BYTES)
+        if (fileSize > SyncLimits.MAX_FILE_SIZE_BYTES)
             return QrResult.Error(
-                QrError.IslandDocumentError.FileTooLarge(fileSize, MAX_FILE_SIZE_BYTES)
+                QrError.IslandDocumentError.FileTooLarge(fileSize, SyncLimits.MAX_FILE_SIZE_BYTES)
             )
 
         // 3. Advisory MIME check — log warning but never block
