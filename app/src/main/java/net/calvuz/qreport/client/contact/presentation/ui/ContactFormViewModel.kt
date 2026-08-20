@@ -13,6 +13,8 @@ import net.calvuz.qreport.app.error.presentation.UiText.StringResource
 import net.calvuz.qreport.app.error.presentation.UiText.StringResources
 import net.calvuz.qreport.app.error.presentation.asUiText  // ✅ Using existing error system
 import net.calvuz.qreport.app.result.domain.QrResult
+import net.calvuz.qreport.client.contact.data.device.DeviceContact
+import net.calvuz.qreport.client.contact.data.device.PendingImportedContactHolder
 import net.calvuz.qreport.client.contact.domain.model.Contact
 import net.calvuz.qreport.client.contact.domain.model.ContactMethod
 import net.calvuz.qreport.client.contact.domain.usecase.CreateContactUseCase
@@ -152,6 +154,10 @@ class ContactFormViewModel @Inject constructor(
 
         // Controlla se è il primo contatto (diventa automaticamente primary)
         checkIfShouldBePrimary(clientId)
+
+        // Se si arriva da un vCard condiviso dall'app Contatti (vedi
+        // PendingImportedContactHolder), precompila subito il form.
+        PendingImportedContactHolder.consume()?.let { applyDeviceContact(it) }
     }
 
     fun initForEdit(contactId: String) {
@@ -338,6 +344,24 @@ class ContactFormViewModel @Inject constructor(
             isDirty = true
         )
         updateCanSaveState()
+    }
+
+    // ============================================================
+    // IMPORT DA RUBRICA / VCARD CONDIVISO
+    // ============================================================
+
+    /**
+     * Applica i dati letti dalla rubrica del telefono (picker) o da un vCard
+     * condiviso, sovrascrivendo i campi del form corrispondenti. Passaggio dati
+     * una tantum: nessun collegamento persistente viene salvato con [Contact].
+     */
+    fun applyDeviceContact(deviceContact: DeviceContact) {
+        deviceContact.firstName?.let { updateFirstName(it) }
+        deviceContact.lastName?.let { updateLastName(it) }
+        deviceContact.phone?.let { updatePhone(it) }
+        deviceContact.mobilePhone?.let { updateMobilePhone(it) }
+        deviceContact.email?.let { updateEmail(it) }
+        deviceContact.company?.let { updateDepartment(it) }
     }
 
     // ============================================================

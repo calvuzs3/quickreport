@@ -1,7 +1,13 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 
 package net.calvuz.qreport.client.contact.presentation.ui
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +35,8 @@ import net.calvuz.qreport.app.app.presentation.components.QrDropdownField
 import net.calvuz.qreport.app.app.presentation.components.QrFormActionsRow
 import net.calvuz.qreport.app.app.presentation.components.QrFormField
 import net.calvuz.qreport.app.app.presentation.components.QrLoadingState
+import net.calvuz.qreport.client.contact.data.device.DeviceContactExportIntent
+import net.calvuz.qreport.client.contact.data.device.DeviceContactReader
 import net.calvuz.qreport.client.contact.domain.model.ContactMethod
 import timber.log.Timber
 import net.calvuz.qreport.R
@@ -57,6 +66,25 @@ fun ContactFormScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
+
+    val importContactLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickContact()
+    ) { contactUri ->
+        contactUri?.let { uri ->
+            DeviceContactReader.readFromUri(context, uri)?.let { deviceContact ->
+                viewModel.applyDeviceContact(deviceContact)
+            }
+        }
+    }
+
+    // Leggere i dati del contatto scelto (non solo il nome mostrato dal picker)
+    // richiede READ_CONTACTS su molti device reali: il permesso temporaneo concesso
+    // dal picker sul solo URI scelto non copre in modo affidabile la sotto-query dei dati.
+    val readContactsPermissionState = rememberPermissionState(
+        permission = Manifest.permission.READ_CONTACTS,
+        onPermissionResult = { granted -> if (granted) importContactLauncher.launch(null) }
+    )
 
     // Initialize form
     LaunchedEffect(clientId, contactId) {
@@ -107,6 +135,45 @@ fun ContactFormScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowBackIosNew,
                         contentDescription = stringResource(R.string.action_back)
+                    )
+                }
+            },
+            actions = {
+                var showMenu by remember { mutableStateOf(false) }
+
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.contact_form_action_menu)
+                    )
+                }
+
+                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.contact_form_action_import_from_contacts)) },
+                        leadingIcon = { Icon(Icons.Default.ImportContacts, contentDescription = null) },
+                        onClick = {
+                            showMenu = false
+                            if (readContactsPermissionState.status.isGranted) {
+                                importContactLauncher.launch(null)
+                            } else {
+                                readContactsPermissionState.launchPermissionRequest()
+                            }
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.contact_form_action_export_to_contacts)) },
+                        leadingIcon = { Icon(Icons.Default.Upload, contentDescription = null) },
+                        enabled = uiState.firstName.isNotBlank(),
+                        onClick = {
+                            showMenu = false
+                            val intent = DeviceContactExportIntent.build(uiState.toContact(), clientName)
+                            if (intent.resolveActivity(context.packageManager) != null) {
+                                context.startActivity(intent)
+                            } else {
+                                Timber.w("ContactFormScreen: nessuna app Contatti disponibile per l'export")
+                            }
+                        }
                     )
                 }
             }

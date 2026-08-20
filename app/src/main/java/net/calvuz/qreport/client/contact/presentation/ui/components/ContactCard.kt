@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.CircularProgressIndicator
@@ -61,6 +62,7 @@ fun ContactCard(
     onEdit: (() -> Unit)? = null,
     @Suppress("unused") onEmail: (() -> Unit)? = null,
     onSetPrimary: (() -> Unit)? = null,
+    onExport: (() -> Unit)? = null,
     isSettingPrimary: Boolean = false,
     isSelected: Boolean = false,
     variant: ListViewMode
@@ -80,6 +82,7 @@ fun ContactCard(
                 onRestore = if (onRestore != null) { { showOnRestoreDialog = true } } else null,
                 onEdit = onEdit,
                 onSetPrimary = onSetPrimary,
+                onExport = onExport,
                 isSettingPrimary = isSettingPrimary,
             )
 
@@ -126,6 +129,7 @@ private fun FullContactCard(
     onRestore: (() -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
     onSetPrimary: (() -> Unit)? = null,
+    onExport: (() -> Unit)? = null,
     isSettingPrimary: Boolean
 ) {
     val context = LocalContext.current
@@ -179,6 +183,21 @@ private fun FullContactCard(
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
+                        }
+                    }
+
+                    // EXPORT (verso la rubrica del telefono)
+                    if (onExport != null) {
+                        IconButton(
+                            modifier = Modifier.size(48.dp),
+                            onClick = onExport
+                        ) {
+                            Icon(
+                                Icons.Default.Upload,
+                                contentDescription = stringResource(R.string.contact_form_action_export_to_contacts),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     }
 

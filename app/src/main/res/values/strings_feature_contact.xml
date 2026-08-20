@@ -143,6 +143,12 @@
     <!-- Contact ValidationError - Basic Fields -->
     <string name="contact_form_title_new">Nuovo Contatto</string>
     <string name="contact_form_title_edit">Modifica Contatto</string>
+    <string name="contact_form_action_menu">Altre azioni</string>
+    <string name="contact_form_action_import_from_contacts">Importa da rubrica</string>
+    <string name="contact_form_action_export_to_contacts">Esporta in rubrica</string>
+    <string name="contact_share_import_title">Contatto ricevuto</string>
+    <string name="contact_share_import_select_client">Seleziona il cliente a cui associare il contatto ricevuto</string>
+    <string name="contact_share_import_parse_error">Impossibile leggere i dati del contatto condiviso</string>
     <string name="contact_form_section_data">Dati anagrafici</string>
     <string name="contact_form_section_contact_info">Informazioni di contatto *</string>
     <string name="contact_form_section_contact_pref">Preferenze metodo di contatto</string>

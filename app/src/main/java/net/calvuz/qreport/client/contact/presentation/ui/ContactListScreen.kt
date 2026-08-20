@@ -1,6 +1,8 @@
 package net.calvuz.qreport.client.contact.presentation.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.platform.LocalContext
+import net.calvuz.qreport.client.contact.data.device.DeviceContactExportIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -367,6 +369,7 @@ private fun ContactListWithSelection(
     variant: ListViewMode = ListViewMode.FULL
 ) {
     val selectionState by selectionManager.selectionState.collectAsState()
+    val context = LocalContext.current
 
     LazyColumn(
         modifier = modifier,
@@ -400,6 +403,14 @@ private fun ContactListWithSelection(
                     } else null,
                     onSetPrimary = if (!selectionState.isInSelectionMode) {
                         { onSetPrimaryContact(contactWithStats.contact.id) }
+                    } else null,
+                    onExport = if (!selectionState.isInSelectionMode) {
+                        {
+                            val intent = DeviceContactExportIntent.build(contactWithStats.contact)
+                            if (intent.resolveActivity(context.packageManager) != null) {
+                                context.startActivity(intent)
+                            }
+                        }
                     } else null,
                     isSettingPrimary = isSettingPrimary == contactWithStats.contact.id,
                     isSelected = isSelected,

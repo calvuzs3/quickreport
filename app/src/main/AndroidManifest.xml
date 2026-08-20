@@ -63,6 +63,10 @@
     <!-- QStore ContentProvider — lettura catalogo articoli -->
     <uses-permission android:name="net.calvuz.qstore.permission.READ_ARTICLES" />
 
+    <!-- Import contatto da rubrica: il permesso temporaneo del picker sul singolo
+         URI scelto non copre in modo affidabile la lettura dei dati su tutti i device. -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name=".app.app.QReportApplication"
         android:allowBackup="true"
@@ -110,6 +114,18 @@
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
+
+            <!-- Ricezione contatto condiviso ("Condividi" dall'app Contatti nativa) -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/x-vcard" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/vcard" />
+            </intent-filter>
         </activity>
 
         <!-- File provider per condivisione documenti -->

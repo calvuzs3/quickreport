@@ -1,11 +1,18 @@
 
 package net.calvuz.qreport.app.navigation
 
+import android.app.Activity
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.IntentCompat
+import net.calvuz.qreport.client.contact.data.device.PendingImportedContactHolder
+import net.calvuz.qreport.client.contact.data.device.VCardParser
 import androidx.navigation.NavHostController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -200,6 +207,9 @@ object QReportRoutes {
     const val VOICE_CONTACT = "voice_contact?query={query}"
     const val VOICE_FACILITY = "voice_facility?query={query}"
     const val VOICE_ISLAND = "voice_island?query={query}"
+
+    // Contatto ricevuto via "Condividi" dall'app Contatti nativa (vCard)
+    const val CONTACT_SHARE_IMPORT = "contact_share_import"
 
     // ------------------------------------------------------------
     // Helper functions
@@ -1563,6 +1573,63 @@ fun QReportNavigation(
                             }
                         },
                         onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // ============================================================
+                // CONTATTO CONDIVISO (vCard "Condividi" dall'app Contatti)
+                // ============================================================
+
+                composable(
+                    route = QReportRoutes.CONTACT_SHARE_IMPORT,
+                    deepLinks = listOf(
+                        navDeepLink { action = Intent.ACTION_SEND; mimeType = "text/x-vcard" },
+                        navDeepLink { action = Intent.ACTION_SEND; mimeType = "text/vcard" }
+                    )
+                ) {
+                    val context = LocalContext.current
+
+                    LaunchedEffect(Unit) {
+                        val intent = (context as? Activity)?.intent
+                        val streamUri = intent?.let {
+                            IntentCompat.getParcelableExtra(it, Intent.EXTRA_STREAM, android.net.Uri::class.java)
+                        }
+                        val deviceContact = streamUri?.let { uri ->
+                            runCatching {
+                                context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                                    ?.toString(Charsets.UTF_8)
+                            }.getOrNull()?.let { VCardParser.parse(it) }
+                        }
+
+                        if (deviceContact != null) {
+                            PendingImportedContactHolder.set(deviceContact)
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.contact_share_import_select_client),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.contact_share_import_parse_error),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+
+                    ClientListScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToClientDetail = { clientId, clientName ->
+                            navController.navigate(
+                                QReportRoutes.contactCreateRoute(clientId, clientName)
+                            ) {
+                                popUpTo(QReportRoutes.CONTACT_SHARE_IMPORT) { inclusive = true }
+                            }
+                        },
+                        onNavigateToEditClient = { },
+                        onCreateNewClient = {
+                            navController.navigate(QReportRoutes.CLIENT_CREATE)
+                        }
                     )
                 }
             }
