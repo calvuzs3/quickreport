@@ -13,7 +13,7 @@
          of business records — see project memory for the full story. -->
     <capability android:name="actions.intent.OPEN_APP_FEATURE">
         <intent
-            android:targetPackage="net.calvuz.quickreport"
+            android:targetPackage="net.calvuz.qreport"
             android:targetClass="net.calvuz.qreport.app.app.presentation.ui.MainActivity">
             <parameter
                 android:name="feature.name"
@@ -29,7 +29,7 @@
         android:shortcutLongLabel="@string/voice_shortcut_clients_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="net.calvuz.quickreport"
+            android:targetPackage="net.calvuz.qreport"
             android:targetClass="net.calvuz.qreport.app.app.presentation.ui.MainActivity"
             android:data="quickreport://clients" />
         <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
@@ -47,7 +47,7 @@
         android:shortcutLongLabel="@string/voice_shortcut_checkups_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="net.calvuz.quickreport"
+            android:targetPackage="net.calvuz.qreport"
             android:targetClass="net.calvuz.qreport.app.app.presentation.ui.MainActivity"
             android:data="quickreport://checkups" />
         <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
@@ -65,7 +65,7 @@
         android:shortcutLongLabel="@string/voice_shortcut_interventions_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="net.calvuz.quickreport"
+            android:targetPackage="net.calvuz.qreport"
             android:targetClass="net.calvuz.qreport.app.app.presentation.ui.MainActivity"
             android:data="quickreport://interventions" />
         <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">

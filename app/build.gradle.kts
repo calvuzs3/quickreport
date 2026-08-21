@@ -18,14 +18,14 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "net.calvuz.quickreport"
+        applicationId = "net.calvuz.qreport"
         minSdk = 33
         //noinspection OldTargetApi
         targetSdk = 35
 
         // Version
-        versionCode = 6
-        versionName = "1.4.1"
+        versionCode = 12
+        versionName = "1.4.8"
 
         // ✅ AGGIORNATO test runner per Hilt
         testInstrumentationRunner = "net.calvuz.qreport.CustomTestRunner"
