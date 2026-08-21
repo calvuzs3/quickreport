@@ -1,8 +1,16 @@
 package net.calvuz.qreport.client.contact.presentation.ui
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.platform.LocalContext
 import net.calvuz.qreport.client.contact.data.device.DeviceContactExportIntent
+import net.calvuz.qreport.client.contact.data.device.DeviceContactReader
+import net.calvuz.qreport.client.contact.data.device.PendingImportedContactHolder
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +25,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.ImportContacts
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.outlined.AssignmentTurnedIn
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -67,9 +77,11 @@ import net.calvuz.qreport.settings.presentation.model.getCardVariantDescription
 import net.calvuz.qreport.settings.presentation.model.getCardVariantIcon
 import timber.log.Timber
 
-// Contact-specific custom action ID
+// Contact-specific custom action IDs
 @Suppress("HardCodedStringLiteral")
 private const val ACTION_SET_PRIMARY = "set_primary"
+@Suppress("HardCodedStringLiteral")
+private const val ACTION_EXPORT = "export_to_device"
 
 /**
  * Screen for client contact list
@@ -84,7 +96,7 @@ private const val ACTION_SET_PRIMARY = "set_primary"
  * - Primary contact indicator
  */
 @Suppress("ParamsComparedByRef")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ContactListScreen(
     modifier: Modifier = Modifier,
@@ -97,11 +109,54 @@ fun ContactListScreen(
     viewModel: ContactListViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val selectionManager = rememberSimpleSelectionManager<Contact>()
     val selectionState by selectionManager.selectionState.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    // Importa da rubrica: legge il contatto scelto e lo passa al form di
+    // creazione tramite PendingImportedContactHolder (già consumato da
+    // ContactFormViewModel.initForCreate).
+    val importContactLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickContact()
+    ) { contactUri ->
+        contactUri?.let { uri ->
+            DeviceContactReader.readFromUri(context, uri)?.let { deviceContact ->
+                PendingImportedContactHolder.set(deviceContact)
+                onNavigateToCreateContact(uiState.clientId)
+            }
+        }
+    }
+    val readContactsPermissionState = rememberPermissionState(
+        permission = Manifest.permission.READ_CONTACTS,
+        onPermissionResult = { granted -> if (granted) importContactLauncher.launch(null) }
+    )
+
+    // Export multiplo dalla selezione: un contatto per volta, apre l'editor
+    // nativo dei Contatti già precompilato; alla chiusura (salvato o annullato)
+    // passa automaticamente al successivo della coda.
+    val exportCompanyName = uiState.selectedClient
+        .takeIf { it != ClientOption.ALL }
+        ?.companyName
+        ?: clientName.takeIf { it.isNotBlank() }
+    var exportQueue by remember { mutableStateOf<List<Contact>>(emptyList()) }
+    val exportContactLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        exportQueue = exportQueue.drop(1)
+    }
+    LaunchedEffect(exportQueue) {
+        val next = exportQueue.firstOrNull() ?: return@LaunchedEffect
+        val intent = DeviceContactExportIntent.build(next, exportCompanyName)
+        if (intent.resolveActivity(context.packageManager) != null) {
+            exportContactLauncher.launch(intent)
+        } else {
+            Timber.w("ContactListScreen: nessuna app Contatti disponibile per l'export")
+            exportQueue = exportQueue.drop(1)
+        }
+    }
 
     LaunchedEffect(clientId) {
         if (!clientId.isNullOrBlank()) viewModel.initializeForClient(clientId)
@@ -136,6 +191,10 @@ fun ContactListScreen(
             onSelectAll = {
                 selectionManager.selectAll(uiState.filteredContacts.map { it.contact })
             },
+            onExport = { contacts ->
+                exportQueue = contacts.toList()
+                selectionManager.clearSelection()
+            },
             onPerformDelete = { contacts ->
                 viewModel.bulkDeleteContacts(contacts.map { it.id })
                 selectionManager.clearSelection()
@@ -151,9 +210,17 @@ fun ContactListScreen(
         actionId = ACTION_SET_PRIMARY
     )
 
+    val exportAction = SelectionAction.Custom(
+        icon = Icons.Default.Upload,
+        label = UiText.StringResources(R.string.contact_form_action_export_to_contacts),
+        isDestructive = false,
+        actionId = ACTION_EXPORT
+    )
+
     val primaryActions = listOf(
         SelectionAction.Edit,
         setPrimaryAction,
+        exportAction,
         SelectionAction.Delete
     )
 
@@ -205,6 +272,22 @@ fun ContactListScreen(
                                 Icon(
                                     imageVector = uiState.cardVariant.getCardVariantIcon(),
                                     contentDescription = uiState.cardVariant.getCardVariantDescription()
+                                )
+                            }
+
+                            // Import from device address book
+                            IconButton(
+                                onClick = {
+                                    if (readContactsPermissionState.status.isGranted) {
+                                        importContactLauncher.launch(null)
+                                    } else {
+                                        readContactsPermissionState.launchPermissionRequest()
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ImportContacts,
+                                    contentDescription = stringResource(R.string.contact_form_action_import_from_contacts)
                                 )
                             }
 
@@ -429,6 +512,7 @@ class ContactActionHandler(
     private val onDelete: () -> Unit,
     private val onSetPrimary: (Set<Contact>) -> Unit,
     private val onSelectAll: () -> Unit,
+    private val onExport: (Set<Contact>) -> Unit,
     private val onPerformDelete: (Set<Contact>) -> Unit
 ) : SimpleSelectionActionHandler<Contact> {
 
@@ -440,6 +524,7 @@ class ContactActionHandler(
             is SelectionAction.Custom -> {
                 when (action.actionId) {
                     ACTION_SET_PRIMARY -> onSetPrimary(selectedItems)
+                    ACTION_EXPORT -> onExport(selectedItems)
                     else -> Timber.d("Custom action: ${action.actionId}")
                 }
             }
@@ -467,6 +552,8 @@ class ContactActionHandler(
                     ACTION_SET_PRIMARY -> {
                         selectedItems.size == 1 && selectedItems.all { !it.isPrimary && it.isActive }
                     }
+                    // Export: any non-empty selection, one native editor screen per contact
+                    ACTION_EXPORT -> selectedItems.isNotEmpty()
                     else -> true
                 }
             }
